@@ -1,6 +1,6 @@
 <template>
   <div class="submit">
-    <h1>Manage displays</h1>
+    <h1>Submit to moda archives</h1>
   </div>
 </template>
 
