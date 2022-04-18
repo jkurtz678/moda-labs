@@ -1,6 +1,14 @@
-<script setup lang="ts">
+<script lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
 import Header from '@/components/Header.vue'
+
+export default {
+  components: {
+    Header,
+    RouterLink,
+    RouterView
+  },
+}
 </script>
 
 <template>
@@ -77,5 +85,4 @@ nav a {
 nav a:first-of-type {
   border: 0;
 }
-
 </style>
