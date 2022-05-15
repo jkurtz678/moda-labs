@@ -12,7 +12,7 @@ export default {
 </script>
 
 <template>
-  <header>
+ <!--  <header>
 
     <div class="wrapper">
       <Header msg="Moda archives" />
@@ -22,13 +22,14 @@ export default {
         <RouterLink to="/submit">Submit</RouterLink>
       </nav>
     </div>
-  </header>
+  </header> -->
 
   <RouterView />
 </template>
 
 <style>
 @import '@/assets/base.css';
+
 
 #app {
   max-width: 1280px;
