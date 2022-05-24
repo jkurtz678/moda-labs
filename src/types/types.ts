@@ -33,3 +33,8 @@ export interface TokenMeta extends BaseDocument {
     media_id: string;
     media_type: string; 
 }
+
+export interface Plaque extends BaseDocument {
+    name: string;
+    token_meta_id_list: string[];
+}

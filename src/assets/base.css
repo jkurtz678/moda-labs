@@ -61,6 +61,9 @@
   position: relative;
   font-weight: normal;
 }
+html {
+  height: 100%;
+}
 
 body {
   min-height: 100vh;
