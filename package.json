@@ -12,9 +12,11 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
   },
   "dependencies": {
+    "@element-plus/icons-vue": "^1.1.4",
     "element-plus": "^2.2.0",
     "firebase": "^9.6.11",
     "pinia": "^2.0.13",
+    "uuid": "^8.3.2",
     "vue": "^3.2.31",
     "vue-router": "^4.0.14"
   },
@@ -22,6 +24,7 @@
     "@rushstack/eslint-patch": "^1.1.0",
     "@types/jsdom": "^16.2.14",
     "@types/node": "^16.11.26",
+    "@types/uuid": "^8.3.4",
     "@vitejs/plugin-vue": "^2.3.1",
     "@vue/eslint-config-prettier": "^7.0.0",
     "@vue/eslint-config-typescript": "^10.0.0",

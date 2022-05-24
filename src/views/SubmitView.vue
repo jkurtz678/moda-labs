@@ -1,48 +1,43 @@
 <template>
   <div class="submit">
-    <h1>SUBMIT TO MODA ARCHIVES</h1>
-    <el-form
-      ref="formRef"
-      :model="form"
-      :rules="rules"
-      label-position="left"
-      label-width="75px"
-      style="max-width: 600px"
-    >
-      <el-form-item
-        label="Name"
-        style="max-width: 400px"
-        prop="name"
-      >
+    <h1 style="margin-bottom: 15px">SUBMIT TO MODA ARCHIVES</h1>
+    <el-form ref="formRef" :model="form" :rules="rules" label-position="left" label-width="95px"
+      style="max-width: 700px">
+      <el-form-item label="Name" style="max-width: 400px" prop="name">
         <el-input v-model="form.name" />
       </el-form-item>
-      <el-form-item
-        label="Artist"
-        style="max-width: 400px"
-        prop="artist"
-      >
+      <el-form-item label="Artist" style="max-width: 400px" prop="artist">
         <el-input v-model="form.artist" />
       </el-form-item>
-      <el-form-item
-        label="Description"
-        prop="description"
-      >
-        <el-input
-          v-model="form.description "
-          type="textarea"
-        />
+      <el-form-item label="Description" prop="description">
+        <el-input v-model="form.description" type="textarea" rows="4" />
       </el-form-item>
-      <el-form-item
-        label="Public Link"
-        prop="public_link"
-      >
+      <el-form-item label="Public Link" prop="public_link">
         <el-input v-model="form.public_link" />
       </el-form-item>
       <el-form-item>
-        <el-button
-          @click="submit(formRef)"
-          :loading="loading"
-        >SUBMIT</el-button>
+        <el-upload class="upload-demo" :auto-upload="false" action="" :on-remove="handleRemove"
+          :before-remove="beforeRemove" :limit="1" drag :file-list="file_list">
+          <el-icon class="el-icon--upload">
+            <upload-filled />
+          </el-icon>
+          <div class="el-upload__text">
+            Drop file here or <em>click to upload</em>
+          </div>
+        </el-upload>
+      </el-form-item>
+      <el-form-item>
+        <el-button @click="submit(formRef)" :loading="loading">
+          <template #loading>
+            <el-icon class="is-loading" style="margin-right: 4px">
+              <Loading />
+            </el-icon>
+            {{ loading_progress }}
+          </template>
+
+          <div>SUBMIT</div>
+
+        </el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -51,21 +46,43 @@
 <script lang="ts" setup>
 import { reactive, ref } from "vue";
 import type { FormInstance, FormRules } from "element-plus";
-import { createTokenMeta } from "@/api/token-meta";
-import type { TokenMeta } from "@/types/types";
+import { createTokenMeta } from "../api/token-meta";
+import { uploadFile } from "../api/storage";
+import type { TokenMeta } from "../types/types";
+
+import { ElMessage, ElMessageBox } from "element-plus";
+import type { UploadProps, UploadUserFile, UploadRequestOptions } from "element-plus";
+import { Timestamp } from "firebase/firestore"
 
 const formRef = ref<FormInstance>();
+const file_uid = ref<string>();
 const form = reactive<TokenMeta>({
   name: "",
   artist: "",
   description: "",
   public_link: "",
+  created_at: Timestamp.now(),
+  updated_at: Timestamp.now(),
+  media_id: "",
+  media_type: ""
 });
+const file_list = ref<UploadUserFile[]>([]);
 const rules = reactive<FormRules>({
   name: [{ required: true, message: "Required", trigger: "blur" }],
   artist: [{ required: true, message: "Required", trigger: "blur" }],
 });
 const loading = ref(false);
+const loading_progress = ref("0%");
+
+const beforeRemove: UploadProps["beforeRemove"] = (uploadFile, uploadFiles) => {
+  return ElMessageBox.confirm(`Cancel the upload of ${uploadFile.name} ?`).then(
+    () => true,
+    () => false
+  );
+};
+const handleRemove = () => {
+
+}
 
 const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) {
@@ -74,13 +91,40 @@ const submit = async (formEl: FormInstance | undefined) => {
   }
   const valid = await formEl.validate((v) => v);
   if (!valid) {
-    console.log("FORM NOT VALID");
     return;
   }
   loading.value = true;
+
+
+  if (file_list?.value?.length !== 1) {
+    console.log("file_list error", file_list.value)
+    return;
+  }
+  const file = file_list.value[0]
+
+  const progressCallback = (progress: number) => {
+    console.log("Progress", progress)
+    loading_progress.value = `${Math.round(progress * 100)}%`
+  }
+
+  const successCallback = () => {
+    uploadSuccess(formEl, file)
+  }
+
+  uploadFile(`${file.uid || ""}`, file.raw as File, progressCallback, successCallback)
+    .catch(err => {
+      console.error(err)
+    })
+};
+
+const uploadSuccess = (formEl: FormInstance, file: UploadUserFile) => {
+  form.media_id = `${file?.uid || ""}`
+  form.media_type = `.${file.name.split(".").pop() || ""}`
+  console.log("upload success, sending form: ", form);
   createTokenMeta(form)
     .then((r) => {
       formEl.resetFields();
+      file_list.value = [];
       loading.value = false;
       alert("Successfully submitted token");
     })
@@ -88,7 +132,8 @@ const submit = async (formEl: FormInstance | undefined) => {
       loading.value = false;
       alert(err);
     });
-};
+
+}
 </script>
 
 <style>

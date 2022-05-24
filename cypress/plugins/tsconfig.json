@@ -1,9 +1,20 @@
 {
   "extends": "@vue/tsconfig/tsconfig.node.json",
-  "include": ["./**/*"],
+  "include": [
+    "./**/*"
+  ],
   "compilerOptions": {
     "module": "CommonJS",
     "preserveValueImports": false,
-    "types": ["node", "cypress/types/cypress", "element-plus/global"]
-  }
+    "types": [
+      "node",
+      "cypress/types/cypress",
+      "element-plus/global"
+    ],
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    },
+  },
 }

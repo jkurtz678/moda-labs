@@ -30,4 +30,6 @@ export interface TokenMeta extends BaseDocument {
     artist?: string;
     description?: string;
     public_link?: string;
+    media_id: string;
+    media_type: string; 
 }
