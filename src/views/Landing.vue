@@ -20,13 +20,28 @@
                 experience for viewing Digital art at the quality inteded by the artist.
             </p>
             <br />
-            <el-button>Connect Wallet</el-button>
-            <el-button>What's New</el-button>
+            <el-button @click="connect">Connect Wallet</el-button>
+            <el-button @click='whatsNew'>What's New</el-button>
         </el-card>
     </el-container>
 </template>
 
 <script lang="ts" setup>
+import { useRouter } from 'vue-router';
+import web3Interface from "@/composables/web3Interface";
+
+ const { connectWallet, setupWeb3Modal, signature, address, web3_modal } =
+      web3Interface();
+const router = useRouter();
+const whatsNew = () => {
+    window.location.assign("https://modadisplay.art/Upcoming-Events")
+}
+const connect = async () => {
+   await setupWeb3Modal();
+   await connectWallet(); 
+   console.log("address", address.value)
+   console.log("signature", signature.value)
+}
 </script>
 
 <style scoped>
