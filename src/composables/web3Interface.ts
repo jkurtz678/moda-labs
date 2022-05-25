@@ -3,14 +3,12 @@ import Web3Modal from "web3modal";
 import { ethers } from "ethers";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import { ref } from 'vue'
-import { useAddressStore } from "@/stores/address"
 
 export default function web3Interface() {
   let web3: Web3;
   const web3_modal = ref<Web3Modal>();
   const address = ref("");
   const signature = ref("");
-  const store = useAddressStore();
 
   const setupWeb3Modal = () => {
     console.log("setup v3 modal...");
@@ -63,7 +61,6 @@ export default function web3Interface() {
     web3 = new Web3(provider);
     const web3_account = (await web3.eth.getAccounts())[0];
     address.value = web3_account;
-    store.address = web3_account
     attemptReverse();
     return getSignature();
   };

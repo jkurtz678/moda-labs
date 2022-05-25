@@ -38,3 +38,10 @@ export interface Plaque extends BaseDocument {
     name: string;
     token_meta_id_list: string[];
 }
+
+export interface Account extends BaseDocument {
+    address: string;
+    signature: string; 
+    admin: boolean;
+    saved_display_ids: Array<string>; // if user is an admin, devices can be saved here and remembered even if another user has assumed control of the device
+}

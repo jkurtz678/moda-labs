@@ -17,7 +17,7 @@
         <el-tab-pane label="Account" name="Third">Account</el-tab-pane>
       </el-tabs>
     </el-header>
-    <el-main style="background-color: #DAD9D7">
+    <el-main style="background-color: #DAD9D7;">
       <PlaqueList></PlaqueList>
     </el-main>
   </el-container>
@@ -35,5 +35,15 @@ import PlaqueList from '../components/PlaqueList.vue'
   padding-left: 30px;
   padding-right: 30px;
   --el-header-height: 100px;
+}
+
+.el-main {
+  --el-main-padding: 10px;
+}
+
+@media only screen and (max-width: 600px) {
+  .el-main {
+    text-align: center; 
+  }
 }
 </style>

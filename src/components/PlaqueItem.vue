@@ -1,5 +1,5 @@
 <template>
-    <el-card style="margin-bottom: 15px; border-radius: 18px;">
+    <el-card>
         <template #header>
             <div style="display: flex; align-items: center">
                 <h1> {{ props.plaque.entity.name }}</h1>
@@ -13,7 +13,7 @@
                 V.E.N.I.C.E
             </el-col>
             <el-col :span="12">
-                <div style="font-size: var(--el-font-size-extra-small)">artists</div>
+                <div style="font-size: var(--el-font-size-extra-small)">artist</div>
                 Nate Mohler
             </el-col>
         </el-row>
@@ -26,7 +26,9 @@
 </template>
 
 <script setup lang="ts">
+import { defineProps } from "vue"
 import type { FirestoreDocument, Plaque } from '../types/types'
+
 interface PlaqueItemProps {
     plaque: FirestoreDocument<Plaque>
 }
@@ -36,5 +38,17 @@ const props = defineProps<PlaqueItemProps>()
 <style scoped>
 .el-card {
     --el-card-padding: 12px;
+    margin: 10px;
+    border-radius: 18px;
+    min-width: 380px;
+    display: inline-block;
+    text-align: left;
+}
+
+@media only screen and (max-width: 600px) {
+  .el-card { 
+      display: block;
+      margin: 20px 10px 20px 10px;
+  }
 }
 </style>

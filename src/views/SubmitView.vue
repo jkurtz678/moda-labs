@@ -1,5 +1,5 @@
 <template>
-  <div class="submit">
+  <div style="padding: 20px">
     <h1 style="margin-bottom: 15px">SUBMIT TO MODA ARCHIVES</h1>
     <el-form ref="formRef" :model="form" :rules="rules" label-position="left" label-width="95px"
       style="max-width: 700px">
