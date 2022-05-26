@@ -23,9 +23,38 @@
   </el-container>
 </template>
 <script setup lang="ts">
-//import Header from '../components/Header.vue'
+import { onMounted } from "vue"
+import { useRouter } from 'vue-router';
 import PlaqueList from '../components/PlaqueList.vue'
+import { useAccountStore } from "@/stores/account"
+import { usePlaqueStore } from "@/stores/plaque"
+import { ElLoading, ElMessage } from 'element-plus'
 
+const account_store = useAccountStore();
+const plaque_store = usePlaqueStore();
+const router = useRouter();
+
+onMounted(async () => {
+  const loading = ElLoading.service({
+    lock: true,
+    text: 'Loading',
+    background: 'rgba(0, 0, 0, 0.7)',
+  })
+  const address = window.localStorage.getItem("account_address")
+  const signature = window.localStorage.getItem("account_signature")
+  // if account address is not found in local storage, redirect to landing
+  if (address == null || signature == null) {
+    router.push("landing");
+    return
+  }
+  await account_store.loadAccount(address, signature)
+  if (account_store.account == null) {
+    ElMessage("Error - failed to load account")
+    return
+  }
+  await plaque_store.loadPlaques(account_store.account.id)
+  loading.close()
+});
 </script>
 
 <style scoped>
@@ -43,7 +72,7 @@ import PlaqueList from '../components/PlaqueList.vue'
 
 @media only screen and (max-width: 600px) {
   .el-main {
-    text-align: center; 
+    text-align: center;
   }
 }
 </style>

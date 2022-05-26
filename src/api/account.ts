@@ -1,4 +1,3 @@
-import firebase from "../firebaseConfig";
 import type { FirestoreDocument, Account } from "@/types/types"
 import { BaseEntity } from "@/types/types";
 import { getFirestore } from "firebase/firestore";
