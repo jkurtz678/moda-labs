@@ -2,10 +2,10 @@
   <el-container style="height: 100%">
     <el-header class="header">
       <div style="display: flex; align-items: center;">
-        <h1 style="display: inline-flex;">MoDA</h1>
-        <el-icon size="25px" style="margin-left: 10px">
+        <el-image src="/logo.png" style="width: 40px; height: 40px;"></el-image>
+        <!-- <el-icon size="25px" style="margin-left: 10px">
           <UserFilled />
-        </el-icon>
+        </el-icon> -->
         <div style="flex-grow: 1"></div>
         <el-icon size="32px">
           <CirclePlus />

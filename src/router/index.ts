@@ -5,17 +5,17 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      redirect: "/home"
+      redirect: "/home/plaque-list"
     },
     {
       path: '/home',
       name: 'home',
       component: () => import('@/views/HomeView.vue'),
       children: [
-        /* {
+        {
           path: "",
-          redirect: "/home/plaques"
-        }, */
+          redirect: "/home/plaque-list"
+        },
         {
           path: "plaque-list",
           name: "plaque-list",
