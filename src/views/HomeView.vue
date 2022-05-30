@@ -18,13 +18,13 @@
       </el-tabs>
     </el-header>
     <el-main style="background-color: #DAD9D7;">
-      <PlaqueList></PlaqueList>
+      <RouterView></RouterView>
     </el-main>
   </el-container>
 </template>
 <script setup lang="ts">
 import { onMounted } from "vue"
-import { useRouter } from 'vue-router';
+import { useRouter, RouterView } from 'vue-router';
 import PlaqueList from '../components/PlaqueList.vue'
 import { useAccountStore } from "@/stores/account"
 import { usePlaqueStore } from "@/stores/plaque"
