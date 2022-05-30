@@ -36,6 +36,7 @@ export interface TokenMeta extends BaseDocument {
 
 export interface Plaque extends BaseDocument {
     name: string;
+    account_id: string;
     token_meta_id_list: string[];
 }
 

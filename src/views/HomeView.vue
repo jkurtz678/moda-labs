@@ -2,14 +2,13 @@
   <el-container style="height: 100%">
     <el-header class="header">
       <div style="display: flex; align-items: center;">
-        <h1 style="display: inline-flex;">MoDA</h1>
-        <el-icon size="25px" style="margin-left: 10px">
+        <el-image src="/logo.png" style="width: 43px; height: 43px;"></el-image>
+        <!-- <el-icon size="25px" style="margin-left: 10px">
           <UserFilled />
-        </el-icon>
+        </el-icon> -->
         <div style="flex-grow: 1"></div>
-        <el-icon size="32px">
-          <CirclePlus />
-        </el-icon>
+        <el-button v-if="router.currentRoute.value.name == 'plaque-list'" icon="plus" circle @click="router.push('qr-scan') "/>
+        <el-button v-if="router.currentRoute.value.name == 'qr-scan'" icon="close" circle @click="router.push('plaque-list') "/>
       </div>
       <el-tabs>
         <el-tab-pane label="Overview" name="first">User</el-tab-pane>
@@ -18,14 +17,42 @@
       </el-tabs>
     </el-header>
     <el-main style="background-color: #DAD9D7;">
-      <PlaqueList></PlaqueList>
+      <RouterView></RouterView>
     </el-main>
   </el-container>
 </template>
 <script setup lang="ts">
-//import Header from '../components/Header.vue'
-import PlaqueList from '../components/PlaqueList.vue'
+import { onMounted } from "vue"
+import { useRouter, RouterView } from 'vue-router';
+import { useAccountStore } from "@/stores/account"
+import { usePlaqueStore } from "@/stores/plaque"
+import { ElLoading, ElMessage } from 'element-plus'
 
+const account_store = useAccountStore();
+const plaque_store = usePlaqueStore();
+const router = useRouter();
+
+onMounted(async () => {
+  const loading = ElLoading.service({
+    lock: true,
+    text: 'Loading',
+    background: 'rgba(0, 0, 0, 0.7)',
+  })
+  const address = window.localStorage.getItem("account_address")
+  const signature = window.localStorage.getItem("account_signature")
+  // if account address is not found in local storage, redirect to landing
+  if (address == null || signature == null) {
+    router.push("landing");
+    return
+  }
+  await account_store.loadAccount(address, signature)
+  if (account_store.account == null) {
+    ElMessage("Error - failed to load account")
+    return
+  }
+  await plaque_store.loadPlaques(account_store.account.id)
+  loading.close()
+});
 </script>
 
 <style scoped>
@@ -43,7 +70,7 @@ import PlaqueList from '../components/PlaqueList.vue'
 
 @media only screen and (max-width: 600px) {
   .el-main {
-    text-align: center; 
+    text-align: center;
   }
 }
 </style>

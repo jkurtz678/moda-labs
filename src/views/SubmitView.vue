@@ -46,9 +46,9 @@
 <script lang="ts" setup>
 import { reactive, ref } from "vue";
 import type { FormInstance, FormRules } from "element-plus";
-import { createTokenMeta } from "../api/token-meta";
-import { uploadFile } from "../api/storage";
-import type { TokenMeta } from "../types/types";
+import { createTokenMeta } from "@/api/token-meta";
+import { uploadFile } from "@/api/storage";
+import type { TokenMeta } from "@/types/types";
 
 import { ElMessage, ElMessageBox } from "element-plus";
 import type { UploadProps, UploadUserFile, UploadRequestOptions } from "element-plus";
