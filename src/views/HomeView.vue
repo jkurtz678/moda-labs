@@ -2,14 +2,13 @@
   <el-container style="height: 100%">
     <el-header class="header">
       <div style="display: flex; align-items: center;">
-        <el-image src="/logo.png" style="width: 40px; height: 40px;"></el-image>
+        <el-image src="/logo.png" style="width: 43px; height: 43px;"></el-image>
         <!-- <el-icon size="25px" style="margin-left: 10px">
           <UserFilled />
         </el-icon> -->
         <div style="flex-grow: 1"></div>
-        <el-icon size="32px">
-          <CirclePlus />
-        </el-icon>
+        <el-button v-if="router.currentRoute.value.name == 'plaque-list'" icon="plus" circle @click="router.push('qr-scan') "/>
+        <el-button v-if="router.currentRoute.value.name == 'qr-scan'" icon="close" circle @click="router.push('plaque-list') "/>
       </div>
       <el-tabs>
         <el-tab-pane label="Overview" name="first">User</el-tab-pane>
@@ -25,7 +24,6 @@
 <script setup lang="ts">
 import { onMounted } from "vue"
 import { useRouter, RouterView } from 'vue-router';
-import PlaqueList from '../components/PlaqueList.vue'
 import { useAccountStore } from "@/stores/account"
 import { usePlaqueStore } from "@/stores/plaque"
 import { ElLoading, ElMessage } from 'element-plus'

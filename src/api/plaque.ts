@@ -1,7 +1,7 @@
 import type { FirestoreDocument, Plaque} from "@/types/types"
 import firebaseConfig from "../firebaseConfig"
 import { getFirestore } from "firebase/firestore";
-import { collection, addDoc, getDoc, where, query, getDocs, onSnapshot} from "firebase/firestore";
+import { collection, getDoc, where, query, doc, onSnapshot, updateDoc} from "firebase/firestore";
 
 const db = getFirestore(firebaseConfig)
 const plaques_ref = collection(db, "plaque")
@@ -16,3 +16,12 @@ export const getPlaquesByAccountIDWithListener = async (account_id: string, onCh
         onChange(plaques)
     })
 };
+
+export const addAccountToPlaque = async (plaque_id: string, account_id: string): Promise<FirestoreDocument<Plaque>> => {
+    const ref = doc(db, "plaque", plaque_id)
+    await updateDoc(ref, {
+        account_id: account_id
+    })
+    const snapshot = await getDoc(ref)
+    return { id: snapshot.id, entity: snapshot.data() as Plaque}
+}
