@@ -31,7 +31,7 @@ export interface TokenMeta extends BaseDocument {
     description?: string;
     public_link?: string;
     media_id: string;
-    media_type: string; 
+    media_type: string;
 }
 
 export interface Plaque extends BaseDocument {
@@ -41,7 +41,12 @@ export interface Plaque extends BaseDocument {
 
 export interface Account extends BaseDocument {
     address: string;
-    signature: string; 
+    signature: string;
     admin: boolean;
     saved_display_ids: Array<string>; // if user is an admin, devices can be saved here and remembered even if another user has assumed control of the device
+}
+export interface Painting extends BaseDocument {
+    src: string;
+    author: string;
+    title: string;
 }
