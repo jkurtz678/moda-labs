@@ -16,7 +16,7 @@
       <p class="bold">{{ props.detail.author }}</p>
     </div>
     <div style="flex: 1;text-align:right; padding-right:1em">
-      <el-icon>
+      <el-icon @click="openDetail">
         <ArrowRightBold />
       </el-icon>
       <!-- <el-icon><ArrowDownBold /></el-icon> -->
@@ -31,6 +31,9 @@ interface PlaqueItemDetailProps {
   detail: FirestoreDocument<Painting>;
 }
 const props = defineProps<PlaqueItemDetailProps>();
+function openDetail(){
+
+}
 </script>
 
 <style scoped>
