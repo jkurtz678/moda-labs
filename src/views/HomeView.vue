@@ -42,7 +42,8 @@ onMounted(async () => {
   const signature = window.localStorage.getItem("account_signature")
   // if account address is not found in local storage, redirect to landing
   if (address == null || signature == null) {
-    router.push("landing");
+    router.push({name: "landing"});
+    loading.close()
     return
   }
   await account_store.loadAccount(address, signature)
