@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
-    "preview": "vite preview --port 5050",
+    "preview": "npm run build && vite preview --port 5050",
     "test:unit": "vitest --environment jsdom",
     "test:e2e": "start-server-and-test preview http://127.0.0.1:5050/ 'cypress open'",
     "test:e2e:ci": "start-server-and-test preview http://127.0.0.1:5050/ 'cypress run'",
@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^1.1.4",
+    "@rollup/plugin-inject": "^4.0.4",
     "@walletconnect/web3-provider": "^1.7.8",
     "browserify-zlib": "^0.2.0",
     "element-plus": "^2.2.0",
