@@ -2,7 +2,7 @@
   <el-container style="height: 100%">
     <el-header class="header">
       <div style="display: flex; align-items: center;">
-        <el-image src="/logo.png" style="width: 43px; height: 43px;"></el-image>
+        <el-image :src="getImageUrl('logo.png')" style="width: 43px; height: 43px;"></el-image>
         <!-- <el-icon size="25px" style="margin-left: 10px">
           <UserFilled />
         </el-icon> -->
@@ -54,6 +54,10 @@ onMounted(async () => {
   await plaque_store.loadPlaques(account_store.account.id)
   loading.close()
 });
+
+function getImageUrl(filename: string) {
+  return new URL(`../assets/${filename}`, import.meta.url).href
+}
 </script>
 
 <style scoped>
