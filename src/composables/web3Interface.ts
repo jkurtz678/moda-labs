@@ -1,7 +1,7 @@
 import Web3 from 'web3/dist/web3.min.js'
 import Web3Modal from "web3modal";
 import { ethers } from "ethers";
-import WalletConnectProvider from "@walletconnect/web3-provider";
+import WalletConnectProvider from '@walletconnect/web3-provider/dist/umd/index.min.js'; // import index.min.js to fix node build issue https://github.com/WalletConnect/walletconnect-monorepo/issues/341#issuecomment-1079579976
 import { ref } from 'vue'
 
 export default function web3Interface() {
