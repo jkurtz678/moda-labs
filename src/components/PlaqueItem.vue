@@ -49,7 +49,7 @@ const activeName = ref("0");
 const collapse = ref(true);
   
 const clearTokens = () => {
-  ElMessageBox.confirm(`Are you sure you want to clear tokens for plaque'${props.plaque.entity.name}'?`, "Clear tokens", {
+  ElMessageBox.confirm(`Are you sure you want to clear tokens for plaque '${props.plaque.entity.name}'?`, "Clear tokens", {
     type: 'warning'
   }).then(() => {
     updatePlaque(props.plaque.id, {token_meta_id_list: []})

@@ -30,6 +30,8 @@
 import { ref } from "vue";
 import { useRouter } from 'vue-router';
 import web3Interface from "@/composables/web3Interface";
+import { useAccountStore } from "@/stores/account"
+const account_store = useAccountStore();
 
 const loading = ref(false);
 
@@ -43,9 +45,8 @@ const connect = async () => {
     loading.value = true
     await setupWeb3Modal();
     await connectWallet();
-    window.localStorage.setItem("account_address", address.value);
-    window.localStorage.setItem("account_signature", signature.value);
-    loading.value = false; 
+    account_store.login(address.value, signature.value);
+    loading.value = false;
     router.push("home")
 }
 </script>
