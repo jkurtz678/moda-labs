@@ -6,17 +6,22 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { QrcodeStream } from "vue3-qrcode-reader";
-import { addAccountToPlaque } from "@/api/plaque";
+import { updatePlaque } from "@/api/plaque";
 import { useRouter } from 'vue-router';
 import { useAccountStore } from "@/stores/account"
 import { ElLoading } from 'element-plus'
+import { ElMessage } from 'element-plus'
+
 
 const account_store = useAccountStore()
 const router = useRouter();
 
 const onDecode = async (qr_code_link: string) => {
+    console.log("QrScan.onDecode qr_code_link ", qr_code_link);
     const split_link = qr_code_link.split("?")
     if (split_link.length != 2) {
+        console.log(`QrScan.onDecode error - invalid url, nor query params found`);
+        ElMessage({ message: "Error adding account to plaque - invalid qr code", type: 'error', showClose: true, duration: 12000 })
         return
     }
 
@@ -25,6 +30,7 @@ const onDecode = async (qr_code_link: string) => {
     const account_id = account_store.account?.id;
     if (!plaque_id || !account_id) {
         console.log(`QrScan.onDecode error - invalid plaque_id: ${plaque_id} or account_id: ${account_id}`)
+        ElMessage({ message: "Error adding account to plaque - invalid plaque or account", type: 'error', showClose: true, duration: 12000 });
         return
     }
 
@@ -33,7 +39,11 @@ const onDecode = async (qr_code_link: string) => {
         text: 'Loading',
         background: 'rgba(0, 0, 0, 0.7)',
     })
-    await addAccountToPlaque(plaque_id, account_id);
+    await updatePlaque(plaque_id, {account_id}).then((plaque) => {
+        ElMessage({ message: `Connected to plaque ${plaque.entity.name}`, type: 'success', showClose: true, duration: 6000 });
+    }).catch(err => {
+        ElMessage({ message: `Error adding account to plaque - ${err}`, type: 'error', showClose: true, duration: 12000 });
+    })
     loading.close();
     router.push('plaque-list');
 };

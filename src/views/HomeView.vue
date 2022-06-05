@@ -2,19 +2,22 @@
   <el-container style="height: 100%">
     <el-header class="header">
       <div style="display: flex; align-items: center;">
-        <el-image src="/logo.png" style="width: 43px; height: 43px;"></el-image>
+        <el-image :src="getImageUrl('logo.png')" style="width: 43px; height: 43px;"></el-image>
         <!-- <el-icon size="25px" style="margin-left: 10px">
           <UserFilled />
         </el-icon> -->
+        <el-tabs style="margin-left: 30px;">
+          <el-tab-pane label="Overview" name="first"></el-tab-pane>
+          <el-tab-pane label="Support" name="second"></el-tab-pane>
+          <el-tab-pane label="Account" name="Third"></el-tab-pane>
+        </el-tabs>
         <div style="flex-grow: 1"></div>
-        <el-button v-if="router.currentRoute.value.name == 'plaque-list'" icon="plus" circle @click="router.push('qr-scan') "/>
-        <el-button v-if="router.currentRoute.value.name == 'qr-scan'" icon="close" circle @click="router.push('plaque-list') "/>
+        <el-button @click="logout">Logout</el-button>
+        <el-button v-if="router.currentRoute.value.name == 'plaque-list'" icon="plus" circle
+          @click="router.push('qr-scan')" />
+        <el-button v-if="router.currentRoute.value.name == 'qr-scan'" icon="close" circle
+          @click="router.push('plaque-list')" />
       </div>
-      <el-tabs>
-        <el-tab-pane label="Overview" name="first">User</el-tab-pane>
-        <el-tab-pane label="Support" name="second">Support</el-tab-pane>
-        <el-tab-pane label="Account" name="Third">Account</el-tab-pane>
-      </el-tabs>
     </el-header>
     <el-main style="background-color: #DAD9D7;">
       <RouterView></RouterView>
@@ -42,7 +45,7 @@ onMounted(async () => {
   const signature = window.localStorage.getItem("account_signature")
   // if account address is not found in local storage, redirect to landing
   if (address == null || signature == null) {
-    router.push({name: "landing"});
+    router.push({ name: "landing" });
     loading.close()
     return
   }
@@ -54,6 +57,15 @@ onMounted(async () => {
   await plaque_store.loadPlaques(account_store.account.id)
   loading.close()
 });
+
+const getImageUrl = (filename: string) => {
+  return new URL(`../assets/${filename}`, import.meta.url).href
+}
+const logout = () => {
+  account_store.logout();
+  router.push({name: "landing"})
+}
+
 </script>
 
 <style scoped>
@@ -62,7 +74,7 @@ onMounted(async () => {
   padding-bottom: 15px;
   padding-left: 30px;
   padding-right: 30px;
-  --el-header-height: 100px;
+  --el-header-height: 75px;
 }
 
 .el-main {

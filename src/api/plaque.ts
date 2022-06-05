@@ -17,11 +17,9 @@ export const getPlaquesByAccountIDWithListener = async (account_id: string, onCh
     })
 };
 
-export const addAccountToPlaque = async (plaque_id: string, account_id: string): Promise<FirestoreDocument<Plaque>> => {
+export const updatePlaque = async (plaque_id: string, update_data: Partial<Plaque>): Promise<FirestoreDocument<Plaque>> => {
     const ref = doc(db, "plaque", plaque_id)
-    await updateDoc(ref, {
-        account_id: account_id
-    })
+    await updateDoc(ref, update_data)
     const snapshot = await getDoc(ref)
     return { id: snapshot.id, entity: snapshot.data() as Plaque}
 }

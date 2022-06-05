@@ -21,6 +21,15 @@ export const useAccountStore = defineStore({
       }
 
       this.account = await createAccount(address, signature)
+    },
+    login (address: string, signature: string) {
+      window.localStorage.setItem("account_address", address);
+      window.localStorage.setItem("account_signature", signature);
+    },
+    logout () {
+      window.localStorage.removeItem("account_address");
+      window.localStorage.removeItem("account_signature");
+      this.account = null;
     }
   }
 })
