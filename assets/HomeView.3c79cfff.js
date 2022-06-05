@@ -1,4 +1,4 @@
-import{_ as S,d as I,u as q,o as C,E as D,a as R,r as o,b as u,c as v,w as n,e as t,f as p,g as c,h as m,R as V,p as A,i as N,j as g}from"./index.5926e50e.js";import{u as U}from"./account.0d5d48dc.js";import{u as z}from"./plaque.e5ebd4e5.js";import"./types.8335cbb0.js";import"./firebaseConfig.d7dbf4c4.js";import"./plaque.5824bace.js";var B=`@import url('https://fonts.googleapis.com/css2?family=K2D&display=swap');
+import{_ as S,d as I,u as q,o as C,E as D,a as R,r as o,b as u,c as v,w as n,e as t,f as p,g as c,h as m,R as V,p as A,i as N,j as g}from"./index.5b8c6171.js";import{u as U}from"./account.637da02b.js";import{u as z}from"./plaque.b4ea72c6.js";import"./types.8335cbb0.js";import"./firebaseConfig.d7dbf4c4.js";import"./plaque.1e56ad14.js";var B=`@import url('https://fonts.googleapis.com/css2?family=K2D&display=swap');
 
 /* color palette from <https://github.com/vuejs/theme> */
 

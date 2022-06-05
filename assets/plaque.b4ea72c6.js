@@ -1,0 +1,1 @@
+import{k as t}from"./index.5b8c6171.js";import{g as s}from"./plaque.1e56ad14.js";const u=t({id:"plaque",state:()=>({plaques:[]}),actions:{async loadPlaques(e){await s(e,a=>{this.plaques=a})}}});export{u};
