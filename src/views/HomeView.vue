@@ -1,23 +1,7 @@
 <template>
   <el-container style="height: 100%">
     <el-header class="header">
-      <div style="display: flex; align-items: center;">
-        <el-image :src="getImageUrl('logo.png')" style="width: 43px; height: 43px;"></el-image>
-        <!-- <el-icon size="25px" style="margin-left: 10px">
-          <UserFilled />
-        </el-icon> -->
-        <el-tabs style="margin-left: 30px;">
-          <el-tab-pane label="Overview" name="first"></el-tab-pane>
-          <el-tab-pane label="Support" name="second"></el-tab-pane>
-          <el-tab-pane label="Account" name="Third"></el-tab-pane>
-        </el-tabs>
-        <div style="flex-grow: 1"></div>
-        <el-button @click="logout">Logout</el-button>
-        <el-button v-if="router.currentRoute.value.name == 'plaque-list'" icon="plus" circle
-          @click="router.push('qr-scan')" />
-        <el-button v-if="router.currentRoute.value.name == 'qr-scan'" icon="close" circle
-          @click="router.push('plaque-list')" />
-      </div>
+     <Header></Header> 
     </el-header>
     <el-main style="background-color: #DAD9D7;">
       <RouterView></RouterView>
@@ -25,6 +9,7 @@
   </el-container>
 </template>
 <script setup lang="ts">
+import Header from "@/components/Header.vue";
 import { onMounted } from "vue"
 import { useRouter, RouterView } from 'vue-router';
 import { useAccountStore } from "@/stores/account"
@@ -57,14 +42,6 @@ onMounted(async () => {
   await plaque_store.loadPlaques(account_store.account.id)
   loading.close()
 });
-
-const getImageUrl = (filename: string) => {
-  return new URL(`../assets/${filename}`, import.meta.url).href
-}
-const logout = () => {
-  account_store.logout();
-  router.push({name: "landing"})
-}
 
 </script>
 
