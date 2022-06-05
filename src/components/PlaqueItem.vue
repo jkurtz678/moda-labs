@@ -1,40 +1,46 @@
 <template>
   <el-card class="rounded-card">
     <template #header>
-      <div style="display: flex; align-items: center;padding:1em">
+      <div style="display: flex; align-items: center;padding:1em" @click="showDetail = !showDetail">
         <h1> {{ props.plaque.entity.name }}</h1>
         <div style="flex-grow: 1" />
         <el-tag class="ml-2" type="success">online</el-tag>
       </div>
-      <div style="display: flex; align-items: center;justify-content:space-between; padding:1em">
-        <p>Filter: Name</p>
-        <el-button text @click="addNewToList = true">ADD NFT</el-button>
+      <transition name="el-fade-in-linear"> 
+      <section v-if="showDetail">
+      <p style="padding:0 1em;">Total artworks: 8</p>
+      <div style="display: flex; align-items: center; justify-content: space-between;padding: 0.5em 1em;">
+        <el-button>Settings</el-button>
+        <el-button type="info" @click="addNewToList = true">ADD Artwork</el-button>
       </div>
+      </section>
+      </transition>
     </template>
-    <el-row style="margin-bottom: 8px;padding:1em" v-if="activeName == 0">
-      <el-col :span="12">
-        <div style="font-size: var(--el-font-size-extra-small)">title</div>
-        <span>V.E.N.I.C.E</span>
-      </el-col>
-      <el-col :span="12">
-        <div style="font-size: var(--el-font-size-extra-small)">artist</div>
-        Nate Mohler
-      </el-col>
-    </el-row>
-    <div v-if="activeName == 0" style="padding:1em">Total artworks: 8</div>
-    <el-collapse accordion>
-      <el-collapse-item name="1">
-        <template #title>
-          View
-        </template>
+    <transition name="el-fade-in-linear"> 
+      <section class="card-simple" v-if="!showDetail" @click="showDetail = true">
+        <el-row style="margin-bottom: 8px;padding:1em">
+          <el-col :span="12">
+            <div style="font-size: var(--el-font-size-extra-small)">title</div>
+            <span>V.E.N.I.C.E</span>
+          </el-col>
+          <el-col :span="12">
+            <div style="font-size: var(--el-font-size-extra-small)">artist</div>
+            Nate Mohler
+          </el-col>
+        </el-row>
+        <div style="padding:1em">Total artworks: 8</div>
+      </section>
+    </transition>
+    <transition name="el-fade-in-linear"> 
+      <section class="card-detail" v-if="showDetail">
         <PlaqueItemDetail :detail="i" v-for="i in items" />
         <div style="display: flex; padding: 1em;">
           <el-button @click="clearTokens">Clear Tokens</el-button>
           <div style="flex-grow: 1"></div>
           <el-button type="danger" plain @click="forgetPlaque">Forget Display</el-button>
         </div>
-      </el-collapse-item>
-    </el-collapse>
+      </section>
+    </transition>
     <el-dialog class="box-dialog" center v-model="centerDialogVisible" width="530px" v-if="addNewToList"
       close-on-click-modal="false">
       <el-card class="box-card" shadow="never">
@@ -67,6 +73,7 @@ interface PlaqueItemProps {
 const centerDialogVisible = ref(true)
 const props = defineProps<PlaqueItemProps>();
 const addNewToList = ref(false);
+const showDetail = ref(false);
 const items: FirestoreDocument<TokenMeta>[] = reactive([
   {
     id: "test",
@@ -202,9 +209,6 @@ const forgetPlaque = () => {
 .box-dialog {
   --el-dialog-padding-primary: 10px 0px 10px 0px;
 }
-
-.dialog-footer {}
-
 el-card__body {
   padding: 0 !important;
 }
