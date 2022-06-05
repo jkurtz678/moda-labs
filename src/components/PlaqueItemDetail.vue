@@ -2,38 +2,61 @@
   <hr class="hr" />
   <div class="card-flex-container">
     <div style="flex: 1">
-      <!-- <img
-        :src="src"
-        class="image"
-      /> -->
       <img
-        :src="props.detail.src"
+        :src="props.detail.entity.public_link"
         class="image"
       />
     </div>
     <div style="flex: 3 1 0%">
-      <p class="bold">{{ props.detail.title }}</p>
-      <p class="bold">{{ props.detail.author }}</p>
+      <p class="bold">{{ props.detail.entity.name }}</p>
+      <p class="bold">{{ props.detail.entity.artist }}</p>
     </div>
     <div style="flex: 1;text-align:right; padding-right:1em">
-      <el-icon>
-        <ArrowRightBold />
+      <el-icon @click="isExpand.expanded = !isExpand.expanded">
+        <ArrowRightBold v-if="!isExpand.expanded"></ArrowRightBold>
+        <ArrowDownBold v-if="isExpand.expanded"></ArrowDownBold>
       </el-icon>
-      <!-- <el-icon><ArrowDownBold /></el-icon> -->
-      <p>Archive</p>
+      <p @click="">Archive</p>  <!--TODO-->
+    </div>
+  </div>
+  <div class="card-body" v-if="isExpand.expanded">
+    <div class="card-flex-container">
+      <div class="card-content">
+        <div >{{ props.detail.entity.name }}</div>
+        <img
+          :src="props.detail.entity.public_link"
+          class="image"
+        />
+      </div>
+      <div class="card-content">
+        <div class="bold bigger-font">{{ props.detail.entity.artist }}</div>
+        <div class="description">{{ props.detail.entity.description }}</div>
+      </div>
     </div>
   </div>
 </template>
+
+
 <script setup lang="ts">
+  
 import { defineProps, computed } from "vue";
-import type { FirestoreDocument, Painting } from "../types/types";
+import type { FirestoreDocument,TokenMeta } from "../types/types";
+import { ref,reactive } from "vue";
 interface PlaqueItemDetailProps {
-  detail: FirestoreDocument<Painting>;
+  detail: FirestoreDocument<TokenMeta>;
 }
 const props = defineProps<PlaqueItemDetailProps>();
+const isExpand = reactive({expanded:false});
+const centerDialogVisible = ref(true)
 </script>
 
-<style scoped>
+<style>
+.description{
+  width:50%
+}
+.bigger-font{
+  font-size: 1.5em;
+}
 .card-flex-container {
   display: flex;
   align-items: center;
@@ -47,6 +70,7 @@ const props = defineProps<PlaqueItemDetailProps>();
     font-weight:700;
 }
 .hr{
-    border: 0.5px solid lightgray;
+    border: 0.1px solid lightgray;
 }
+
 </style>
