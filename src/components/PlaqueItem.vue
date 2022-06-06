@@ -41,25 +41,15 @@
         </div>
       </section>
     </transition>
-    <el-dialog class="box-dialog" center v-model="centerDialogVisible" width="530px" v-if="addNewToList"
-      close-on-click-modal="false">
-      <el-card class="box-card" shadow="never">
-        <AllDetails :detail="i" v-for="i in allItems"></AllDetails>
-        <hr class="hr" />
-      </el-card>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="addNewToList = false">Clear</el-button>
-          <el-button type="info" @click="addNewToList = false">Done</el-button>
-        </span>
-      </template>
-    </el-dialog>
+    
+    <AddTokenDialog v-model:show_add_token_dialog="show_add_token_dialog"></AddTokenDialog>
+
   </el-card>
 </template>
 <script setup lang="ts">
 import { defineProps, computed } from "vue";
 import type { FirestoreDocument, Plaque, TokenMeta } from "@/types/types";
-import AllDetails from './AllDetails.vue';
+import AddTokenDialog from './AddTokenDialog.vue';
 import PlaqueItemDetail from "./PlaqueItemDetail.vue";
 import { Timestamp } from "firebase/firestore";
 import { reactive } from "vue";
@@ -67,6 +57,7 @@ import PlaqueItemDetailList from './PlaqueItemDetailList.vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { ref } from "vue";
 import { updatePlaque } from "@/api/plaque";
+
 interface PlaqueItemProps {
   plaque: FirestoreDocument<Plaque>;
 }
@@ -74,6 +65,7 @@ const centerDialogVisible = ref(true)
 const props = defineProps<PlaqueItemProps>();
 const addNewToList = ref(false);
 const showDetail = ref(false);
+const show_add_token_dialog = ref(false);
 const items: FirestoreDocument<TokenMeta>[] = reactive([
   {
     id: "test",

@@ -14,10 +14,12 @@ import { onMounted } from "vue"
 import { useRouter, RouterView } from 'vue-router';
 import { useAccountStore } from "@/stores/account"
 import { usePlaqueStore } from "@/stores/plaque"
+import { useTokenMetaStore } from "@/stores/token-meta"
 import { ElLoading, ElMessage } from 'element-plus'
 
 const account_store = useAccountStore();
 const plaque_store = usePlaqueStore();
+const token_meta_store = useTokenMetaStore();
 const router = useRouter();
 
 onMounted(async () => {
@@ -40,6 +42,8 @@ onMounted(async () => {
     return
   }
   await plaque_store.loadPlaques(account_store.account.id)
+  
+  await token_meta_store.loadTokenMetas(plaque_store.token_meta_id_list)
   loading.close()
 });
 
