@@ -41,10 +41,10 @@ onMounted(async () => {
     ElMessage("Error - failed to load account")
     return
   }
-  await plaque_store.loadPlaques(account_store.account.id)
-  
-  await token_meta_store.loadTokenMetas(plaque_store.token_meta_id_list)
-  loading.close()
+  await plaque_store.loadPlaques(account_store.account.id, async () => {
+      await token_meta_store.loadTokenMetas(plaque_store.token_meta_id_list);
+      loading.close()
+  })
 });
 
 </script>

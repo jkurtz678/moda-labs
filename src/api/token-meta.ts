@@ -29,7 +29,7 @@ export const getTokenMetaListByIDListWithListener = async (token_meta_id_list: s
         return;
     }
     const q = query(token_meta_ref, where(documentId(), "in", token_meta_id_list));
-    const unsubscribe = onSnapshot(q, (query_snapshot) => {
+    const unsubscribe = await onSnapshot(q, (query_snapshot) => {
         const metas: FirestoreDocument<TokenMeta>[] = [];
         query_snapshot.forEach((doc) => {
             metas.push({ id: doc.id, entity: doc.data() as TokenMeta })
