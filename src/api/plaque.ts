@@ -8,7 +8,7 @@ const plaques_ref = collection(db, "plaque")
 
 export const getPlaquesByAccountIDWithListener = async (account_id: string, onChange: (arr: Array<FirestoreDocument<Plaque>>) => void) => {
     const q = query(plaques_ref, where("account_id", "==", account_id));
-    const unsubscribe = onSnapshot(q, (query_snapshot) => {
+    const unsubscribe = await onSnapshot(q, (query_snapshot) => {
         const plaques: FirestoreDocument<Plaque>[] = [];
         query_snapshot.forEach((doc) => {
             plaques.push( { id: doc.id, entity: doc.data() as Plaque})

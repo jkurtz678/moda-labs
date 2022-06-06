@@ -33,7 +33,7 @@
     </transition>
     <transition name="el-fade-in-linear"> 
       <section class="card-detail" v-if="showDetail">
-        <PlaqueItemDetail :detail="i" v-for="i in items" />
+        <PlaqueItemDetail :detail="i" v-for="i in plaque_tokens" />
         <div style="display: flex; padding: 1em;">
           <el-button @click="clearTokens">Clear Tokens</el-button>
           <div style="flex-grow: 1"></div>
@@ -41,7 +41,7 @@
         </div>
       </section>
     </transition>
-    
+    <!-- {{plaque_tokens}} -->
     <AddTokenDialog v-model:show_add_token_dialog="show_add_token_dialog"></AddTokenDialog>
 
   </el-card>
@@ -57,7 +57,7 @@ import PlaqueItemDetailList from './PlaqueItemDetailList.vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { ref } from "vue";
 import { updatePlaque } from "@/api/plaque";
-
+import { useTokenMetaStore } from "../stores/token-meta";
 interface PlaqueItemProps {
   plaque: FirestoreDocument<Plaque>;
 }
@@ -66,70 +66,86 @@ const props = defineProps<PlaqueItemProps>();
 const addNewToList = ref(false);
 const showDetail = ref(false);
 const show_add_token_dialog = ref(false);
-const items: FirestoreDocument<TokenMeta>[] = reactive([
-  {
-    id: "test",
-    entity: {
-      name: "V.E.N.I.C.E",
-      artist: "Nate Mohler",
-      description: "Lorem ipsum dolor sit amet",
-      public_link: "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png",
-      media_id: "dfefe",
-      media_type: "mp3",
-      // isExpand: true,
-      // computedHeight: 0,
-      created_at: Timestamp.now(),
-      updated_at: Timestamp.now(),
-    }
-  },
-  {
-    id: "test",
-    entity: {
-      name: "Bing Bong",
-      artist: "Shawn Lister",
-      description: "Lorem ipsum dolor sit amet",
-      public_link: "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png",
-      media_id: "balavavdd",
-      media_type: "mp3",
-      // isExpand: true,
-      // computedHeight: 0,
-      created_at: Timestamp.now(),
-      updated_at: Timestamp.now(),
-    }
-  },
-])
-const allItems: FirestoreDocument<TokenMeta>[] = reactive([
-  {
-    id: "test",
-    entity: {
-      name: "V.E.N.I.C.E",
-      artist: "Nate Mohler",
-      description: "Lorem ipsum dolor sit amet",
-      public_link: "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png",
-      media_id: "dfefe",
-      media_type: "mp3",
-      // isExpand: true,
-      // computedHeight: 0,
-      created_at: Timestamp.now(),
-      updated_at: Timestamp.now(),
-    }
-  },
-  {
-    id: "test",
-    entity: {
-      name: "Bing Bong",
-      artist: "Shawn Lister",
-      description: "Lorem ipsum dolor sit amet",
-      public_link: "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png",
-      media_id: "balavavdd",
-      media_type: "mp3",
-      // isExpand: true,
-      // computedHeight: 0,
-      created_at: Timestamp.now(),
-      updated_at: Timestamp.now(),
-    }
-  },
-])
+const token_meta_store = useTokenMetaStore()
+
+const items: FirestoreDocument<TokenMeta>[] = token_meta_store.token_meta_list;
+
+interface TokenMetaMap {
+    [id: string]: FirestoreDocument<TokenMeta>;
+}
+const plaque_tokens = computed(() => {
+  const token_map = token_meta_store.token_meta_map;
+  let res= props.plaque.entity.token_meta_id_list.map(token_id => token_map[token_id])
+  for(let i of res){
+    i.entity.public_link = "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
+  }
+  return res;
+})
+// DUMMY DATA
+// const items: FirestoreDocument<TokenMeta>[] = reactive([
+//   {
+//     id: "test",
+//     entity: {
+//       name: "V.E.N.I.C.E",
+//       artist: "Nate Mohler",
+//       description: "Lorem ipsum dolor sit amet",
+//       public_link: "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png",
+//       media_id: "dfefe",
+//       media_type: "mp3",
+//       // isExpand: true,
+//       // computedHeight: 0,
+//       created_at: Timestamp.now(),
+//       updated_at: Timestamp.now(),
+//     }
+//   },
+//   {
+//     id: "test",
+//     entity: {
+//       name: "Bing Bong",
+//       artist: "Shawn Lister",
+//       description: "Lorem ipsum dolor sit amet",
+//       public_link: "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png",
+//       media_id: "balavavdd",
+//       media_type: "mp3",
+//       // isExpand: true,
+//       // computedHeight: 0,
+//       created_at: Timestamp.now(),
+//       updated_at: Timestamp.now(),
+//     }
+//   },
+// ])
+// const allItems: FirestoreDocument<TokenMeta>[] = reactive([
+//   {
+//     id: "test",
+//     entity: {
+//       name: "V.E.N.I.C.E",
+//       artist: "Nate Mohler",
+//       description: "Lorem ipsum dolor sit amet",
+//       public_link: "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png",
+//       media_id: "dfefe",
+//       media_type: "mp3",
+//       // isExpand: true,
+//       // computedHeight: 0,
+//       created_at: Timestamp.now(),
+//       updated_at: Timestamp.now(),
+//     }
+//   },
+//   {
+//     id: "test",
+//     entity: {
+//       name: "Bing Bong",
+//       artist: "Shawn Lister",
+//       description: "Lorem ipsum dolor sit amet",
+//       public_link: "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png",
+//       media_id: "balavavdd",
+//       media_type: "mp3",
+//       // isExpand: true,
+//       // computedHeight: 0,
+//       created_at: Timestamp.now(),
+//       updated_at: Timestamp.now(),
+//     }
+//   },
+// ])
 const activeName = ref("0");
 const collapse = ref(true);
 

@@ -21,15 +21,15 @@
   </div>
   <div class="card-body" v-if="isExpand.expanded">
     <div class="card-flex-container">
-      <div class="card-content">
+      <div style="flex: 1 1 0%">
         <div >{{ props.detail.entity.name }}</div>
         <img
           :src="props.detail.entity.public_link"
           class="image"
         />
       </div>
-      <div class="card-content">
-        <div class="bold bigger-font">{{ props.detail.entity.artist }}</div>
+      <div style="flex: 2 1 0%">
+        <div class="bold bigger-font description">{{ props.detail.entity.artist }}</div>
         <div class="description">{{ props.detail.entity.description }}</div>
       </div>
     </div>
@@ -52,7 +52,7 @@ const centerDialogVisible = ref(true)
 
 <style>
 .description{
-  width:50%
+padding: 0 1em;
 }
 .bigger-font{
   font-size: 1.5em;

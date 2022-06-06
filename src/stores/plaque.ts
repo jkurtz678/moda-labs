@@ -14,15 +14,16 @@ export const usePlaqueStore = defineStore({
         token_meta_id_list: (state): string[] => {
             let token_meta_id_list: string[] = [];
             state.plaques.forEach( p => {
-                token_meta_id_list = token_meta_id_list.concat(p.entity.token_meta_id_list);
+                token_meta_id_list.push(...p.entity.token_meta_id_list);
             })
             return token_meta_id_list;
         }
     },
     actions: {
-        async loadPlaques(account_id: string) {
+        async loadPlaques(account_id: string, callback: () => void ) {
             await getPlaquesByAccountIDWithListener(account_id, (plaques) => {
                 this.plaques = plaques;
+                callback();
             })
         }
     }
