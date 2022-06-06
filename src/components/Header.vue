@@ -1,7 +1,7 @@
 <template>
     <div style="display: flex; align-items: center;">
         <el-image :src="getImageUrl('logo.png')" style="width: 43px; height: 43px;"></el-image>
-        <el-tabs style="margin-left: 2em;">
+        <el-tabs v-if="screen_type != 'xs'"  style="margin-left: 2em;">
             <el-tab-pane label="Overview" name="first"></el-tab-pane>
             <el-tab-pane label="Support" name="second"></el-tab-pane>
             <el-tab-pane label="Account" name="Third"></el-tab-pane>
@@ -18,8 +18,10 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
 import { useAccountStore } from "@/stores/account"
+import useBreakpoints from "@/composables/breakpoints"
 const router = useRouter();
 const account_store = useAccountStore();
+const {width, screen_type} = useBreakpoints();
 
 const logout = () => {
     account_store.logout();

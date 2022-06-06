@@ -1,6 +1,7 @@
 
 <template>
-  <el-dialog class="box-dialog" center v-model="show_dialog" title="Add tokens"  width="530px" close-on-click-modal="false">
+  <el-dialog class="box-dialog" center v-model="show_dialog" title="Add tokens" width="530px"
+    close-on-click-modal="false" :fullscreen="screen_type == 'xs'">
     <el-card class="box-card" shadow="never">
       <AddTokenItem :plaque_id="plaque_id" :detail="i" v-for="i in token_metas"></AddTokenItem>
       <hr class="hr" />
@@ -20,6 +21,7 @@ import { getTokenMetas } from "@/api/token-meta";
 import AddTokenItem from './AddTokenItem.vue';
 import { ElLoading, ElMessage } from 'element-plus'
 import type { FirestoreDocument, TokenMeta } from "@/types/types";
+import useBreakpoints from "@/composables/breakpoints"
 
 interface PlaqueItemProps {
   show_add_token_dialog: boolean;
@@ -30,6 +32,7 @@ const props = defineProps<PlaqueItemProps>();
 const emit = defineEmits(['update:show_add_token_dialog'])
 const token_metas = ref<FirestoreDocument<TokenMeta>[]>();
 const loading = ref(false);
+const {width, screen_type} = useBreakpoints();
 
 const show_dialog = computed({
   get() {

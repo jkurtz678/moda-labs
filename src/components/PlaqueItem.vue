@@ -1,5 +1,5 @@
 <template>
-  <el-card class="rounded-card">
+  <el-card>
     <template #header>
       <div style="display: flex; align-items: center;padding:1em" @click="showDetail = !showDetail">
         <h1> {{ props.plaque.entity.name }}</h1>
@@ -11,7 +11,7 @@
       <p style="padding:0 1em;">{{`Total artworks: ${plaque.entity.token_meta_id_list.length}`}}</p>
       <div style="display: flex; align-items: center; justify-content: space-between;padding: 0.5em 1em;">
         <el-button>Settings</el-button>
-        <el-button type="info" @click="show_add_token_dialog = true">ADD Artwork</el-button>
+        <el-button type="info" @click="show_add_token_dialog = true">Add Artwork</el-button>
       </div>
       </section>
       </transition>
@@ -194,7 +194,7 @@ const forgetPlaque = () => {
 </script>
 
 <style scoped>
-.rounded-card {
+.el-card {
   --el-card-padding: 0px;
   margin: 10px;
   border-radius: 18px;
@@ -220,7 +220,7 @@ const forgetPlaque = () => {
 }
 
 .el-dialog__body {
-  padding: 0 !important;
+  padding: 0 !important;    
 }
 
 .box-dialog {
@@ -231,9 +231,11 @@ el-card__body {
 }
 
 @media only screen and (max-width: 600px) {
-  .el-card {
+  div.el-card {
     display: block;
     margin: 20px 10px 20px 10px;
+
+    min-width: 250px !important;
   }
 }
 </style>
