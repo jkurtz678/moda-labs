@@ -21,11 +21,11 @@
         <el-row style="margin-bottom: 8px;padding:1em">
           <el-col :span="12">
             <div style="font-size: var(--el-font-size-extra-small)">title</div>
-            <span>V.E.N.I.C.E</span>
+            <span>{{firstItem?.entity.name}}</span>
           </el-col>
           <el-col :span="12">
             <div style="font-size: var(--el-font-size-extra-small)">artist</div>
-            Nate Mohler
+            {{firstItem?.entity.artist}}
           </el-col>
         </el-row>
         <div style="padding:1em">Total artworks: 8</div>
@@ -73,6 +73,11 @@ const items: FirestoreDocument<TokenMeta>[] = token_meta_store.token_meta_list;
 interface TokenMetaMap {
     [id: string]: FirestoreDocument<TokenMeta>;
 }
+const firstItem = computed(() => {
+  const token_map = token_meta_store.token_meta_map;
+  let res= props.plaque.entity.token_meta_id_list.map(token_id => token_map[token_id])
+  return res[0]?res[0]:null;
+})
 const plaque_tokens = computed(() => {
   const token_map = token_meta_store.token_meta_map;
   let res= props.plaque.entity.token_meta_id_list.map(token_id => token_map[token_id])
@@ -81,6 +86,8 @@ const plaque_tokens = computed(() => {
   }
   return res;
 })
+
+
 // DUMMY DATA
 // const items: FirestoreDocument<TokenMeta>[] = reactive([
 //   {
@@ -189,7 +196,7 @@ const forgetPlaque = () => {
   --el-card-padding: 0px;
   margin: 10px;
   border-radius: 18px;
-  min-width: 380px;
+  min-width: 410px;
   display: inline-block;
   vertical-align: top;
   text-align: left;
