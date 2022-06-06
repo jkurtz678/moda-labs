@@ -8,10 +8,10 @@
       </div>
       <transition name="el-fade-in-linear"> 
       <section v-if="showDetail">
-      <p style="padding:0 1em;">Total artworks: 8</p>
+      <p style="padding:0 1em;">{{`Total artworks: ${plaque.entity.token_meta_id_list.length}`}}</p>
       <div style="display: flex; align-items: center; justify-content: space-between;padding: 0.5em 1em;">
         <el-button>Settings</el-button>
-        <el-button type="info" @click="addNewToList = true">ADD Artwork</el-button>
+        <el-button type="info" @click="show_add_token_dialog = true">ADD Artwork</el-button>
       </div>
       </section>
       </transition>
@@ -28,7 +28,7 @@
             {{firstItem?.entity.artist}}
           </el-col>
         </el-row>
-        <div style="padding:1em">Total artworks: 8</div>
+        <div style="padding:1em">{{`Total artworks: ${plaque.entity.token_meta_id_list.length}`}}</div>
       </section>
     </transition>
     <transition name="el-fade-in-linear"> 
@@ -41,8 +41,8 @@
         </div>
       </section>
     </transition>
-    <!-- {{plaque_tokens}} -->
-    <AddTokenDialog v-model:show_add_token_dialog="show_add_token_dialog"></AddTokenDialog>
+    
+    <AddTokenDialog :plaque_id="props.plaque.id" v-model:show_add_token_dialog="show_add_token_dialog"></AddTokenDialog>
 
   </el-card>
 </template>
@@ -63,7 +63,6 @@ interface PlaqueItemProps {
 }
 const centerDialogVisible = ref(true)
 const props = defineProps<PlaqueItemProps>();
-const addNewToList = ref(false);
 const showDetail = ref(false);
 const show_add_token_dialog = ref(false);
 const token_meta_store = useTokenMetaStore()
@@ -81,9 +80,12 @@ const firstItem = computed(() => {
 const plaque_tokens = computed(() => {
   const token_map = token_meta_store.token_meta_map;
   let res= props.plaque.entity.token_meta_id_list.map(token_id => token_map[token_id])
-  for(let i of res){
+  /* for(let i of res){
+    if(!i) {
+      continue;
+    }
     i.entity.public_link = "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-  }
+  } */
   return res;
 })
 

@@ -3,13 +3,14 @@
   <div class="card-flex-container">
     <div style="flex: 1">
       <img
-        :src="props.detail.entity.public_link"
+        :src="getImageUrl('logo.png')"
         class="image"
+        style="max-width: 70px;" 
       />
     </div>
     <div style="flex: 3 1 0%">
-      <p class="bold">{{ props.detail.entity.name }}</p>
-      <p class="bold">{{ props.detail.entity.artist }}</p>
+      <p class="bold">{{ props.detail?.entity?.name }}</p>
+      <p class="bold">{{ props.detail?.entity?.artist }}</p>
     </div>
     <div style="flex: 1;text-align:right; padding-right:1em">
       <el-icon @click="isExpand.expanded = !isExpand.expanded">
@@ -24,8 +25,8 @@
       <div style="flex:1; width:30%">
         <div >{{ props.detail.entity.name }}</div>
         <img
-          :src="props.detail.entity.public_link"
           style="width:121px"
+          :src="getImageUrl('logo.png')"
         />
       </div>
       <div style="flex: 3 1 0%; width:70%">
@@ -42,12 +43,16 @@
 import { defineProps, computed } from "vue";
 import type { FirestoreDocument,TokenMeta } from "../types/types";
 import { ref,reactive } from "vue";
+
 interface PlaqueItemDetailProps {
   detail: FirestoreDocument<TokenMeta>;
 }
 const props = defineProps<PlaqueItemDetailProps>();
 const isExpand = reactive({expanded:false});
 const centerDialogVisible = ref(true)
+const getImageUrl = (filename: string) => {
+    return new URL(`../assets/${filename}`, import.meta.url).href
+}
 </script>
 
 <style>
