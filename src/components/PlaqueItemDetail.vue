@@ -20,15 +20,15 @@
     </div>
   </div>
   <div class="card-body" v-if="isExpand.expanded">
-    <div class="card-flex-container">
-      <div style="flex: 1 1 0%">
+    <div class="card-flex-container" >
+      <div style="flex:1; width:30%">
         <div >{{ props.detail.entity.name }}</div>
         <img
           :src="props.detail.entity.public_link"
-          class="image"
+          style="width:121px"
         />
       </div>
-      <div style="flex: 2 1 0%">
+      <div style="flex: 3 1 0%; width:70%">
         <div class="bold bigger-font description">{{ props.detail.entity.artist }}</div>
         <div class="description">{{ props.detail.entity.description }}</div>
       </div>
@@ -65,6 +65,9 @@ padding: 0 1em;
   width: 100%;
   display: block;
   padding-right: 1em;
+}
+.card-body{
+      max-width: 404px;
 }
 .bold{
     font-weight:700;
