@@ -1,7 +1,7 @@
 
 <template>
-  <el-dialog class="box-dialog" center v-model="show_dialog" title="Add tokens" width="530px"
-    close-on-click-modal="false" :fullscreen="screen_type == 'xs'">
+  <el-dialog class="box-dialog" center v-model="show_dialog" title="Add tokens" close-on-click-modal="false"
+    :fullscreen="screen_type == 'xs'">
     <el-card class="box-card" shadow="never">
       <AddTokenItem :plaque_id="plaque_id" :detail="i" v-for="i in token_metas"></AddTokenItem>
       <hr class="hr" />
@@ -32,7 +32,7 @@ const props = defineProps<PlaqueItemProps>();
 const emit = defineEmits(['update:show_add_token_dialog'])
 const token_metas = ref<FirestoreDocument<TokenMeta>[]>();
 const loading = ref(false);
-const {width, screen_type} = useBreakpoints();
+const { width, screen_type } = useBreakpoints();
 
 const show_dialog = computed({
   get() {
@@ -53,3 +53,14 @@ watch(show_dialog, async (v) => {
 })
 
 </script>
+
+<style scoped>
+.el-dialog.el-dialog--center{
+  --el-dialog-margin-top: 1em;
+  margin: 1em auto 50px !important;
+}
+
+.el-dialog--center.el-dialog__body {
+  padding: 0px calc(var(--el-dialog-padding-primary) + 5px) 30px
+}
+</style> 

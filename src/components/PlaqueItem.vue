@@ -6,33 +6,34 @@
         <div style="flex-grow: 1" />
         <el-tag class="ml-2" type="success">online</el-tag>
       </div>
-      <transition name="el-fade-in-linear"> 
-      <section v-if="showDetail">
-      <p style="padding:0 1em;">{{`Total artworks: ${plaque.entity.token_meta_id_list.length}`}}</p>
-      <div style="display: flex; align-items: center; justify-content: space-between;padding: 0.5em 1em;">
-        <el-button>Settings</el-button>
-        <el-button type="info" @click="show_add_token_dialog = true">Add Artwork</el-button>
-      </div>
-      </section>
+      <transition name="el-fade-in-linear">
+        <section v-if="showDetail">
+          <p style="padding:0 1em;">{{ `Total artworks: ${plaque.entity.token_meta_id_list.length}` }}</p>
+          <div style="display: flex; align-items: center; justify-content: space-between;padding: 0.5em 1em;">
+            <el-button>Settings</el-button>
+            <el-button type="info" @click="show_add_token_dialog = true">Add Artwork</el-button>
+          </div>
+        </section>
       </transition>
     </template>
-    <transition name="el-fade-in-linear"> 
+    <transition name="el-fade-in-linear">
       <section class="card-simple" v-if="!showDetail" @click="showDetail = true">
         <el-row style="margin-bottom: 8px;padding:1em">
           <el-col :span="12">
             <div style="font-size: var(--el-font-size-extra-small)">title</div>
-            <span>{{firstItem?.entity.name}}</span>
+            <span>{{ first_token?.entity.name || "N/A" }}</span>
           </el-col>
           <el-col :span="12">
             <div style="font-size: var(--el-font-size-extra-small)">artist</div>
-            {{firstItem?.entity.artist}}
+            {{ first_token?.entity.artist || "N/A" }}
           </el-col>
         </el-row>
-        <div style="padding:1em">{{`Total artworks: ${plaque.entity.token_meta_id_list.length}`}}</div>
+        <div style="padding:1em">{{ `Total artworks: ${plaque.entity.token_meta_id_list.length}` }}</div>
       </section>
     </transition>
-    <transition name="el-fade-in-linear"> 
+    <transition name="el-fade-in-linear">
       <section class="card-detail" v-if="showDetail">
+      <div v-if="plaque_tokens.length == 0" style="padding: 1em;">No tokens added</div>
         <PlaqueItemDetail :detail="i" v-for="i in plaque_tokens" />
         <div style="display: flex; padding: 1em;">
           <el-button @click="clearTokens">Clear Tokens</el-button>
@@ -41,7 +42,7 @@
         </div>
       </section>
     </transition>
-    
+
     <AddTokenDialog :plaque_id="props.plaque.id" v-model:show_add_token_dialog="show_add_token_dialog"></AddTokenDialog>
 
   </el-card>
@@ -70,91 +71,21 @@ const token_meta_store = useTokenMetaStore()
 const items: FirestoreDocument<TokenMeta>[] = token_meta_store.token_meta_list;
 
 interface TokenMetaMap {
-    [id: string]: FirestoreDocument<TokenMeta>;
+  [id: string]: FirestoreDocument<TokenMeta>;
 }
-const firstItem = computed(() => {
-  const token_map = token_meta_store.token_meta_map;
-  let res= props.plaque.entity.token_meta_id_list.map(token_id => token_map[token_id])
-  return res[0]?res[0]:null;
+// first_token is the token visible on the simple view of the plaque card
+const first_token = computed(() => {
+  if (plaque_tokens.value.length == 0) {
+    return null
+  }
+  return plaque_tokens.value[0];
 })
 const plaque_tokens = computed(() => {
   const token_map = token_meta_store.token_meta_map;
-  let res= props.plaque.entity.token_meta_id_list.map(token_id => token_map[token_id])
-  /* for(let i of res){
-    if(!i) {
-      continue;
-    }
-    i.entity.public_link = "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-  } */
+  let res = props.plaque.entity.token_meta_id_list.map(token_id => token_map[token_id])
   return res;
 })
 
-
-// DUMMY DATA
-// const items: FirestoreDocument<TokenMeta>[] = reactive([
-//   {
-//     id: "test",
-//     entity: {
-//       name: "V.E.N.I.C.E",
-//       artist: "Nate Mohler",
-//       description: "Lorem ipsum dolor sit amet",
-//       public_link: "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png",
-//       media_id: "dfefe",
-//       media_type: "mp3",
-//       // isExpand: true,
-//       // computedHeight: 0,
-//       created_at: Timestamp.now(),
-//       updated_at: Timestamp.now(),
-//     }
-//   },
-//   {
-//     id: "test",
-//     entity: {
-//       name: "Bing Bong",
-//       artist: "Shawn Lister",
-//       description: "Lorem ipsum dolor sit amet",
-//       public_link: "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png",
-//       media_id: "balavavdd",
-//       media_type: "mp3",
-//       // isExpand: true,
-//       // computedHeight: 0,
-//       created_at: Timestamp.now(),
-//       updated_at: Timestamp.now(),
-//     }
-//   },
-// ])
-// const allItems: FirestoreDocument<TokenMeta>[] = reactive([
-//   {
-//     id: "test",
-//     entity: {
-//       name: "V.E.N.I.C.E",
-//       artist: "Nate Mohler",
-//       description: "Lorem ipsum dolor sit amet",
-//       public_link: "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png",
-//       media_id: "dfefe",
-//       media_type: "mp3",
-//       // isExpand: true,
-//       // computedHeight: 0,
-//       created_at: Timestamp.now(),
-//       updated_at: Timestamp.now(),
-//     }
-//   },
-//   {
-//     id: "test",
-//     entity: {
-//       name: "Bing Bong",
-//       artist: "Shawn Lister",
-//       description: "Lorem ipsum dolor sit amet",
-//       public_link: "https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png",
-//       media_id: "balavavdd",
-//       media_type: "mp3",
-//       // isExpand: true,
-//       // computedHeight: 0,
-//       created_at: Timestamp.now(),
-//       updated_at: Timestamp.now(),
-//     }
-//   },
-// ])
 const activeName = ref("0");
 const collapse = ref(true);
 
@@ -162,7 +93,7 @@ const clearTokens = () => {
   ElMessageBox.confirm(`Are you sure you want to clear tokens for plaque '${props.plaque.entity.name}'?`, "Clear tokens", {
     type: 'warning'
   }).then(() => {
-    updatePlaque(props.plaque.id, {token_meta_id_list: []})
+    updatePlaque(props.plaque.id, { token_meta_id_list: [] })
       .then(() => {
         ElMessage({
           type: 'success',
@@ -220,12 +151,13 @@ const forgetPlaque = () => {
 }
 
 .el-dialog__body {
-  padding: 0 !important;    
+  padding: 0 !important;
 }
 
 .box-dialog {
   --el-dialog-padding-primary: 10px 0px 10px 0px;
 }
+
 el-card__body {
   padding: 0 !important;
 }

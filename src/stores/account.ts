@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import type { FirestoreDocument, Account } from "@/types/types"
 import { getAccountByAddress, createAccount } from "@/api/account"
+import { ElMessage } from 'element-plus'
 
 export type RootAccountState = {
   account: FirestoreDocument<Account> | null
@@ -10,6 +11,16 @@ export const useAccountStore = defineStore({
   state: () => ({
     account: null,
   } as RootAccountState),
+  getters: {
+    get_account: (state): FirestoreDocument<Account> => {
+      if (!state.account) {
+        ElMessage("Error - tried to retrieve account for unautheticated user");
+        throw "Error - tried to retrieve account for unauthenticated user";
+      }
+
+      return state.account;
+    }
+  },
   actions: {
     // loadAccount will retrieve an account by a given address, creating if it does not exist
     async loadAccount(address: string, signature: string) {
