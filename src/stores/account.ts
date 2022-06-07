@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import type { FirestoreDocument, Account } from "@/types/types"
 import { getAccountByAddress, createAccount } from "@/api/account"
 import { ElMessage } from 'element-plus'
+import { connectWallet } from "@/web3Interface"
 
 export type RootAccountState = {
   account: FirestoreDocument<Account> | null
@@ -33,11 +34,12 @@ export const useAccountStore = defineStore({
 
       this.account = await createAccount(address, signature)
     },
-    login (address: string, signature: string) {
+    async login() {
+      const { address, signature } = await connectWallet()
       window.localStorage.setItem("account_address", address);
       window.localStorage.setItem("account_signature", signature);
     },
-    logout () {
+    logout() {
       window.localStorage.removeItem("account_address");
       window.localStorage.removeItem("account_signature");
       this.account = null;

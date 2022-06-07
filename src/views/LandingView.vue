@@ -29,25 +29,26 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 import { useRouter } from 'vue-router';
-import web3Interface from "@/composables/web3Interface";
+import { connectWallet } from "@/web3Interface";
 import { useAccountStore } from "@/stores/account"
 const account_store = useAccountStore();
 
 const loading = ref(false);
 
-const { connectWallet, setupWeb3Modal, signature, address, web3_modal } =
-    web3Interface();
 const router = useRouter();
 const whatsNew = () => {
     window.location.assign("https://modadisplay.art/Upcoming-Events")
 }
-const connect = async () => {
+const connect = () => {
     loading.value = true
-    await setupWeb3Modal();
-    await connectWallet();
-    account_store.login(address.value, signature.value);
-    loading.value = false;
-    router.push("home")
+    account_store.login()
+        .then(() => {
+            router.push("home")
+        }).catch(err => {
+            console.error(err);
+        }).finally(() => {
+            loading.value = false;
+        });
 }
 </script>
 
