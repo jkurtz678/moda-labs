@@ -1,12 +1,12 @@
 <template>
   <div style="padding: 20px">
     <h1 style="margin-bottom: 15px">SUBMIT TO MODA ARCHIVES</h1>
-    <el-form ref="formRef" :model="form" :rules="rules" label-position="left" label-width="95px"
+    <el-form ref="formRef" :model="form" :rules="rules" label-position="left" label-width="120px"
       style="max-width: 700px">
-      <el-form-item label="Name" style="max-width: 400px" prop="name">
+      <el-form-item label="Artwork title" style="max-width: 400px" prop="name">
         <el-input v-model="form.name" />
       </el-form-item>
-      <el-form-item label="Artist" style="max-width: 400px" prop="artist">
+      <el-form-item label="Artist name" style="max-width: 400px" prop="artist">
         <el-input v-model="form.artist" />
       </el-form-item>
       <el-form-item label="Description" prop="description">
@@ -44,15 +44,17 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from "vue";
+import { reactive, ref, onMounted } from "vue";
 import type { FormInstance, FormRules } from "element-plus";
 import { createTokenMeta } from "@/api/token-meta";
 import { uploadFile } from "@/api/storage";
 import type { TokenMeta } from "@/types/types";
+import { useRouter } from 'vue-router';
+import { useAccountStore } from "@/stores/account"
 
-import { ElMessage, ElMessageBox } from "element-plus";
 import type { UploadProps, UploadUserFile, UploadRequestOptions } from "element-plus";
 import { Timestamp } from "firebase/firestore"
+import { ElLoading, ElMessage, ElMessageBox } from 'element-plus'
 
 const formRef = ref<FormInstance>();
 const file_uid = ref<string>();
@@ -64,7 +66,8 @@ const form = reactive<TokenMeta>({
   created_at: Timestamp.now(),
   updated_at: Timestamp.now(),
   media_id: "",
-  media_type: ""
+  media_type: "",
+  account_id: ""
 });
 const file_list = ref<UploadUserFile[]>([]);
 const rules = reactive<FormRules>({
@@ -73,6 +76,33 @@ const rules = reactive<FormRules>({
 });
 const loading = ref(false);
 const loading_progress = ref("0%");
+const router = useRouter();
+const account_store = useAccountStore();
+
+onMounted(async () => {
+
+  const address = window.localStorage.getItem("account_address")
+  const signature = window.localStorage.getItem("account_signature")
+
+  if (address == null || signature == null) {
+    router.push({ name: "login" })
+    return
+  }
+  const loading = ElLoading.service({
+    lock: true,
+    text: 'Loading',
+    background: 'rgba(0, 0, 0, 0.7)',
+  })
+
+  try {
+    await account_store.loadAccount(address, signature);
+    form.account_id = account_store.get_account.id
+  } catch (err) {
+    ElMessage({ message: `Error loading moda archive account - ${err}`, type: 'error', showClose: true, duration: 12000 });
+  } finally {
+    loading.close()
+  }
+})
 
 const beforeRemove: UploadProps["beforeRemove"] = (uploadFile, uploadFiles) => {
   return ElMessageBox.confirm(`Cancel the upload of ${uploadFile.name} ?`).then(

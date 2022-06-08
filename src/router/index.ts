@@ -5,7 +5,7 @@ const router = createRouter({
   routes: [
    {
       path: '/',
-      redirect: "/home"
+      redirect: "/submit"
     },
     {
       path: '/home',
@@ -37,7 +37,12 @@ const router = createRouter({
       path: '/submit',
       name: 'submit',
       component: () => import('@/views/SubmitView.vue')
-    }
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: () => import('@/views/MetamaskLogin.vue')
+    },
   ]
 })
 

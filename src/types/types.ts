@@ -32,6 +32,7 @@ export interface TokenMeta extends BaseDocument {
     public_link?: string;
     media_id: string;
     media_type: string;
+    account_id: string;
 }
 
 export interface Plaque extends BaseDocument {
