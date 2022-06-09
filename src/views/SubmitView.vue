@@ -163,6 +163,8 @@ const submit = async (formEl: FormInstance | undefined) => {
   uploadFile(`${file.uid || ""}`, file.raw as File, progressCallback, successCallback)
     .catch(err => {
       console.error(err)
+      loading.value = false;
+      ElMessage({ message: `Error uploading file to moda archive - ${err}`, type: 'error', showClose: true, duration: 12000 });
     })
 };
 
@@ -180,7 +182,7 @@ const uploadSuccess = (formEl: FormInstance, file: UploadUserFile) => {
       })
     })
     .catch((err) => {
-      ElMessage({ message: `Error uploading to moda archive - ${err}`, type: 'error', showClose: true, duration: 12000 });
+      ElMessage({ message: `Error uploading metadata to moda archive - ${err}`, type: 'error', showClose: true, duration: 12000 });
     })
     .finally(() => (loading.value = false))
 
