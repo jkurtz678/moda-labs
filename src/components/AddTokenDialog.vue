@@ -72,14 +72,14 @@ watch(show_dialog, async (v) => {
 </script>
 
 <style scoped>
-::v-deep .el-dialog.add-dialog {
+:deep .el-dialog.add-dialog {
   height: auto;
   max-height: 100vh;
   overflow-y: auto;
   margin: 4vh auto;
 }
 
-::v-deep .el-dialog__body {
+:deep .el-dialog__body {
   padding: 10px calc(var(--el-dialog-padding-primary) + 5px) 30px;
   position: relative;
   border-top: 1px solid #dcdfe6;

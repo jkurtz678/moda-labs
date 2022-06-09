@@ -39,8 +39,7 @@
 
 
 <script setup lang="ts">
-  
-import { defineProps, computed } from "vue";
+
 import type { FirestoreDocument,TokenMeta } from "../types/types";
 import { ref,reactive } from "vue";
 

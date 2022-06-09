@@ -16,7 +16,7 @@
 
 <script setup lang="ts">
 
-import { defineProps, computed, ref } from "vue";
+import {computed, ref } from "vue";
 import type { FirestoreDocument, TokenMeta, Plaque } from "../types/types";
 import { usePlaqueStore } from "@/stores/plaque"
 import { updatePlaque } from "@/api/plaque"
