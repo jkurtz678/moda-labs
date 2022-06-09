@@ -42,7 +42,12 @@ onMounted(async () => {
     return
   }
   await plaque_store.loadPlaques(account_store.account.id, async () => {
-      await token_meta_store.loadTokenMetas(plaque_store.token_meta_id_list);
+      await token_meta_store.loadTokenMetas(plaque_store.token_meta_id_list).catch(
+        err => {
+              ElMessage({ message: `Error add new item - ${err}`, type: 'error', showClose: true, duration: 12000 })
+        }
+      );
+
       loading.close()
   })
 });
