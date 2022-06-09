@@ -1,18 +1,20 @@
 
 <template>
-  <el-dialog class="box-dialog" center v-model="show_dialog" title="Add tokens" close-on-click-modal="false"
-    :fullscreen="screen_type == 'xs'">
-    <el-card class="box-card" shadow="never">
-      <AddTokenItem :plaque_id="plaque_id" :detail="i" v-for="i in token_metas"></AddTokenItem>
-      <hr class="hr" />
-    </el-card>
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button>Clear</el-button>
-        <el-button type="info">Done</el-button>
-      </span>
-    </template>
-  </el-dialog>
+  <div class="dialog-container">
+    <el-dialog class="box-dialog" center v-model="show_dialog" title="Add tokens" close-on-click-modal="false"
+      :fullscreen="screen_type == 'xs'" custom-class="add-dialog">
+      <el-card class="box-card" shadow="never">
+        <AddTokenItem :plaque_id="plaque_id" :detail="i" v-for="i in token_metas"></AddTokenItem>
+        <hr class="hr" />
+      </el-card>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button>Clear</el-button>
+          <el-button type="info">Done</el-button>
+        </span>
+      </template>
+    </el-dialog>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -55,12 +57,25 @@ watch(show_dialog, async (v) => {
 </script>
 
 <style scoped>
-.el-dialog.el-dialog--center{
-  --el-dialog-margin-top: 1em;
-  margin: 1em auto 50px !important;
+::v-deep .el-dialog.add-dialog {
+  height: auto;
+  max-height: 80vh;
+  overflow-y: auto;
+  margin: 10vh auto;
 }
 
-.el-dialog--center.el-dialog__body {
-  padding: 0px calc(var(--el-dialog-padding-primary) + 5px) 30px
+::v-deep .el-dialog__body {
+  padding: 10px calc(var(--el-dialog-padding-primary) + 5px) 30px;
+  position: relative;
+  border-top: 1px solid #dcdfe6;
+  max-height: 51vh;
+  overflow-y: scroll;
+}
+
+.dialog-container {
+  position: relative;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  width: 50%;
+  height: 100%;
 }
 </style> 
