@@ -29,10 +29,13 @@ export interface TokenMeta extends BaseDocument {
     name: string;
     artist?: string;
     description?: string;
-    public_link?: string;
-    media_id: string;
-    media_type: string;
-    account_id: string;
+    public_link?: string; // link to public site for art, such as opensea listing. Embedded in plaque qr code link
+    media_id: string; // uid of media in firebase storage
+    media_type: string; // file extension of media e.g. .mp4
+    account_id?: string; // document id of account
+    blockchain?: string; // ethereum, off-chain
+    asset_contract_address?: string; // contract address for ethereum token
+    token_id?: string; // token id for ethereum token
 }
 
 export interface Plaque extends BaseDocument {

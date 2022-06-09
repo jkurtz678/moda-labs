@@ -1,16 +1,28 @@
 <template>
   <div style="padding: 20px">
     <h1 style="margin-bottom: 15px">SUBMIT TO MODA ARCHIVES</h1>
-    <el-form ref="formRef" :model="form" :rules="rules" label-position="left" label-width="120px"
-      style="max-width: 700px">
-      <el-form-item label="Artwork title" style="max-width: 400px" prop="name">
+    <el-form ref="formRef" :model="form" :rules="rules" label-position="left" label-width="180px"
+      style="max-width: 750px">
+      <el-form-item label="Artwork title" style="max-width: 550px" prop="name">
         <el-input v-model="form.name" />
       </el-form-item>
-      <el-form-item label="Artist name" style="max-width: 400px" prop="artist">
+      <el-form-item label="Artist name" style="max-width: 550px" prop="artist">
         <el-input v-model="form.artist" />
       </el-form-item>
+      <el-form-item label="Blockchain">
+        <el-radio-group v-model="form.blockchain">
+          <el-radio label="ethereum">Ethereum</el-radio>
+          <el-radio label="off_chain">Off-chain</el-radio>
+        </el-radio-group>
+      </el-form-item>
+      <el-form-item v-if="form.blockchain == 'ethereum'" label="Asset Contract Address"  style="max-width: 550px;" prop="asset_contract_address">
+        <el-input v-model="form.asset_contract_address" />
+      </el-form-item>
+      <el-form-item v-if="form.blockchain == 'ethereum'" label="Token ID" style="max-width: 550px;" prop="token_id">
+        <el-input v-model="form.token_id" />
+      </el-form-item>
       <el-form-item label="Description" prop="description">
-        <el-input v-model="form.description" type="textarea" rows="4" />
+        <el-input v-model="form.description" type="textarea" rows="3" />
       </el-form-item>
       <el-form-item label="Public Link" prop="public_link">
         <el-input v-model="form.public_link" />
@@ -67,12 +79,18 @@ const form = reactive<TokenMeta>({
   updated_at: Timestamp.now(),
   media_id: "",
   media_type: "",
-  account_id: ""
+  account_id: "",
+  blockchain: "ethereum",
+  asset_contract_address: "",
+  token_id: ""
+
 });
 const file_list = ref<UploadUserFile[]>([]);
 const rules = reactive<FormRules>({
   name: [{ required: true, message: "Required", trigger: "blur" }],
   artist: [{ required: true, message: "Required", trigger: "blur" }],
+  asset_contract_address: [{ required: true, message: "Required", trigger: "blur" }],
+  token_id: [{ required: true, message: "Required", trigger: "blur" }],
 });
 const loading = ref(false);
 const loading_progress = ref("0%");
@@ -156,15 +174,25 @@ const uploadSuccess = (formEl: FormInstance, file: UploadUserFile) => {
       formEl.resetFields();
       file_list.value = [];
       loading.value = false;
-      alert("Successfully submitted token");
+       ElMessage({
+          type: 'success',
+          message: 'Successfully submitted token',
+        })
     })
     .catch((err) => {
       loading.value = false;
-      alert(err);
+      ElMessage({ message: `Error uploading to moda archive - ${err}`, type: 'error', showClose: true, duration: 12000 });
     });
 
 }
 </script>
 
 <style>
+.el-upload {
+    --el-upload-dragger-padding-horizontal: 4px;
+    --el-upload-dragger-padding-vertical: 10px;
+}
+.el-upload-dragger .el-icon--upload {
+  margin-bottom: 0px;
+}
 </style>
