@@ -18,22 +18,14 @@ import { ref, onMounted, computed } from "vue";
 import { ethers } from "ethers";
 import { ElMessage, ElMessageBox } from 'element-plus'
 import router from "@/router";
+import detectEthereumProvider from '@metamask/detect-provider';
 
 const metamask_supported = ref(false);
 const connect_account_loading = ref(false);
 
-onMounted(() => {
-    const { ethereum } = window;
-    metamask_supported.value = Boolean(ethereum && ethereum.isMetaMask);
-
-    interface ProviderMessage {
-        type: string;
-        data: unknown;
-    }
-
-    ethereum.on('message', (message: ProviderMessage) => {
-        console.log("MESSAGE", message);
-    });
+onMounted(async () => {
+    const provider = await detectEthereumProvider();
+    metamask_supported.value = Boolean(provider);
 })
 
 const connectWallet = async () => {
