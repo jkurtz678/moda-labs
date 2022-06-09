@@ -48,7 +48,7 @@
   </el-card>
 </template>
 <script setup lang="ts">
-import { defineProps, computed } from "vue";
+import { computed } from "vue";
 import type { FirestoreDocument, Plaque, TokenMeta } from "@/types/types";
 import AddTokenDialog from './AddTokenDialog.vue';
 import PlaqueItemDetail from "./PlaqueItemDetail.vue";
