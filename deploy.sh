@@ -5,6 +5,8 @@ set -e
 npm run build
 
 cd dist
+echo 'labs.modadisplay.art' > CNAME
+
 
 git init
 git add -A
