@@ -15,7 +15,8 @@
           <el-radio label="off_chain">Off-chain</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item v-if="form.blockchain == 'ethereum'" label="Asset Contract Address"  style="max-width: 550px;" prop="asset_contract_address">
+      <el-form-item v-if="form.blockchain == 'ethereum'" label="Asset Contract Address" style="max-width: 550px;"
+        prop="asset_contract_address">
         <el-input v-model="form.asset_contract_address" />
       </el-form-item>
       <el-form-item v-if="form.blockchain == 'ethereum'" label="Token ID" style="max-width: 550px;" prop="token_id">
@@ -173,25 +174,25 @@ const uploadSuccess = (formEl: FormInstance, file: UploadUserFile) => {
     .then((r) => {
       formEl.resetFields();
       file_list.value = [];
-      loading.value = false;
-       ElMessage({
-          type: 'success',
-          message: 'Successfully submitted token',
-        })
+      ElMessage({
+        type: 'success',
+        message: 'Successfully submitted token',
+      })
     })
     .catch((err) => {
-      loading.value = false;
       ElMessage({ message: `Error uploading to moda archive - ${err}`, type: 'error', showClose: true, duration: 12000 });
-    });
+    })
+    .finally(() => (loading.value = false))
 
 }
 </script>
 
 <style>
 .el-upload {
-    --el-upload-dragger-padding-horizontal: 4px;
-    --el-upload-dragger-padding-vertical: 10px;
+  --el-upload-dragger-padding-horizontal: 4px;
+  --el-upload-dragger-padding-vertical: 10px;
 }
+
 .el-upload-dragger .el-icon--upload {
   margin-bottom: 0px;
 }
