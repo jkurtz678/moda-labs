@@ -21,6 +21,9 @@ export const usePlaqueStore = defineStore({
             });
             return plaque_map;
         },
+        meta_in_playlist: (state) => (plaque:FirestoreDocument<Plaque>, token_meta_id:string): boolean => {
+             return !!plaque.entity.token_meta_id_list.find(id => id == token_meta_id);
+        },
         token_meta_id_list: (state): string[] => {
             let token_meta_id_list: string[] = [];
             state.plaques.forEach(p => {

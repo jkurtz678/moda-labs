@@ -47,8 +47,3 @@ export interface Account extends BaseDocument {
     admin: boolean;
     saved_display_ids: Array<string>; // if user is an admin, devices can be saved here and remembered even if another user has assumed control of the device
 }
-export interface Painting extends BaseDocument {
-    src: string;
-    author: string;
-    title: string;
-}
