@@ -50,7 +50,7 @@ const sort_token_metas = computed(() => {
   const sort_token_metas: FirestoreDocument<TokenMeta>[] = [];
   if (token_metas?.value) {
     for (let token of token_metas?.value) {
-      if (plaque_store.meta_in_playlist(plaque_store.plaque_map[props.plaque_id], token.id)) {
+      if (plaque_store.meta_in_playlist(props.plaque_id, token.id)) {
         sort_token_metas.unshift(token)
       } else {
         sort_token_metas.push(token)
@@ -72,14 +72,14 @@ watch(show_dialog, async (v) => {
 </script>
 
 <style scoped>
-::v-deep .el-dialog.add-dialog {
+:deep .el-dialog.add-dialog {
   height: auto;
   max-height: 100vh;
   overflow-y: auto;
   margin: 4vh auto;
 }
 
-::v-deep .el-dialog__body {
+:deep .el-dialog__body {
   padding: 10px calc(var(--el-dialog-padding-primary) + 5px) 30px;
   position: relative;
   border-top: 1px solid #dcdfe6;
