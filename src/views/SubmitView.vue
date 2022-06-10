@@ -62,6 +62,7 @@ import { uploadFile } from "@/api/storage";
 import type { TokenMeta } from "@/types/types";
 import { useRouter } from 'vue-router';
 import { useAccountStore } from "@/stores/account"
+import { showError } from "@/util/util";
 
 import type { UploadProps, UploadUserFile, UploadRequestOptions } from "element-plus";
 import { Timestamp } from "firebase/firestore"
@@ -115,7 +116,7 @@ onMounted(async () => {
     await account_store.loadAccount(address, signature);
     form.account_id = account_store.get_account.id
   } catch (err) {
-    ElMessage({ message: `Error loading moda archive account - ${err}`, type: 'error', showClose: true, duration: 12000 });
+    showError(`Error loading moda archive account - ${err}`);
   } finally {
     loading.close()
   }
@@ -133,24 +134,27 @@ const handleRemove = () => {
 
 const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) {
-    console.log("SubmitView.vue Submit - formRef is null");
+    showError(`Error finding form element`);
     return;
   }
   const valid = await formEl.validate((v) => v);
   if (!valid) {
     return;
   }
-  loading.value = true;
 
+  // clear out asset contract and token_id if off chain
+  if (form.blockchain != 'ethereum') {
+    form.asset_contract_address = ""
+    form.token_id = ""
+  }
 
   if (file_list?.value?.length !== 1) {
-    console.log("file_list error", file_list.value)
+    showError(`Please add a file to upload`);
     return;
   }
   const file = file_list.value[0]
 
   const progressCallback = (progress: number) => {
-    console.log("Progress", progress)
     loading_progress.value = `${Math.round(progress * 100)}%`
   }
 
@@ -158,12 +162,14 @@ const submit = async (formEl: FormInstance | undefined) => {
     uploadSuccess(formEl, file)
   }
 
+  loading.value = true;
+
   uploadFile(`${file.uid || ""}`, file.raw as File, progressCallback, successCallback)
     .catch(err => {
       console.error(err)
       loading.value = false;
-      ElMessage({ message: `Error uploading file to moda archive - ${err}`, type: 'error', showClose: true, duration: 12000 });
-    })
+      showError(`Error uploading file to moda archive - ${err}`);
+    });
 };
 
 const uploadSuccess = (formEl: FormInstance, file: UploadUserFile) => {
@@ -180,7 +186,7 @@ const uploadSuccess = (formEl: FormInstance, file: UploadUserFile) => {
       })
     })
     .catch((err) => {
-      ElMessage({ message: `Error uploading metadata to moda archive - ${err}`, type: 'error', showClose: true, duration: 12000 });
+      showError(`Error uploading metadata to moda archive - ${err}`);
     })
     .finally(() => (loading.value = false))
 
