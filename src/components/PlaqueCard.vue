@@ -34,7 +34,7 @@
     <transition name="el-fade-in-linear">
       <section class="card-detail" v-if="showDetail">
       <div v-if="plaque_tokens.length == 0" style="padding: 1em;">No tokens added</div>
-        <PlaqueItemDetail :detail="i" v-for="i in plaque_tokens" />
+        <PlaqueTokenItem :token_meta="i" v-for="i in plaque_tokens" />
         <div style="display: flex; padding: 1em;">
           <el-button @click="clearTokens">Clear Tokens</el-button>
           <div style="flex-grow: 1"></div>
@@ -51,19 +51,16 @@
 import { computed } from "vue";
 import type { FirestoreDocument, Plaque, TokenMeta } from "@/types/types";
 import AddTokenDialog from './AddTokenDialog.vue';
-import PlaqueItemDetail from "./PlaqueItemDetail.vue";
-import { Timestamp } from "firebase/firestore";
-import { reactive } from "vue";
-import PlaqueItemDetailList from './PlaqueItemDetailList.vue'
+import PlaqueTokenItem from "./PlaqueTokenItem.vue";
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { ref } from "vue";
 import { updatePlaque } from "@/api/plaque";
 import { useTokenMetaStore } from "../stores/token-meta";
-interface PlaqueItemProps {
+
+interface PlaqueCardProps {
   plaque: FirestoreDocument<Plaque>;
 }
-const centerDialogVisible = ref(true)
-const props = defineProps<PlaqueItemProps>();
+const props = defineProps<PlaqueCardProps>();
 const showDetail = ref(false);
 const show_add_token_dialog = ref(false);
 const token_meta_store = useTokenMetaStore()

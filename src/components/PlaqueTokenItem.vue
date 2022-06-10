@@ -9,8 +9,8 @@
       />
     </div>
     <div style="flex: 3 1 0%">
-      <p class="bold">{{ props.detail?.entity?.name }}</p>
-      <p class="bold">{{ props.detail?.entity?.artist }}</p>
+      <p class="bold">{{ props.token_meta?.entity?.name }}</p>
+      <p class="bold">{{ props.token_meta?.entity?.artist }}</p>
     </div>
     <div style="flex: 1;text-align:right; padding-right:1em">
       <el-icon @click="isExpand.expanded = !isExpand.expanded">
@@ -23,15 +23,15 @@
   <div class="card-body" v-if="isExpand.expanded">
     <div class="card-flex-container" >
       <div style="flex:1; width:30%">
-        <div >{{ props.detail.entity.name }}</div>
+        <div >{{ props.token_meta.entity.name }}</div>
         <img
           style="width:121px"
           :src="getImageUrl('logo.png')"
         />
       </div>
       <div style="flex: 3 1 0%; width:70%">
-        <div class="bold bigger-font description">{{ props.detail.entity.artist }}</div>
-        <div class="description">{{ props.detail.entity.description }}</div>
+        <div class="bold bigger-font description">{{ props.token_meta.entity.artist }}</div>
+        <div class="description">{{ props.token_meta.entity.description }}</div>
       </div>
     </div>
   </div>
@@ -43,12 +43,12 @@
 import type { FirestoreDocument,TokenMeta } from "../types/types";
 import { ref,reactive } from "vue";
 
-interface PlaqueItemDetailProps {
-  detail: FirestoreDocument<TokenMeta>;
+interface PlaqueTokenItem {
+  token_meta: FirestoreDocument<TokenMeta>;
 }
-const props = defineProps<PlaqueItemDetailProps>();
+const props = defineProps<PlaqueTokenItem>();
 const isExpand = reactive({expanded:false});
-const centerDialogVisible = ref(true)
+
 const getImageUrl = (filename: string) => {
     return new URL(`../assets/${filename}`, import.meta.url).href
 }

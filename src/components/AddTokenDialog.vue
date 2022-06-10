@@ -26,12 +26,12 @@ import { ElLoading, ElMessage } from 'element-plus'
 import type { FirestoreDocument, TokenMeta, Plaque } from "@/types/types";
 import useBreakpoints from "@/composables/breakpoints"
 
-interface PlaqueItemProps {
+interface AddTokenDialogProps {
   show_add_token_dialog: boolean;
   plaque_id: string
 }
 
-const props = defineProps<PlaqueItemProps>();
+const props = defineProps<AddTokenDialogProps>();
 const emit = defineEmits(['update:show_add_token_dialog'])
 const token_metas = ref<FirestoreDocument<TokenMeta>[]>();
 const loading = ref(false);
