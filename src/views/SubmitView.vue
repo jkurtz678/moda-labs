@@ -47,9 +47,7 @@
             </el-icon>
             {{ loading_progress }}
           </template>
-
           <div>SUBMIT</div>
-
         </el-button>
       </el-form-item>
     </el-form>

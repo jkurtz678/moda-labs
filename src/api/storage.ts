@@ -1,4 +1,5 @@
 import { getStorage, ref, uploadBytesResumable } from "firebase/storage";
+import { ElMessage } from 'element-plus'
 
 const storage = getStorage();
 
@@ -14,10 +15,8 @@ export const uploadFile = async (file_name: string, file: File, progressCallback
         },
         err => {
             console.log("uploadFile error - ", err)
+            ElMessage({ message: `Error uploading file to moda archive - ${err}`, type: 'error', showClose: true, duration: 12000 });
         },
-        () => {
-            console.log("SUCCESS CALLBACK")
-            successCallback();
-        }
+        successCallback
     )
 }
