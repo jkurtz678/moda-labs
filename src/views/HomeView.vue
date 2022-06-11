@@ -1,7 +1,7 @@
 <template>
   <el-container style="height: 100%">
     <el-header class="header">
-     <Header></Header> 
+      <Header></Header>
     </el-header>
     <el-main style="background-color: #DAD9D7;">
       <RouterView></RouterView>
@@ -16,6 +16,7 @@ import { useAccountStore } from "@/stores/account"
 import { usePlaqueStore } from "@/stores/plaque"
 import { useTokenMetaStore } from "@/stores/token-meta"
 import { ElLoading, ElMessage } from 'element-plus'
+import { showError } from "@/util/util";
 
 const account_store = useAccountStore();
 const plaque_store = usePlaqueStore();
@@ -41,14 +42,16 @@ onMounted(async () => {
     ElMessage("Error - failed to load account")
     return
   }
-  await plaque_store.loadPlaques(account_store.account.id, async () => {
-      await token_meta_store.loadTokenMetas(plaque_store.token_meta_id_list).catch(
-        err => {
-              ElMessage({ message: `Error add new item - ${err}`, type: 'error', showClose: true, duration: 12000 })
-        }
-      );
 
-      loading.close()
+  await plaque_store.loadPlaques(account_store.account.id, async () => {
+    await token_meta_store.loadArchiveTokenMetas(plaque_store.token_meta_id_list).catch(
+      err => {
+        showError(`Error loading archive token metas - ${err}`)
+      }
+    );
+    await token_meta_store.loadOpenseaTokenMetas(account_store.get_account.entity.address).catch(err => (showError(`Error loading opensea tokens - ${err}`)));
+
+    loading.close()
   })
 });
 

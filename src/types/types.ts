@@ -62,6 +62,16 @@ export interface TokenMeta extends BaseDocument {
     token_id?: string; // token id for ethereum token
 }
 
-
-
-
+// OpenseaToken is the structure of tokens returned from the opensea API
+export interface OpenseaToken {
+    image_url: string;
+    image_thumbnail_url: string;
+    animation_url: string;
+    name: string;
+    asset_contract: { address: string; };
+    token_id: string;
+    description: string;
+    permalink: string;
+    creator: any;
+    orders: Array<any>;
+}
