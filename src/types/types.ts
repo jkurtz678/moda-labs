@@ -1,4 +1,5 @@
 import { Timestamp } from "firebase/firestore"
+import type { StringFormat } from "firebase/storage";
 
 // BaseDocument contains fields that all firestore documents should include
 export interface BaseDocument {
@@ -61,16 +62,18 @@ export interface TokenMeta extends BaseDocument {
     asset_contract_address?: string; // contract address for ethereum token
     token_id?: string; // token id for ethereum token
     platform: TokenPlatform; // token id for ethereum token
+    thumbnail_url?: string; // url to thumbnail image 
+    media_url?: string; // url to media
 }
 
 export enum Blockchain {
-    Ethereum = "ethereum",
-    OffChain = "off-chain"
+    Ethereum = "ethereum", // nft on ethereum blockchain, has a asset_contract_adress and token_id that can link it to the token on ethereum
+    OffChain = "off-chain" // off chain art, stored in moda archive but cannot be found on chain
 }
 
 export enum TokenPlatform {
-    Archive = "archive",
-    Opensea = "opensea"
+    Archive = "archive", // token stored in moda archive
+    Opensea = "opensea" // token from opensea api, not stored in moda archive
 }
 
 // OpenseaToken is the structure of tokens returned from the opensea API
@@ -83,6 +86,12 @@ export interface OpenseaToken {
     token_id: string;
     description: string;
     permalink: string;
-    creator: any;
+    creator: { user: {username: string}};
     orders: Array<any>;
+    external_link: string; 
+}
+
+// getUniqueOpenseaID returns a unique identifier for opensea tokens
+export function getUniqueOpenseaID(opensea_token: OpenseaToken): string {
+    return `${opensea_token.asset_contract.address}/${opensea_token.token_id}`
 }

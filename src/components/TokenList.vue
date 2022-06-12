@@ -10,11 +10,11 @@
             <div v-if="tokens.length == 0">No tokens found</div>
             <PlaqueTokenItem v-for="token in tokens" :token_meta="token">
             </PlaqueTokenItem>
-
             <hr class="hr" />
         </el-card>
     </div>
-    <el-dialog v-model="show_dialog" title="Submit Moda Archives" top="2vh">
+    <el-dialog v-model="show_dialog" title="Submit Moda Archives" top="2vh" :fullscreen="screen_type == 'xs'"
+        width="75%">
         <SubmitTokenForm></SubmitTokenForm>
     </el-dialog>
 </template>
@@ -23,11 +23,14 @@ import { computed, ref } from "vue";
 import SubmitTokenForm from "./SubmitTokenForm.vue"
 import PlaqueTokenItem from "./PlaqueTokenItem.vue";
 import { useTokenMetaStore } from "../stores/token-meta";
+import useBreakpoints from "@/composables/breakpoints";
+
+const { width, screen_type } = useBreakpoints();
 
 const token_meta_store = useTokenMetaStore()
 const show_dialog = ref(false);
 const tokens = computed(() => {
-    return token_meta_store.archive_token_meta_list
+    return Object.values(token_meta_store.all_token_metas);
 }) 
 </script>
 <style scoped>

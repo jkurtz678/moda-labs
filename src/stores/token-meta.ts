@@ -1,5 +1,7 @@
 import { defineStore } from "pinia";
-import type { FirestoreDocument, OpenseaToken, TokenMeta } from "@/types/types"
+import { type FirestoreDocument, type OpenseaToken, type TokenMeta, Blockchain, TokenPlatform } from "@/types/types"
+import { getUniqueOpenseaID } from "@/types/types"
+
 import { getTokenMetaListByWalletAddressWithListener } from "@/api/token-meta";
 import { loadTokensByAccountID } from "@/api/opensea";
 
@@ -17,12 +19,38 @@ export const useTokenMetaStore = defineStore({
         opensea_token_meta_list: [],
     } as RootTokenMetaState),
     getters: {
-        token_meta_map: (state): TokenMetaMap => {
+        archive_token_meta_map: (state): TokenMetaMap => {
             const token_meta_map: TokenMetaMap = {};
             state.archive_token_meta_list.forEach((m) => {
                 token_meta_map[m.id] = m;
             });
             return token_meta_map;
+        },
+        opensea_token_meta_map: (state): TokenMetaMap => {
+            const token_meta_map: TokenMetaMap = {};
+            state.opensea_token_meta_list.forEach((o) => {
+                const id = getUniqueOpenseaID(o)
+                token_meta_map[id] = {
+                    id: id,
+                    entity: {
+                        name: o.name,
+                        artist: o.creator.user.username,
+                        description: o.description,
+                        public_link: o.permalink,
+                        blockchain: Blockchain.Ethereum,
+                        asset_contract_address: o.asset_contract.address,
+                        token_id: o.token_id,
+                        platform: TokenPlatform.Opensea,
+                        thumbnail_url: o.image_thumbnail_url,
+                        media_url: o.animation_url ? o.animation_url : o.image_url,
+
+                    }
+                } as FirestoreDocument<TokenMeta>
+            })
+            return token_meta_map;
+        },
+        all_token_metas(): TokenMetaMap {
+            return { ...this.archive_token_meta_map, ...this.opensea_token_meta_map };
         }
     },
     actions: {

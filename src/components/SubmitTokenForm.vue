@@ -56,7 +56,7 @@ import { reactive, ref } from "vue";
 import type { FormInstance, FormRules } from "element-plus";
 import { createTokenMeta } from "@/api/token-meta";
 import { uploadFile } from "@/api/storage";
-import { type TokenMeta, Blockchain} from "@/types/types";
+import { type TokenMeta, Blockchain, TokenPlatform} from "@/types/types";
 import { useAccountStore } from "@/stores/account"
 import { showError } from "@/util/util";
 
@@ -78,8 +78,8 @@ const form = reactive<TokenMeta>({
     wallet_address: "",
     blockchain: Blockchain.Ethereum,
     asset_contract_address: "",
-    token_id: ""
-
+    token_id: "",
+    platform: TokenPlatform.Archive
 });
 const file_list = ref<UploadUserFile[]>([]);
 const rules = reactive<FormRules>({
