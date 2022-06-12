@@ -57,9 +57,20 @@ export interface TokenMeta extends BaseDocument {
     media_id: string; // uid of media in firebase storage
     media_type: string; // file extension of media e.g. .mp4
     wallet_address?: string; // wallet address from the associated account 
-    blockchain?: string; // ethereum, off-chain
+    blockchain?: Blockchain; // ethereum, off-chain
     asset_contract_address?: string; // contract address for ethereum token
     token_id?: string; // token id for ethereum token
+    platform: TokenPlatform; // token id for ethereum token
+}
+
+export enum Blockchain {
+    Ethereum = "ethereum",
+    OffChain = "off-chain"
+}
+
+export enum TokenPlatform {
+    Archive = "archive",
+    Opensea = "opensea"
 }
 
 // OpenseaToken is the structure of tokens returned from the opensea API

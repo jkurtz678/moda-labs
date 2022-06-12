@@ -1,6 +1,7 @@
 <template>
     <div style="display: flex; align-items: center;">
-        <el-image v-if="screen_type != 'xs'" :src="getImageUrl('logo.png')" style="width: 43px; height: 43px; margin-right: 2em">
+        <el-image v-if="screen_type != 'xs'" :src="getImageUrl('logo.png')"
+            style="width: 43px; height: 43px; margin-right: 2em">
         </el-image>
         <template v-if="router.currentRoute.value.name == 'qr-scan'">
             <div style="flex-grow: 1"></div>
@@ -9,10 +10,9 @@
             </el-button>
         </template>
         <template v-else>
-            <el-tabs >
-                <el-tab-pane label="Overview" name="first"></el-tab-pane>
-                <el-tab-pane label="Support" name="second"></el-tab-pane>
-                <el-tab-pane label="Account" name="Third"></el-tab-pane>
+            <el-tabs v-model="route.name" @tab-click="handleClick">
+                <el-tab-pane label="Plaques" name="plaque-list"></el-tab-pane>
+                <el-tab-pane label="Tokens" name="token-list"></el-tab-pane>
             </el-tabs>
             <div style="flex-grow: 1"></div>
             <el-button @click="logout" style="margin-left: 1em;">Logout</el-button>
@@ -22,14 +22,22 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { useAccountStore } from "@/stores/account"
 import useBreakpoints from "@/composables/breakpoints"
-
+import type { TabsPaneContext } from 'element-plus'
 
 const router = useRouter();
+const route = useRoute();
 const account_store = useAccountStore();
 const { width, screen_type } = useBreakpoints();
+
+const handleClick = (tab: TabsPaneContext, event: Event) => {
+    if (tab.paneName && typeof tab.paneName === 'string') {
+        console.log("tabPaneName:", tab.paneName)
+        router.push({ name: tab.paneName })
+    }
+}
 
 const logout = () => {
     account_store.logout();

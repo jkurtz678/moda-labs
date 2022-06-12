@@ -6,7 +6,7 @@
       <el-card class="box-card" shadow="never">
         <div v-if="sort_token_metas.length == 0">No tokens found</div>
         <AddTokenItem :plaque_id="plaque_id" :token="i" v-for="i in sort_token_metas"></AddTokenItem>
-        <!-- <hr class="hr" /> -->
+        <hr class="hr" />
       </el-card>
       <template #footer>
         <span class="dialog-footer">

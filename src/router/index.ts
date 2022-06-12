@@ -22,6 +22,11 @@ const router = createRouter({
           component: () => import('@/components/PlaqueList.vue')
         },
         {
+          path: "token-list",
+          name: "token-list",
+          component: () => import('@/components/TokenList.vue')
+        },
+        {
           path: "qr-scan",
           name: "qr-scan",
           component: () => import('@/components/QrScan.vue')
