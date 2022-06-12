@@ -22,7 +22,7 @@ onMounted(async () => {
   const signature = window.localStorage.getItem("account_signature")
 
   if (address == null || signature == null) {
-    router.push({ name: "login" })
+    router.push({ name: "landing", query: {redir: window.location.href}})
     return
   }
   const loading = ElLoading.service({

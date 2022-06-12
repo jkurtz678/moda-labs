@@ -1,29 +1,14 @@
 <script lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
-import Header from '@/components/Header.vue'
+import { RouterView } from 'vue-router'
 
 export default {
   components: {
-    Header,
-    RouterLink,
     RouterView
   },
 }
 </script>
 
 <template>
- <!--  <header>
-
-    <div class="wrapper">
-      <Header msg="Moda archives" />
-
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/submit">Submit</RouterLink>
-      </nav>
-    </div>
-  </header> -->
-
   <RouterView />
 </template>
 

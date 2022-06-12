@@ -15,7 +15,7 @@
                 <el-tab-pane label="Tokens" name="token-list"></el-tab-pane>
             </el-tabs>
             <div style="flex-grow: 1"></div>
-            <div style="margin-right: 10px;" >{{toolbar_address}}</div>
+            <div style="margin-right: 10px;">{{ toolbar_address }}</div>
             <el-button @click="logout" style="margin-left: 1em;">Logout</el-button>
         </template>
     </div>
@@ -48,7 +48,7 @@ const toolbar_address = computed(() => {
 
 const logout = () => {
     account_store.logout();
-    router.push({ name: "landing" })
+    router.push({ name: "landing", query: { redir: window.location.href } });
 }
 
 const getImageUrl = (filename: string) => {
