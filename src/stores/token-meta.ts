@@ -3,7 +3,7 @@ import { type FirestoreDocument, type OpenseaToken, type TokenMeta, Blockchain, 
 import { getUniqueOpenseaID } from "@/types/types"
 
 import { getTokenMetaListByWalletAddressWithListener } from "@/api/token-meta";
-import { loadTokensByAccountID } from "@/api/opensea";
+import { loadTokensByAccountID, loadTokensCreatedByAddress } from "@/api/opensea";
 
 export type RootTokenMetaState = {
     archive_token_meta_list: FirestoreDocument<TokenMeta>[];
@@ -29,12 +29,13 @@ export const useTokenMetaStore = defineStore({
         opensea_token_meta_map: (state): TokenMetaMap => {
             const token_meta_map: TokenMetaMap = {};
             state.opensea_token_meta_list.forEach((o) => {
+                console.log("O", o)
                 const id = getUniqueOpenseaID(o)
                 token_meta_map[id] = {
                     id: id,
                     entity: {
                         name: o.name,
-                        artist: o.creator.user.username,
+                        artist: o.creator?.user?.username || "N/A",
                         description: o.description,
                         public_link: o.permalink,
                         blockchain: Blockchain.Ethereum,
@@ -60,7 +61,7 @@ export const useTokenMetaStore = defineStore({
             })
         },
         async loadOpenseaTokenMetas(wallet_address: string) {
-            await loadTokensByAccountID(wallet_address).then(tokens => {
+            await loadTokensCreatedByAddress(wallet_address).then(tokens => {
                 this.opensea_token_meta_list = tokens;
             })
         }

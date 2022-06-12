@@ -1,5 +1,5 @@
 <template>
-    <div v-if="plaque_store.plaques.length == 0" style="padding: 1em;">No plaques connected</div>
+    <!-- <div v-if="plaque_store.plaques.length == 0" style="padding: 1em;">No plaques connected</div> -->
     <PlaqueCard :plaque="plaque" v-for="plaque in plaque_store.plaques" :key="plaque.id" />
     <div class='add-button-container'>
         <div style="display: flex; align-items: center; justify-content: center; height: 100%">

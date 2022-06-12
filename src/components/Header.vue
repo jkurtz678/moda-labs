@@ -15,13 +15,14 @@
                 <el-tab-pane label="Tokens" name="token-list"></el-tab-pane>
             </el-tabs>
             <div style="flex-grow: 1"></div>
+            <div style="margin-right: 10px;" >{{toolbar_address}}</div>
             <el-button @click="logout" style="margin-left: 1em;">Logout</el-button>
         </template>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed } from "vue";
 import { useRouter, useRoute } from 'vue-router';
 import { useAccountStore } from "@/stores/account"
 import useBreakpoints from "@/composables/breakpoints"
@@ -37,6 +38,13 @@ const handleClick = (tab: TabsPaneContext, event: Event) => {
         router.push({ name: tab.paneName })
     }
 }
+const toolbar_address = computed(() => {
+    const address = account_store.account?.entity.wallet_address
+    if (!address) {
+        return "";
+    }
+    return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`
+})
 
 const logout = () => {
     account_store.logout();
