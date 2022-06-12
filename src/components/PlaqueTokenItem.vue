@@ -1,10 +1,10 @@
 <template>
   <hr class="hr" />
   <div class="card-flex-container">
-    <div style="flex: 1">
-      <img :src="getImageUrl('logo.png')" class="image" style="max-width: 70px;" />
+    <div style="display: flex; align-items: center; margin: 5px 25px 5px 0px;">
+      <el-image :src="thumbnail_image" style="width:50px; height: 50px;" fit="contain" />
     </div>
-    <div style="flex: 3 1 0%">
+    <div style="flex: 3 1 0%; text-align: left;">
       <p class="bold">{{ props.token_meta?.entity?.name }}</p>
       <p class="bold">{{ props.token_meta?.entity?.artist }}</p>
     </div>
@@ -45,6 +45,13 @@ const isExpand = reactive({ expanded: false });
 const platform = computed(() => {
   const platform = props.token_meta.entity.platform || "archive";
   return platform.charAt(0).toUpperCase() + platform.slice(1);
+})
+
+const thumbnail_image = computed(() => {
+  if (props.token_meta.entity.thumbnail_url) {
+    return props.token_meta.entity.thumbnail_url
+  }
+  return getImageUrl('logo.png')
 })
 
 const getImageUrl = (filename: string) => {

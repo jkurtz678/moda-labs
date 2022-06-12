@@ -34,7 +34,6 @@ const { width, screen_type } = useBreakpoints();
 
 const handleClick = (tab: TabsPaneContext, event: Event) => {
     if (tab.paneName && typeof tab.paneName === 'string') {
-        console.log("tabPaneName:", tab.paneName)
         router.push({ name: tab.paneName })
     }
 }
