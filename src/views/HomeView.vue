@@ -37,22 +37,25 @@ onMounted(async () => {
     loading.close()
     return
   }
+
+  // load account first
   await account_store.loadAccount(address, signature)
   if (account_store.account == null) {
     ElMessage("Error - failed to load account")
     return
   }
 
-  await plaque_store.loadPlaques(account_store.account.id, async () => {
-    await token_meta_store.loadArchiveTokenMetas(plaque_store.token_meta_id_list).catch(
-      err => {
-        showError(`Error loading archive token metas - ${err}`)
-      }
-    );
-    await token_meta_store.loadOpenseaTokenMetas(account_store.get_account.entity.address).catch(err => (showError(`Error loading opensea tokens - ${err}`)));
+  // then load all tokens and plaques in parallel 
+  const plaque_promise = plaque_store.loadPlaques(account_store.account.entity.wallet_address)
+    .catch(err => (showError(`Error loading plaques - ${err}`)));
+  const archive_token_promise = token_meta_store.loadArchiveTokenMetas(account_store.get_account.entity.wallet_address)
+    .catch(err => (showError(`Error loading archive token metas - ${err}`)));
+  const opensea_token_promise = token_meta_store.loadOpenseaTokenMetas(account_store.get_account.entity.wallet_address)
+    .catch(err => (showError(`Error loading opensea tokens - ${err}`)))
 
-    loading.close()
-  })
+  await Promise.all([plaque_promise, archive_token_promise, opensea_token_promise])
+
+  loading.close()
 });
 
 </script>

@@ -55,7 +55,7 @@ const createTestPlaque = async () => {
     add_test_plaque_loading.value = true
     await createPlaque({
         name: "Test Plaque",
-        account_id: account_store.get_account.id,
+        wallet_address: account_store.get_account.entity.wallet_address,
         token_meta_id_list: [],
         created_at: Timestamp.now(),
         updated_at: Timestamp.now()

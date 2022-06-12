@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import type { FirestoreDocument, OpenseaToken, TokenMeta } from "@/types/types"
-import { getTokenMetaListByIDListWithListener } from "@/api/token-meta";
+import { getTokenMetaListByWalletAddressWithListener } from "@/api/token-meta";
 import { loadTokensByAccountID } from "@/api/opensea";
 
 export type RootTokenMetaState = {
@@ -26,13 +26,13 @@ export const useTokenMetaStore = defineStore({
         }
     },
     actions: {
-        async loadArchiveTokenMetas(token_meta_ids: string[]) {
-            await getTokenMetaListByIDListWithListener(token_meta_ids, (token_metas) => {
+        async loadArchiveTokenMetas(wallet_address: string) {
+            await getTokenMetaListByWalletAddressWithListener(wallet_address, (token_metas) => {
                 this.archive_token_meta_list = token_metas;
             })
         },
-        async loadOpenseaTokenMetas(address: string) {
-            await loadTokensByAccountID(address).then(tokens => {
+        async loadOpenseaTokenMetas(wallet_address: string) {
+            await loadTokensByAccountID(wallet_address).then(tokens => {
                 this.opensea_token_meta_list = tokens;
             })
         }

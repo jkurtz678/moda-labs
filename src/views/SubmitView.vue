@@ -79,7 +79,7 @@ const form = reactive<TokenMeta>({
   updated_at: Timestamp.now(),
   media_id: "",
   media_type: "",
-  account_id: "",
+  wallet_address: "",
   blockchain: "ethereum",
   asset_contract_address: "",
   token_id: ""
@@ -114,7 +114,7 @@ onMounted(async () => {
 
   try {
     await account_store.loadAccount(address, signature);
-    form.account_id = account_store.get_account.id
+    form.wallet_address = account_store.get_account.entity.wallet_address
   } catch (err) {
     showError(`Error loading moda archive account - ${err}`);
   } finally {

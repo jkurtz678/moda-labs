@@ -3,8 +3,8 @@ import type { OpenseaToken, FirestoreDocument, TokenMeta } from "@/types/types";
 const OPENSEA_API_KEY = '742ea11e1d864fe2b23ac7cfe66a43f7';
 
 // loadTokensByAccountID returns all associated opensea tokens for a given account id
-export async function loadTokensByAccountID(web3_account_id: string): Promise<Array<OpenseaToken>> {
-    const res = await fetch(`https://api.opensea.io/api/v1/assets/?owner=${web3_account_id}`);
+export async function loadTokensByAccountID(wallet_address: string): Promise<Array<OpenseaToken>> {
+    const res = await fetch(`https://api.opensea.io/api/v1/assets/?owner=${wallet_address}`);
     const res_json = await res.json();
 
     return res_json.assets;

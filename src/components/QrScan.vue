@@ -27,9 +27,9 @@ const onDecode = async (qr_code_link: string) => {
 
     const qparams = new URLSearchParams(split_link[1]);
     const plaque_id = qparams.get("plaque_id");
-    const account_id = account_store.account?.id;
-    if (!plaque_id || !account_id) {
-        console.log(`QrScan.onDecode error - invalid plaque_id: ${plaque_id} or account_id: ${account_id}`)
+    const wallet_address = account_store.account?.entity.wallet_address;
+    if (!plaque_id || !wallet_address) {
+        console.log(`QrScan.onDecode error - invalid plaque_id: ${plaque_id} or wallet addressl: ${wallet_address}`)
         ElMessage({ message: "Error adding account to plaque - invalid plaque or account", type: 'error', showClose: true, duration: 12000 });
         return
     }
@@ -39,7 +39,7 @@ const onDecode = async (qr_code_link: string) => {
         text: 'Loading',
         background: 'rgba(0, 0, 0, 0.7)',
     })
-    await updatePlaque(plaque_id, {account_id}).then((plaque) => {
+    await updatePlaque(plaque_id, {wallet_address: wallet_address}).then((plaque) => {
         ElMessage({ message: `Connected to plaque ${plaque.entity.name}`, type: 'success', showClose: true, duration: 6000 });
     }).catch(err => {
         ElMessage({ message: `Error adding account to plaque - ${err}`, type: 'error', showClose: true, duration: 12000 });
