@@ -4,13 +4,13 @@
     <el-dialog class="box-dialog" center v-model="show_dialog" title="Add tokens" close-on-click-modal="false"
       :fullscreen="screen_type == 'xs'" custom-class="add-dialog">
       <el-card class="box-card" shadow="never">
-        <AddTokenItem :plaque_id="plaque_id" :detail="i" v-for="i in sort_token_metas"></AddTokenItem>
+        <AddTokenItem :plaque_id="plaque_id" :detail="i" v-for="i in sort_token_metas" :add_list="addList"></AddTokenItem>
         <hr class="hr" />
       </el-card>
       <template #footer>
         <span class="dialog-footer">
           <el-button>Clear</el-button>
-          <el-button type="info">Done</el-button>
+          <el-button type="info" @click="addList= true">Done</el-button>
         </span>
       </template>
     </el-dialog>
@@ -28,7 +28,8 @@ import useBreakpoints from "@/composables/breakpoints"
 
 interface AddTokenDialogProps {
   show_add_token_dialog: boolean;
-  plaque_id: string
+  plaque_id: string;
+  add_list :boolean;
 }
 
 const props = defineProps<AddTokenDialogProps>();
@@ -37,6 +38,7 @@ const token_metas = ref<FirestoreDocument<TokenMeta>[]>();
 const loading = ref(false);
 const { width, screen_type } = useBreakpoints();
 const plaque_store = usePlaqueStore();
+const addList = ref(false);
 const show_dialog = computed({
   get() {
     return props.show_add_token_dialog
@@ -59,7 +61,6 @@ const sort_token_metas = computed(() => {
   }
   return sort_token_metas;
 })
-
 watch(show_dialog, async (v) => {
   if (!v) {
     return
