@@ -17,7 +17,7 @@
                 MoDA Labs includes a powerful extension frameworks that allows creators to manage and showcase their
                 artwork
                 in the physical world. Supporting communion with collectors and galleries, MoDA Labs provides a seamless
-                experience for viewing Digital art at the quality inteded by the artist.
+                experience for viewing digital art at the quality inteded by the artist.
             </p>
             <br />
             <el-button :loading="loading" @click="connect">Connect Wallet</el-button>
@@ -28,22 +28,31 @@
 
 <script lang="ts" setup>
 import { ref } from "vue";
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { connectWallet } from "@/web3Interface";
 import { useAccountStore } from "@/stores/account"
 const account_store = useAccountStore();
 
 const loading = ref(false);
-
+const route = useRoute()
 const router = useRouter();
+
 const whatsNew = () => {
     window.location.assign("https://modadisplay.art/Upcoming-Events")
 }
+
 const connect = () => {
     loading.value = true
     account_store.login()
         .then(() => {
-            router.push("home")
+            // if redir param is set, user has been sent to the login page from a specific url. Send them back to this page after login
+            if (route.query.redir && typeof route.query.redir === 'string') {
+                window.location.assign(route.query.redir);
+                return
+            }
+
+            // if no redir param is set, go to home route by default
+            router.push({name: "home"})
         }).catch(err => {
             console.error(err);
         }).finally(() => {

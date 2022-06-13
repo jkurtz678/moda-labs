@@ -23,7 +23,19 @@ export const getTokenMetas = async (): Promise<FirestoreDocument<TokenMeta>[]> =
     }))
 }
 
-export const getTokenMetaListByIDListWithListener = async (token_meta_id_list: string[], onChange: (arr: FirestoreDocument<TokenMeta>[]) => void) => {
+export const getTokenMetaListByWalletAddressWithListener = async (wallet_address: string, onChange: (arr: Array<FirestoreDocument<TokenMeta>>) => void) => {
+    console.log("getTokenMetaListByWalletAddressWithListener")
+    const q = query(token_meta_ref, where("wallet_address", "==", wallet_address));
+    const unsubscribe = await onSnapshot(q, (query_snapshot) => {
+        const plaques: FirestoreDocument<TokenMeta>[] = [];
+        query_snapshot.forEach((doc) => {
+            plaques.push({ id: doc.id, entity: doc.data() as TokenMeta})
+        })
+        onChange(plaques)
+    })
+};
+
+/* export const getTokenMetaListByIDListWithListener = async (token_meta_id_list: string[], onChange: (arr: FirestoreDocument<TokenMeta>[]) => void) => {
     // in filters will error if array is empty
     if (token_meta_id_list.length == 0) {
         return;
@@ -36,4 +48,4 @@ export const getTokenMetaListByIDListWithListener = async (token_meta_id_list: s
         })
         onChange(metas)
     })
-}
+} */
