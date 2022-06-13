@@ -1,10 +1,11 @@
 
 <template>
   <div class="dialog-container">
-    <el-dialog class="box-dialog" center v-model="show_dialog" title="Add tokens" close-on-click-modal="false"
+    <el-dialog class="box-dialog" center v-model="show_dialog" title="Add tokens to plaque" close-on-click-modal="false"
       :fullscreen="screen_type == 'xs'" custom-class="add-dialog">
       <el-card class="box-card" shadow="never">
-        <AddTokenItem :plaque_id="plaque_id" :detail="i" v-for="i in sort_token_metas" :add_list="addList"></AddTokenItem>
+        <div v-if="sort_token_metas.length == 0">No tokens found</div>
+        <AddTokenItem :plaque_id="plaque_id" :token="i" v-for="i in sort_token_metas" :add_list="addList"></AddTokenItem>
         <hr class="hr" />
       </el-card>
       <template #footer>
@@ -25,6 +26,7 @@ import AddTokenItem from './AddTokenItem.vue';
 import { ElLoading, ElMessage } from 'element-plus'
 import type { FirestoreDocument, TokenMeta, Plaque } from "@/types/types";
 import useBreakpoints from "@/composables/breakpoints"
+import { useTokenMetaStore } from "@/stores/token-meta";
 
 interface AddTokenDialogProps {
   show_add_token_dialog: boolean;
@@ -34,11 +36,11 @@ interface AddTokenDialogProps {
 
 const props = defineProps<AddTokenDialogProps>();
 const emit = defineEmits(['update:show_add_token_dialog'])
-const token_metas = ref<FirestoreDocument<TokenMeta>[]>();
 const loading = ref(false);
 const { width, screen_type } = useBreakpoints();
 const plaque_store = usePlaqueStore();
 const addList = ref(false);
+const token_meta_store = useTokenMetaStore();
 const show_dialog = computed({
   get() {
     return props.show_add_token_dialog
@@ -46,6 +48,10 @@ const show_dialog = computed({
   set(value) {
     emit('update:show_add_token_dialog', value)
   }
+})
+
+const token_metas = computed(() => {
+  return token_meta_store.archive_token_meta_list;
 })
 
 const sort_token_metas = computed(() => {
@@ -61,14 +67,15 @@ const sort_token_metas = computed(() => {
   }
   return sort_token_metas;
 })
-watch(show_dialog, async (v) => {
+
+/* watch(show_dialog, async (v) => {
   if (!v) {
     return
   }
   loading.value = true
   token_metas.value = await getTokenMetas()
   loading.value = false;
-})
+}) */
 
 </script>
 

@@ -65,8 +65,6 @@ const showDetail = ref(false);
 const show_add_token_dialog = ref(false);
 const token_meta_store = useTokenMetaStore()
 
-const items: FirestoreDocument<TokenMeta>[] = token_meta_store.token_meta_list;
-
 interface TokenMetaMap {
   [id: string]: FirestoreDocument<TokenMeta>;
 }
@@ -78,7 +76,7 @@ const first_token = computed(() => {
   return plaque_tokens.value[0];
 })
 const plaque_tokens = computed(() => {
-  const token_map = token_meta_store.token_meta_map;
+  const token_map = token_meta_store.archive_token_meta_map;
   let res = props.plaque.entity.token_meta_id_list.map(token_id => token_map[token_id])
   return res;
 })
@@ -107,7 +105,7 @@ const forgetPlaque = () => {
   ElMessageBox.confirm(`Are you sure you want to forget the plaque named '${props.plaque.entity.name}'?`, "Forget plaque", {
     type: 'warning'
   }).then(() => {
-    updatePlaque(props.plaque.id, { account_id: "" })
+    updatePlaque(props.plaque.id, { wallet_address: "" })
       .then(() => {
         ElMessage({
           type: 'success',

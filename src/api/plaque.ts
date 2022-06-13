@@ -6,8 +6,8 @@ import { collection, getDoc, where, query, doc, onSnapshot, updateDoc, addDoc } 
 const db = getFirestore(firebaseConfig)
 const plaques_ref = collection(db, "plaque")
 
-export const getPlaquesByAccountIDWithListener = async (account_id: string, onChange: (arr: Array<FirestoreDocument<Plaque>>) => void) => {
-    const q = query(plaques_ref, where("account_id", "==", account_id));
+export const getPlaquesByWalletAddressWithListener = async (wallet_address: string, onChange: (arr: Array<FirestoreDocument<Plaque>>) => void) => {
+    const q = query(plaques_ref, where("wallet_address", "==", wallet_address));
     const unsubscribe = await onSnapshot(q, (query_snapshot) => {
         const plaques: FirestoreDocument<Plaque>[] = [];
         query_snapshot.forEach((doc) => {

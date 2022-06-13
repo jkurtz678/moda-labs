@@ -1,7 +1,6 @@
 import { defineStore } from "pinia";
 import type { FirestoreDocument, Plaque } from "@/types/types"
-import { getPlaquesByAccountIDWithListener } from "@/api/plaque";
-import type { State } from "element-plus/node_modules/@popperjs/core";
+import { getPlaquesByWalletAddressWithListener } from "@/api/plaque";
 
 export type RootPlaqueState = {
     plaques: FirestoreDocument<Plaque>[],
@@ -22,7 +21,7 @@ export const usePlaqueStore = defineStore({
             });
             return plaque_map;
         },
-        meta_in_playlist: (getters:any) => (plaque_id: string, token_meta_id: string): boolean => {
+        meta_in_playlist: (getters: any) => (plaque_id: string, token_meta_id: string): boolean => {
             const plaque: FirestoreDocument<Plaque> = getters.plaque_map[plaque_id]
             return !!plaque.entity.token_meta_id_list.find(id => id == token_meta_id);
         },
@@ -35,10 +34,9 @@ export const usePlaqueStore = defineStore({
         }
     },
     actions: {
-        async loadPlaques(account_id: string, callback: () => void) {
-            await getPlaquesByAccountIDWithListener(account_id, (plaques) => {
+        async loadPlaques(wallet_address: string) {
+            await getPlaquesByWalletAddressWithListener(wallet_address, (plaques) => {
                 this.plaques = plaques;
-                callback();
             })
         }
     }

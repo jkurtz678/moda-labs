@@ -3,9 +3,9 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
   routes: [
-   {
+    {
       path: '/',
-      redirect: "/submit"
+      redirect: "/home"
     },
     {
       path: '/home',
@@ -22,6 +22,11 @@ const router = createRouter({
           component: () => import('@/components/PlaqueList.vue')
         },
         {
+          path: "token-list",
+          name: "token-list",
+          component: () => import('@/components/TokenList.vue')
+        },
+        {
           path: "qr-scan",
           name: "qr-scan",
           component: () => import('@/components/QrScan.vue')
@@ -31,18 +36,18 @@ const router = createRouter({
     {
       path: '/landing',
       name: 'landing',
-      component: () => import('@/views/LandingView.vue')
+      component: () => import('@/views/LandingView.vue'),
     },
     {
       path: '/submit',
       name: 'submit',
       component: () => import('@/views/SubmitView.vue')
     },
-    {
-      path: '/login',
-      name: 'login',
-      component: () => import('@/views/MetamaskLogin.vue')
-    },
+    /*  {
+       path: '/login',
+       name: 'login',
+       component: () => import('@/views/MetamaskLogin.vue')
+     }, */
   ]
 })
 
