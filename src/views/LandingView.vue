@@ -17,26 +17,50 @@
                 MoDA Labs includes a powerful extension frameworks that allows creators to manage and showcase their
                 artwork
                 in the physical world. Supporting communion with collectors and galleries, MoDA Labs provides a seamless
-                experience for viewing digital art at the quality inteded by the artist.
+                experience for viewing digital art at the quality intended by the artist.
             </p>
             <br />
-            <el-button :loading="loading" @click="connect">Connect Wallet</el-button>
+            <el-button v-if="metamask_supported" :loading="loading" @click="connect">Connect Wallet</el-button>
+            <el-alert v-else type="warning" show-icon title="Install Metamask" style="margin-bottom: 1.5em">
+                The Metamask extension was not detected on your browser.
+                Please
+                <el-link type="primary" style="font-size: 12px; vertical-align: top;"
+                    href="https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en">
+                    install Metamask
+                </el-link> and then refresh the page.
+            </el-alert>
             <el-button @click='whatsNew'>What's New</el-button>
         </el-card>
     </el-container>
 </template>
 
 <script lang="ts" setup>
-import { ref, computed } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter, useRoute } from 'vue-router';
-import { connectWallet } from "@/web3Interface";
 import { useAccountStore } from "@/stores/account"
 import { showError } from "@/util/util";
+import { ElLoading } from 'element-plus'
+import detectEthereumProvider from '@metamask/detect-provider';
+
 const account_store = useAccountStore();
 
 const loading = ref(false);
+const metamask_supported = ref(false);
 const route = useRoute()
 const router = useRouter();
+
+onMounted(async () => {
+    const loading = ElLoading.service({
+        lock: true,
+        text: 'Loading',
+        background: 'rgba(0, 0, 0, 0.7)',
+    })
+    const provider = await detectEthereumProvider().catch((err: Error) => {
+        showError(`Error detecting ethereum provider - ${err}`)
+    });
+    metamask_supported.value = Boolean(provider);
+    loading.close()
+})
 
 const whatsNew = () => {
     window.location.assign("https://modadisplay.art/Upcoming-Events")

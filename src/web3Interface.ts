@@ -16,6 +16,8 @@ export async function connectWallet(): Promise<ConnectWalletResponse> {
   await ethereum.request({
     method: 'wallet_requestPermissions',
     params: [{ eth_accounts: {} }],
+  }).catch((err: Error) => {
+    throw `Error requesting wallet permissions - ${err}`
   })
   // setup web3 modal
   console.log("setup web3 modal...");
