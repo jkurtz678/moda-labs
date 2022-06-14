@@ -10,6 +10,12 @@ interface ConnectWalletResponse {
 }
 
 export async function connectWallet(): Promise<ConnectWalletResponse> {
+
+  const { ethereum } = window;
+  await ethereum.request({
+    method: 'wallet_requestPermissions',
+    params: [{ eth_accounts: {} }],
+  })
   // setup web3 modal
   console.log("setup web3 modal...");
   const web3_modal = new Web3Modal({
@@ -29,8 +35,7 @@ export async function connectWallet(): Promise<ConnectWalletResponse> {
   console.log("connecting wallet...");
   //web3_modal.clearCachedProvider();
   const provider = await web3_modal.connect().catch((err) => {
-    console.error(err);
-    ElMessage({ message: `Error connecting to web3 modal - ${err}`, type: 'error', showClose: true, duration: 12000 });
+    throw `Error connecting to web3 modal - ${err.message ? err.message : err}`
   });
   console.log("AFTER CONNECT", provider)
 
@@ -53,7 +58,7 @@ export async function connectWallet(): Promise<ConnectWalletResponse> {
   console.log("setWeb3Account", provider)
   const web3 = new Web3(provider);
   let address: string = (await web3.eth.getAccounts().catch((err: Error) => {
-    ElMessage({ message: `Error getting eth account - ${err}`, type: 'error', showClose: true, duration: 12000 });
+    throw `Error getting eth account - $ ${err.message ? err.message : err}`;
   }))[0];
 
   // attempt reverse
@@ -65,7 +70,7 @@ export async function connectWallet(): Promise<ConnectWalletResponse> {
       address = ensName;
     }
   }).catch(err => {
-    ElMessage({ message: `Error getting adddress from ethers - ${err}`, type: 'error', showClose: true, duration: 12000 });
+    throw `Error getting adddress from ethers - ${err.message ? err.message : err}`;
   })
 
   // get signature
@@ -77,7 +82,7 @@ export async function connectWallet(): Promise<ConnectWalletResponse> {
 
     signature = await web3.eth.personal.sign(msg, address, "")
       .catch((err: Error) => {
-        ElMessage({ message: `Error getting signature - ${err}`, type: 'error', showClose: true, duration: 12000 });
+        throw `Error getting signature - ${err.message}`;
       })
   }
 

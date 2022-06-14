@@ -31,6 +31,7 @@ import { ref } from "vue";
 import { useRouter, useRoute } from 'vue-router';
 import { connectWallet } from "@/web3Interface";
 import { useAccountStore } from "@/stores/account"
+import { showError } from "@/util/util";
 const account_store = useAccountStore();
 
 const loading = ref(false);
@@ -54,7 +55,8 @@ const connect = () => {
             // if no redir param is set, go to home route by default
             router.push({name: "home"})
         }).catch(err => {
-            console.error(err);
+            console.error(err); 
+            showError(`Error connecting to Metamask - ${err.message ? err.message : err}`);
         }).finally(() => {
             loading.value = false;
         });
