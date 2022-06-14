@@ -6,12 +6,12 @@
       <el-card class="box-card" shadow="never">
         <div v-if="sort_token_metas.length == 0">No tokens found</div>
         <AddTokenItem :plaque_id="plaque_id" :token="i" v-for="i in sort_token_metas"
-          @update_token_list="update_token_list" :submit_new_token="submit_new_token"></AddTokenItem>
+          @update_token_list="update_token_list" :submit_new_token="submit_new_token" :clear="ref_new_token_meta_id"></AddTokenItem>
         <hr class="hr" />
       </el-card>
       <template #footer>
         <span class="dialog-footer">
-          <el-button>Clear</el-button>
+          <el-button @click="clearList">Clear</el-button>
           <el-button type="info" @click="updateList">Done</el-button>
         </span>
       </template>
@@ -33,7 +33,8 @@ import { useTokenMetaStore } from "@/stores/token-meta";
 interface AddTokenDialogProps {
   show_add_token_dialog: boolean;
   plaque_id: string;
-  submit_new_token:boolean;
+  submit_new_token: boolean;
+  clear:string[]
 }
 
 const props = defineProps<AddTokenDialogProps>();
@@ -55,6 +56,7 @@ const token_metas = computed(() => {
 })
 
 const sort_token_metas = computed(() => {
+  console.log(token_metas)
   const sort_token_metas: FirestoreDocument<TokenMeta>[] = [];
   if (token_metas?.value) {
     for (let token of token_metas?.value) {
@@ -70,30 +72,23 @@ const sort_token_metas = computed(() => {
 const plaque = computed((): FirestoreDocument<Plaque> => {
   return plaque_store.plaque_map[props.plaque_id];
 })
-const new_id_list = ref<string[]>();
+const new_token_meta_id: string[] = JSON.parse(JSON.stringify(plaque.value.entity.token_meta_id_list))
+const ref_new_token_meta_id = ref(new_token_meta_id)
 const update_token_list = (new_id: string) => {
-  let new_token_id_list: string[] = [];
-  let token_media_id_list = plaque.value.entity.token_meta_id_list;
-  if (plaque_store.meta_in_playlist(props.plaque_id, new_id)) {
-    new_token_id_list = token_media_id_list.filter(id => id != new_id);
+  if (ref_new_token_meta_id.value.some(id => id === new_id)) {
+    ref_new_token_meta_id.value = ref_new_token_meta_id.value.filter(id => id != new_id);
   } else {
-    new_token_id_list = [...token_media_id_list]
-    new_token_id_list.push(new_id);
+    ref_new_token_meta_id.value.push(new_id);
   }
-  new_id_list.value = new_token_id_list
 }
 const updateList = async () => {
-  await updatePlaque(props.plaque_id, { token_meta_id_list: new_id_list.value });
+  await updatePlaque(props.plaque_id, { token_meta_id_list: ref_new_token_meta_id.value });
   submit_new_token.value = true
+  show_dialog.value = false
 }
-/* watch(show_dialog, async (v) => {
-  if (!v) {
-    return
-  }
-  loading.value = true
-  token_metas.value = await getTokenMetas()
-  loading.value = false;
-}) */
+const clearList = () => {
+  ref_new_token_meta_id.value = []
+}
 
 </script>
 

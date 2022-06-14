@@ -21,33 +21,41 @@ import type { FirestoreDocument, TokenMeta, Plaque } from "../types/types";
 import { usePlaqueStore } from "@/stores/plaque"
 import { updatePlaque } from "@/api/plaque"
 import { defaultMaxListeners } from "events";
+import { pipelineTopicExpression } from "@babel/types";
 
 interface AddTokenItemProps {
     token: FirestoreDocument<TokenMeta>;
     plaque_id: string;
-    submit_new_token: boolean
+    submit_new_token: boolean;
+    clear: string[];
 }
 const props = defineProps<AddTokenItemProps>();
 const toggle_token_loading = ref(false);
-const new_tmp_id_list = ref<string[]>();
-new_tmp_id_list.value = []
+const new_tmp_list: string[] = [];
+const new_list = ref(new_tmp_list);
 const in_playlist = computed(() => {
-    return plaque.value.entity.token_meta_id_list.find(id => id == props.token.id);
+    console.log("in_playlist", plaque_store.meta_in_playlist(props.plaque_id, props.token.id))
+
+    return plaque_store.meta_in_playlist(props.plaque_id, props.token.id)
 })
 const in_newlist = computed(() => {
-    return new_tmp_id_list.value?.find(id => id == props.token.id);
+    return new_list.value.some(id => id == props.token.id);
 })
 const plaque = computed((): FirestoreDocument<Plaque> => {
     return plaque_store.plaque_map[props.plaque_id];
 })
-
+const reset = ref(props.submit_new_token)
 const plaque_store = usePlaqueStore();
 const emit = defineEmits(['update_token_list'])
 const toggleTokenMeta = () => {
+    if (reset.value) {
+        new_list.value = []
+        reset.value = false
+    }
     if (!in_newlist.value) {
-        new_tmp_id_list.value?.push(props.token.id)
+        new_list.value.push(props.token.id)
     } else {
-        new_tmp_id_list.value?.pop()
+        new_list.value = new_list.value.filter(id => id != props.token.id)
     }
     emit('update_token_list', props.token.id)
 };
@@ -56,9 +64,10 @@ const getImageUrl = (filename: string) => {
     return new URL(`../assets/${filename}`, import.meta.url).href
 }
 const getType = computed(() => {
-    if (props.submit_new_token) {
-        new_tmp_id_list.value = []
-    }
+    // if(props.clear.length!=0){
+    //     console.log("here",props.clear)
+    // }
+
     if (in_playlist.value && !in_newlist.value) {
         return 'danger'
     } else if (in_playlist.value && in_newlist.value) {
@@ -70,9 +79,6 @@ const getType = computed(() => {
     }
 })
 const getIcon = computed(() => {
-    if (props.submit_new_token) {
-        new_tmp_id_list.value = []
-    }
     if (in_playlist.value && !in_newlist.value) {
         return 'close'
     } else if (in_playlist.value && in_newlist.value) {
