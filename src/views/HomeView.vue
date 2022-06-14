@@ -4,13 +4,13 @@
       <Header></Header>
     </el-header>
     <el-main style="background-color: #DAD9D7;">
-      <RouterView></RouterView>
+      <RouterView v-if="initial_load_done"></RouterView>
     </el-main>
   </el-container>
 </template>
 <script setup lang="ts">
 import Header from "@/components/Header.vue";
-import { onMounted } from "vue"
+import { onMounted, ref } from "vue"
 import { useRouter, RouterView } from 'vue-router';
 import { useAccountStore } from "@/stores/account"
 import { usePlaqueStore } from "@/stores/plaque"
@@ -22,6 +22,7 @@ const account_store = useAccountStore();
 const plaque_store = usePlaqueStore();
 const token_meta_store = useTokenMetaStore();
 const router = useRouter();
+const initial_load_done = ref(false);
 
 onMounted(async () => {
   const loading = ElLoading.service({
@@ -54,7 +55,7 @@ onMounted(async () => {
     .catch(err => (showError(`Error loading opensea tokens - ${err}`)))
 
   await Promise.all([plaque_promise, archive_token_promise, opensea_token_promise])
-
+  initial_load_done.value = true;
   loading.close()
 });
 
