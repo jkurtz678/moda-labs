@@ -7,6 +7,7 @@ import { ElMessage } from 'element-plus'
 interface ConnectWalletResponse {
   address: string;
   signature: string;
+  ens_name: string | null;
 }
 
 export async function connectWallet(): Promise<ConnectWalletResponse> {
@@ -32,12 +33,12 @@ export async function connectWallet(): Promise<ConnectWalletResponse> {
   });
 
   // connect wallet
-  console.log("connecting wallet...");
+  console.log("web3_modal connecting wallet...");
   //web3_modal.clearCachedProvider();
   const provider = await web3_modal.connect().catch((err) => {
     throw `Error connecting to web3 modal - ${err.message ? err.message : err}`
   });
-  console.log("AFTER CONNECT", provider)
+  console.log("web3_modal.connect provider: ", provider)
 
   // Subscribe to accounts change
   provider.on("accountsChanged", () => {
@@ -55,23 +56,25 @@ export async function connectWallet(): Promise<ConnectWalletResponse> {
   });
 
   // set web3 account
-  console.log("setWeb3Account", provider)
+  console.log("web3.eth.getAccounts with provider: ", provider)
   const web3 = new Web3(provider);
-  let address: string = (await web3.eth.getAccounts().catch((err: Error) => {
-    throw `Error getting eth account - $ ${err.message ? err.message : err}`;
-  }))[0];
+  const account_addresses: string[] = await web3.eth.getAccounts()
+    .catch((err: Error) => {
+      throw `Error getting eth account - $ ${err.message ? err.message : err}`;
+    });
 
-  // attempt reverse
+  // should always be first
+  let address = account_addresses[0]
+  console.log("web3.eth.getAccounts address: ", address)
+
+  // attempt lookup of address in ENS using reverse registrar (e.g. 0x333... -> name.eth)
   const ethers_provider = new ethers.providers.Web3Provider(
     web3.currentProvider as ethers.providers.ExternalProvider
   );
-  await ethers_provider.lookupAddress(address).then((ensName) => {
-    if (ensName != null) {
-      address = ensName;
-    }
-  }).catch(err => {
-    throw `Error getting adddress from ethers - ${err.message ? err.message : err}`;
-  })
+  const ens_name = await ethers_provider.lookupAddress(address)
+    .catch(err => {
+      throw `Error getting adddress from ethers - ${err.message ? err.message : err}`;
+    })
 
   // get signature
   let signature = window.localStorage.getItem("account_signature") || ""
@@ -80,12 +83,14 @@ export async function connectWallet(): Promise<ConnectWalletResponse> {
       "MoDA Labs - proof of ownership. Please sign this message to prove ownership over your Ethereum account.";
     const msg = web3.utils.asciiToHex(plain);
 
-    signature = await web3.eth.personal.sign(msg, address, "")
+    // do not use ens_name (e.g. name.eth) to sign instead of address will fail with following error:
+    // "Provided address natemohler.eth is invalid, the capitalization checksum test failed, or it's an indirect IBAN address which can't be converted."
+    signature = await web3.eth.personal.sign(msg, address)
       .catch((err: Error) => {
         throw `Error getting signature - ${err.message}`;
       })
   }
 
-  return { address, signature };
+  return { address, signature, ens_name };
 
 }

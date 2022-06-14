@@ -30,17 +30,16 @@ onMounted(async () => {
     text: 'Loading',
     background: 'rgba(0, 0, 0, 0.7)',
   })
-  const address = window.localStorage.getItem("account_address")
-  const signature = window.localStorage.getItem("account_signature")
-  // if account address is not found in local storage, redirect to landing
-  if (address == null || signature == null) {
+  const { wallet_address, signature, ens_name } = account_store.getCachedAccountData()
+  // if account address is not found in local storage, redirect to landing. ens_name can be empty
+  if (!wallet_address || !signature) {
     router.push({ name: "landing" });
     loading.close()
     return
   }
 
   // load account first
-  await account_store.loadAccount(address, signature)
+  await account_store.loadAccount(wallet_address, signature, ens_name)
   if (account_store.account == null) {
     ElMessage("Error - failed to load account")
     return
