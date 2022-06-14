@@ -5,13 +5,14 @@
       :fullscreen="screen_type == 'xs'" custom-class="add-dialog">
       <el-card class="box-card" shadow="never">
         <div v-if="sort_token_metas.length == 0">No tokens found</div>
-        <AddTokenItem :plaque_id="plaque_id" :token="i" v-for="i in sort_token_metas" :add_list="addList"></AddTokenItem>
+        <AddTokenItem :plaque_id="plaque_id" :token="i" v-for="i in sort_token_metas"
+          @update_token_list="update_token_list" :submit_new_token="submit_new_token"></AddTokenItem>
         <hr class="hr" />
       </el-card>
       <template #footer>
         <span class="dialog-footer">
           <el-button>Clear</el-button>
-          <el-button type="info" @click="addList= true">Done</el-button>
+          <el-button type="info" @click="updateList">Done</el-button>
         </span>
       </template>
     </el-dialog>
@@ -21,6 +22,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
 import { getTokenMetas } from "@/api/token-meta";
+import { updatePlaque } from "@/api/plaque"
 import { usePlaqueStore } from "@/stores/plaque"
 import AddTokenItem from './AddTokenItem.vue';
 import { ElLoading, ElMessage } from 'element-plus'
@@ -31,15 +33,13 @@ import { useTokenMetaStore } from "@/stores/token-meta";
 interface AddTokenDialogProps {
   show_add_token_dialog: boolean;
   plaque_id: string;
-  add_list :boolean;
+  submit_new_token:boolean;
 }
 
 const props = defineProps<AddTokenDialogProps>();
-const emit = defineEmits(['update:show_add_token_dialog'])
-const loading = ref(false);
+const emit = defineEmits(['update:show_add_token_dialog',])
 const { width, screen_type } = useBreakpoints();
 const plaque_store = usePlaqueStore();
-const addList = ref(false);
 const token_meta_store = useTokenMetaStore();
 const show_dialog = computed({
   get() {
@@ -49,7 +49,7 @@ const show_dialog = computed({
     emit('update:show_add_token_dialog', value)
   }
 })
-
+const submit_new_token = ref(false)
 const token_metas = computed(() => {
   return token_meta_store.archive_token_meta_list;
 })
@@ -67,7 +67,25 @@ const sort_token_metas = computed(() => {
   }
   return sort_token_metas;
 })
-
+const plaque = computed((): FirestoreDocument<Plaque> => {
+  return plaque_store.plaque_map[props.plaque_id];
+})
+const new_id_list = ref<string[]>();
+const update_token_list = (new_id: string) => {
+  let new_token_id_list: string[] = [];
+  let token_media_id_list = plaque.value.entity.token_meta_id_list;
+  if (plaque_store.meta_in_playlist(props.plaque_id, new_id)) {
+    new_token_id_list = token_media_id_list.filter(id => id != new_id);
+  } else {
+    new_token_id_list = [...token_media_id_list]
+    new_token_id_list.push(new_id);
+  }
+  new_id_list.value = new_token_id_list
+}
+const updateList = async () => {
+  await updatePlaque(props.plaque_id, { token_meta_id_list: new_id_list.value });
+  submit_new_token.value = true
+}
 /* watch(show_dialog, async (v) => {
   if (!v) {
     return
