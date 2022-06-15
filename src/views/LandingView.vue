@@ -21,7 +21,8 @@
             </p>
             <br />
             <el-button v-if="metamask_supported" :loading="loading" @click="connect">Connect Wallet</el-button>
-            <el-alert v-else type="warning" show-icon title="Install Metamask" style="margin-bottom: 1.5em">
+            <el-alert v-else type="warning" show-icon title="Install Metamask" style="margin-bottom: 1.5em"
+                :closable="false">
                 The Metamask extension was not detected on your browser.
                 Please
                 <el-link type="primary" style="font-size: 12px; vertical-align: top;"
@@ -38,7 +39,7 @@
 import { ref, onMounted } from "vue";
 import { useRouter, useRoute } from 'vue-router';
 import { useAccountStore } from "@/stores/account"
-import { showError } from "@/util/util";
+import { showError, isMobileBrowser } from "@/util/util";
 import { ElLoading } from 'element-plus'
 import detectEthereumProvider from '@metamask/detect-provider';
 
@@ -50,6 +51,12 @@ const route = useRoute()
 const router = useRouter();
 
 onMounted(async () => {
+    // had difficulties detecting metamask on mobile browsers, always show connect button on mobile for now
+    if (isMobileBrowser()) {
+        metamask_supported.value = true
+        return
+    }
+
     const loading = ElLoading.service({
         lock: true,
         text: 'Loading',
@@ -59,6 +66,7 @@ onMounted(async () => {
         showError(`Error detecting ethereum provider - ${err}`)
     });
     metamask_supported.value = Boolean(provider);
+
     loading.close()
 })
 
