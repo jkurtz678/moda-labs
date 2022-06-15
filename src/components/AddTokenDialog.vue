@@ -3,6 +3,7 @@
   <div class="dialog-container">
     <el-dialog center v-model="show_dialog" title="Add tokens to plaque" :close-on-click-modal="false"
       :fullscreen="screen_type == 'xs'">
+      <input type="text" v-model="input" class="search-bar" placeholder="Please enter an artist or art name" />
       <el-card class="box-card" shadow="never">
         <div v-if="sort_token_metas.length == 0">No tokens found</div>
         <AddTokenItem v-for="token in sort_token_metas" :token="token" :in_list="Boolean(token_in_list_map[token.id])"
@@ -35,12 +36,10 @@ interface AddTokenDialogProps {
   show_add_token_dialog: boolean;
   plaque_id: string;
 }
-
 const props = defineProps<AddTokenDialogProps>();
 const new_token_meta_id_list = ref<string[]>([]);
 const save_loading = ref(false);
-
-
+const input = ref("");
 const emit = defineEmits(['update:show_add_token_dialog',])
 const { width, screen_type } = useBreakpoints();
 const plaque_store = usePlaqueStore();
@@ -53,8 +52,8 @@ const show_dialog = computed({
     emit('update:show_add_token_dialog', value)
   }
 })
-watch(show_dialog, (v) => {
-  if (v) {
+watch(show_dialog, (show) => {
+  if (show) {
     new_token_meta_id_list.value = JSON.parse(JSON.stringify(plaque.value.entity.token_meta_id_list));
   }
 })
@@ -64,7 +63,6 @@ const token_metas = computed(() => {
 })
 
 const sort_token_metas = computed(() => {
-  console.log(token_metas)
   const sort_token_metas: FirestoreDocument<TokenMeta>[] = [];
   if (token_metas?.value) {
     for (let token of token_metas?.value) {
@@ -74,6 +72,11 @@ const sort_token_metas = computed(() => {
         sort_token_metas.push(token)
       }
     }
+  }
+  if (input.value.trim() !== '') {
+    return sort_token_metas.filter((token) =>
+      token.entity.artist?.toLowerCase().includes(input.value.toLowerCase()) || token.entity.name?.toLowerCase().includes(input.value.toLowerCase())
+    );
   }
   return sort_token_metas;
 })
@@ -140,5 +143,18 @@ const clearList = () => {
   display: flex;
   align-items: center;
   padding: 0px 5px 0px 5px;
+}
+.search-bar {
+  display: block;
+  width: 100%;
+  margin: 20px auto;
+  padding: 10px 45px;
+  background: white url("../assets/search-icon.svg") no-repeat 15px center;
+  background-size: 15px 15px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
+    rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
 }
 </style> 
