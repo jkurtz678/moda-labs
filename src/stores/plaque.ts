@@ -23,7 +23,7 @@ export const usePlaqueStore = defineStore({
         },
         meta_in_playlist: (getters: any) => (plaque_id: string, token_meta_id: string): boolean => {
             const plaque: FirestoreDocument<Plaque> = getters.plaque_map[plaque_id]
-            return !!plaque.entity.token_meta_id_list.find(id => id == token_meta_id);
+            return plaque.entity.token_meta_id_list.some(id => id == token_meta_id);
         },
         token_meta_id_list: (state): string[] => {
             let token_meta_id_list: string[] = [];

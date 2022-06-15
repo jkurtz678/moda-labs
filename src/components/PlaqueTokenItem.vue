@@ -43,14 +43,13 @@ const props = defineProps<PlaqueTokenItem>();
 const isExpand = reactive({ expanded: false });
 
 const platform = computed(() => {
-  console.log("PROPS", props.token_meta)
   const platform = props.token_meta.entity.platform || "archive";
   return platform.charAt(0).toUpperCase() + platform.slice(1);
 })
 
 const thumbnail_image = computed(() => {
-  if (props.token_meta.entity.thumbnail_url) {
-    return props.token_meta.entity.thumbnail_url
+  if (props.token_meta?.entity.thumbnail_url) {
+    return props.token_meta?.entity.thumbnail_url
   }
   return getImageUrl('logo.png')
 })
