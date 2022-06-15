@@ -16,11 +16,12 @@ export const getAccountByAddress = async (wallet_address: string): Promise<Array
 };
 
 // creates a new account record in the database and returns it
-export const createAccount = async (wallet_address: string, signature: string): Promise<FirestoreDocument<Account>> => {
+export const createAccount = async (wallet_address: string, signature: string, ens_name: string | null): Promise<FirestoreDocument<Account>> => {
     const document = await addDoc(accounts_ref, {
         ...BaseEntity.createBaseEntity(),
         wallet_address: wallet_address,
-        signature: signature
+        signature: signature,
+        ens_name: ens_name
     })
     const snapshot = await getDoc(document)
     return { id: snapshot.id, entity: snapshot.data() as Account }

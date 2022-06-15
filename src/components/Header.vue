@@ -38,11 +38,16 @@ const handleClick = (tab: TabsPaneContext, event: Event) => {
         router.push({ name: tab.paneName })
     }
 }
+// show ens if found, otherwise show truncated wallet address
 const toolbar_address = computed(() => {
-    const address = account_store.account?.entity.wallet_address
-    if (!address) {
-        return "";
+    const account = account_store.account
+    if (!account) {
+        return ""
     }
+    if (account.entity.ens_name) {
+        return account.entity.ens_name;
+    }
+    const address = account.entity.wallet_address;
     return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`
 })
 

@@ -1,5 +1,5 @@
 <template>
-  <hr class="hr" />
+  <hr />
   <div class="card-flex-container">
     <div style="display: flex; align-items: center; margin: 5px 25px 5px 0px;">
       <el-image :src="thumbnail_image" style="width:50px; height: 50px;" fit="contain" />
@@ -43,7 +43,7 @@ const props = defineProps<PlaqueTokenItem>();
 const isExpand = reactive({ expanded: false });
 
 const platform = computed(() => {
-  const platform = props.token_meta?.entity.platform || "archive";
+  const platform = props.token_meta.entity.platform || "archive";
   return platform.charAt(0).toUpperCase() + platform.slice(1);
 })
 
@@ -87,7 +87,5 @@ const getImageUrl = (filename: string) => {
   font-weight: 700;
 }
 
-.hr {
-  border: 0.1px solid lightgray;
-}
+
 </style>

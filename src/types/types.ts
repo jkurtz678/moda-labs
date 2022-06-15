@@ -38,6 +38,7 @@ export interface FirestoreDocument<Entity extends BaseDocument> {
 export interface Account extends BaseDocument {
     wallet_address: string; // ethereum account address
     signature: string; // encoded signature created when user first signs into the app
+    ens_name?: string; // ens (ethereum name service) name if it exists, e.g. natemohler.eth
     //admin: boolean;
     //saved_display_ids: Array<string>; // if user is an admin, devices can be saved here and remembered even if another user has assumed control of the device
 }

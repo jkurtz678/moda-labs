@@ -4,13 +4,13 @@
       <Header></Header>
     </el-header>
     <el-main style="background-color: #DAD9D7;">
-      <RouterView></RouterView>
+      <RouterView v-if="initial_load_done"></RouterView>
     </el-main>
   </el-container>
 </template>
 <script setup lang="ts">
 import Header from "@/components/Header.vue";
-import { onMounted } from "vue"
+import { onMounted, ref } from "vue"
 import { useRouter, RouterView } from 'vue-router';
 import { useAccountStore } from "@/stores/account"
 import { usePlaqueStore } from "@/stores/plaque"
@@ -22,6 +22,7 @@ const account_store = useAccountStore();
 const plaque_store = usePlaqueStore();
 const token_meta_store = useTokenMetaStore();
 const router = useRouter();
+const initial_load_done = ref(false);
 
 onMounted(async () => {
   const loading = ElLoading.service({
@@ -29,17 +30,16 @@ onMounted(async () => {
     text: 'Loading',
     background: 'rgba(0, 0, 0, 0.7)',
   })
-  const address = window.localStorage.getItem("account_address")
-  const signature = window.localStorage.getItem("account_signature")
-  // if account address is not found in local storage, redirect to landing
-  if (address == null || signature == null) {
+  const { wallet_address, signature, ens_name } = account_store.getCachedAccountData()
+  // if account address is not found in local storage, redirect to landing. ens_name can be empty
+  if (!wallet_address || !signature) {
     router.push({ name: "landing" });
     loading.close()
     return
   }
 
   // load account first
-  await account_store.loadAccount(address, signature)
+  await account_store.loadAccount(wallet_address, signature, ens_name)
   if (account_store.account == null) {
     ElMessage("Error - failed to load account")
     return
@@ -54,7 +54,7 @@ onMounted(async () => {
     .catch(err => (showError(`Error loading opensea tokens - ${err}`)))
 
   await Promise.all([plaque_promise, archive_token_promise, opensea_token_promise])
-
+  initial_load_done.value = true;
   loading.close()
 });
 

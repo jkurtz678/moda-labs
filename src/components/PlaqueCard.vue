@@ -1,23 +1,13 @@
 <template>
   <el-card>
-    <template #header>
-      <div style="display: flex; align-items: center;padding:1em" @click="showDetail = !showDetail">
-        <h1> {{ props.plaque.entity.name }}</h1>
-        <div style="flex-grow: 1" />
-        <el-tag class="ml-2" type="success">online</el-tag>
-      </div>
-      <transition name="el-fade-in-linear">
-        <section v-if="showDetail">
-          <p style="padding:0 1em;">{{ `Total artworks: ${plaque.entity.token_meta_id_list.length}` }}</p>
-          <div style="display: flex; align-items: center; justify-content: space-between;padding: 0.5em 1em;">
-            <el-button>Settings</el-button>
-            <el-button type="info" @click="show_add_token_dialog = true">Add Artwork</el-button>
-          </div>
-        </section>
-      </transition>
-    </template>
-    <transition name="el-fade-in-linear">
-      <section class="card-simple" v-if="!showDetail" @click="showDetail = true">
+    <div style="display: flex; align-items: center;padding:1em">
+      <h1> {{ props.plaque.entity.name }}</h1>
+      <div style="flex-grow: 1" />
+      <el-tag class="ml-2" type="success">online</el-tag>
+    </div>
+    <el-collapse-transition>
+      <section v-show="plaque_view == 'simple'" class="card-simple" >
+        <hr>
         <el-row style="margin-bottom: 8px;padding:1em">
           <el-col :span="12">
             <div style="font-size: var(--el-font-size-extra-small)">title</div>
@@ -28,20 +18,45 @@
             {{ first_token?.entity.artist || "N/A" }}
           </el-col>
         </el-row>
-        <div style="padding:1em">{{ `Total artworks: ${plaque.entity.token_meta_id_list.length}` }}</div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-right: 1em">
+          <div style="padding:1em">{{ `Total artworks: ${plaque.entity.token_meta_id_list.length}` }}</div>
+          <el-button @click="plaque_view = 'detail'">
+            View <el-icon class="el-icon--right">
+              <ArrowRight />
+            </el-icon>
+          </el-button>
+        </div>
       </section>
-    </transition>
-    <transition name="el-fade-in-linear">
-      <section class="card-detail" v-if="showDetail">
-      <div v-if="plaque_tokens.length == 0" style="padding: 1em;">No tokens added</div>
-        <PlaqueTokenItem :token_meta="i" v-for="i in plaque_tokens" />
+    </el-collapse-transition>
+    <el-collapse-transition>
+      <section v-if="plaque_view == 'detail'" class="card-detail" >
+        <p style="padding:0 1em;">{{ `Total artworks: ${plaque.entity.token_meta_id_list.length}` }}</p>
+        <div style="display: flex; align-items: center; justify-content: space-between;padding: 0.5em 1em;">
+          <el-button @click="plaque_view = 'settings'">Settings</el-button>
+          <el-button type="info" @click="show_add_token_dialog = true">Add Artwork</el-button>
+        </div>
+        <div v-if="plaque_tokens.length == 0" style="padding: 1em;">No tokens added</div>
+        <PlaqueTokenItem :token_meta="meta" v-for="meta in plaque_tokens" />
         <div style="display: flex; padding: 1em;">
           <el-button @click="clearTokens">Clear Tokens</el-button>
           <div style="flex-grow: 1"></div>
-          <el-button type="danger" plain @click="forgetPlaque">Forget Display</el-button>
+          <el-button @click="plaque_view = 'simple'">Close<el-icon class="el-icon--right">
+              <Close />
+            </el-icon>
+          </el-button>
         </div>
       </section>
-    </transition>
+    </el-collapse-transition>
+
+    <el-collapse-transition>
+      <section v-if="plaque_view == 'settings'" style="padding: 1em; display: flex; justify-content: space-between;" >
+        <el-button type="danger" plain @click="forgetPlaque">Forget Display</el-button>
+        <el-button @click="plaque_view = 'detail'">Close<el-icon class="el-icon--right">
+            <Close />
+          </el-icon>
+        </el-button>
+      </section>
+    </el-collapse-transition>
 
     <AddTokenDialog :plaque_id="props.plaque.id" v-model:show_add_token_dialog="show_add_token_dialog"></AddTokenDialog>
 
@@ -61,7 +76,7 @@ interface PlaqueCardProps {
   plaque: FirestoreDocument<Plaque>;
 }
 const props = defineProps<PlaqueCardProps>();
-const showDetail = ref(false);
+const plaque_view = ref("simple"); // 3 modes - 'simple', 'detail', 'settings'
 const show_add_token_dialog = ref(false);
 const token_meta_store = useTokenMetaStore()
 

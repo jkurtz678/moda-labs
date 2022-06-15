@@ -48,9 +48,12 @@ export const loadTokensCreatedByAddress = async (wallet_address: string): Promis
         const res_json = await res.json();
 
         // add creator to fit with other opensea endpoint pattern
-        token_list.push(...res_json.asset_events.map((e: any) => {
-            return { ...e.asset, creator: e.from_account};
-        }));
+        if (res_json.asset_events) {
+            token_list.push(...res_json.asset_events.map((e: any) => {
+                return { ...e.asset, creator: e.from_account };
+            }));
+        }
+
 
         // continue to call api until all tokens have been retrieved
         cursor = res_json.next;
