@@ -8,9 +8,9 @@
             <p class="bold">{{ props.token.entity.name }}</p>
             <p class="bold">{{ props.token.entity.artist }}</p>
         </div>
-        <el-button :icon="in_list ? 'close' : 'plus'" :type="in_list ? 'danger' : 'success'" plain circle @click=" emit('update_token_list', props.token.id)" />
+        <el-button :icon="in_list ? 'close' : 'plus'" :type="in_list ? 'danger' : 'success'" plain circle
+            @click="emit('update_token_list', props.token.id)" />
     </div>
-
 </template>
 
 <script setup lang="ts">
@@ -32,7 +32,7 @@ const emit = defineEmits(['update_token_list'])
 
 const getImageUrl = (filename: string) => {
     return new URL(`../assets/${filename}`, import.meta.url).href
-} 
+}
 
 // watch(add_to_list, async (v) => {
 //     if (v) {

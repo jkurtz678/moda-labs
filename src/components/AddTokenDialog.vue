@@ -1,8 +1,8 @@
 
 <template>
   <div class="dialog-container">
-    <el-dialog class="box-dialog" center v-model="show_dialog" title="Add tokens to plaque" close-on-click-modal="false"
-      :fullscreen="screen_type == 'xs'" custom-class="add-dialog">
+    <el-dialog center v-model="show_dialog" title="Add tokens to plaque" :close-on-click-modal="false"
+      :fullscreen="screen_type == 'xs'">
       <el-card class="box-card" shadow="never">
         <div v-if="sort_token_metas.length == 0">No tokens found</div>
         <AddTokenItem v-for="token in sort_token_metas" :token="token" :in_list="token_in_list_map[token.id]"

@@ -1,12 +1,12 @@
 <template>
   <div style="padding: 20px">
     <h1 style="margin-bottom: 15px">SUBMIT TO MODA ARCHIVES</h1>
-    <SubmitTokenForm v-if="account_store.account"></SubmitTokenForm> 
+    <SubmitTokenForm v-if="account_store.account"></SubmitTokenForm>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {onMounted} from "vue";
+import { onMounted } from "vue";
 import { useRouter } from 'vue-router';
 import { useAccountStore } from "@/stores/account"
 import { showError } from "@/util/util";
@@ -18,11 +18,10 @@ const account_store = useAccountStore();
 
 onMounted(async () => {
 
-  const address = window.localStorage.getItem("account_address")
-  const signature = window.localStorage.getItem("account_signature")
+  const { wallet_address, signature, ens_name } = account_store.getCachedAccountData()
 
-  if (address == null || signature == null) {
-    router.push({ name: "landing", query: {redir: window.location.href}})
+  if (wallet_address == null || signature == null) {
+    router.push({ name: "landing", query: { redir: window.location.href } })
     return
   }
   const loading = ElLoading.service({
@@ -32,7 +31,7 @@ onMounted(async () => {
   })
 
   try {
-    await account_store.loadAccount(address, signature);
+    await account_store.loadAccount(wallet_address, signature, ens_name);
   } catch (err) {
     showError(`Error loading moda archive account - ${err}`);
   } finally {
