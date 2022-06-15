@@ -5,7 +5,7 @@
       :fullscreen="screen_type == 'xs'">
       <el-card class="box-card" shadow="never">
         <div v-if="sort_token_metas.length == 0">No tokens found</div>
-        <AddTokenItem v-for="token in sort_token_metas" :token="token" :in_list="token_in_list_map[token.id]"
+        <AddTokenItem v-for="token in sort_token_metas" :token="token" :in_list="Boolean(token_in_list_map[token.id])"
           @update_token_list="updateLocalTokenList"></AddTokenItem>
         <hr class="hr" />
       </el-card>
