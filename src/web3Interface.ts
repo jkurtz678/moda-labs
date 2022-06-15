@@ -85,6 +85,12 @@ export async function connectWallet(): Promise<ConnectWalletResponse> {
 
   // get signature
   let signature = window.localStorage.getItem("account_signature") || ""
+
+  // skip signature on mobile for now, buggy and causing difficulty on login
+  if (isMobileBrowser() && !signature) {
+    signature = 'mobile-skip'
+  }
+
   if (!signature) {
     const plain =
       "MoDA Labs - proof of ownership. Please sign this message to prove ownership over your Ethereum account.";

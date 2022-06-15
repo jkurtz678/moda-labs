@@ -1,12 +1,12 @@
 <template>
   <el-card>
-    <div style="display: flex; align-items: center;padding:1em">
+    <div style="display: flex; align-items: center; padding:1em">
       <h1> {{ props.plaque.entity.name }}</h1>
       <div style="flex-grow: 1" />
       <el-tag class="ml-2" type="success">online</el-tag>
     </div>
     <el-collapse-transition>
-      <section v-show="plaque_view == 'simple'" class="card-simple" >
+      <section v-show="plaque_view == 'simple'" class="card-simple">
         <hr>
         <el-row style="margin-bottom: 8px;padding:1em">
           <el-col :span="12">
@@ -29,7 +29,7 @@
       </section>
     </el-collapse-transition>
     <el-collapse-transition>
-      <section v-if="plaque_view == 'detail'" class="card-detail" >
+      <section v-if="plaque_view == 'detail'" class="card-detail">
         <p style="padding:0 1em;">{{ `Total artworks: ${plaque.entity.token_meta_id_list.length}` }}</p>
         <div style="display: flex; align-items: center; justify-content: space-between;padding: 0.5em 1em;">
           <el-button @click="plaque_view = 'settings'">Settings</el-button>
@@ -49,7 +49,7 @@
     </el-collapse-transition>
 
     <el-collapse-transition>
-      <section v-if="plaque_view == 'settings'" style="padding: 1em; display: flex; justify-content: space-between;" >
+      <section v-if="plaque_view == 'settings'" style="padding: 1em; display: flex; justify-content: space-between;">
         <el-button type="danger" plain @click="forgetPlaque">Forget Display</el-button>
         <el-button @click="plaque_view = 'detail'">Close<el-icon class="el-icon--right">
             <Close />
