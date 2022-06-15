@@ -1,12 +1,19 @@
 <template>
   <el-card>
-    <div style="display: flex; align-items: center;padding:1em">
-      <h1> {{ props.plaque.entity.name }}</h1>
+    <div style="display: flex; align-items: center; padding:1em">
+      <h1 v-if="!edit_plaque_name"> {{ props.plaque.entity.name }}</h1>
+      <input v-else v-model="props.plaque.entity.name" class="edit-name-input" />
+      <el-icon :size="16" color="gray" v-if="!edit_plaque_name" @click="edit_plaque_name = true" class="editIcon">
+        <Edit />
+      </el-icon>
+      <el-icon :size="16" color="green" v-else @click="updatePlaqueName" class="editIcon">
+        <Select />
+      </el-icon>
       <div style="flex-grow: 1" />
       <el-tag class="ml-2" type="success">online</el-tag>
     </div>
     <el-collapse-transition>
-      <section v-show="plaque_view == 'simple'" class="card-simple" >
+      <section v-show="plaque_view == 'simple'" class="card-simple">
         <hr>
         <el-row style="margin-bottom: 8px;padding:1em">
           <el-col :span="12">
@@ -29,7 +36,7 @@
       </section>
     </el-collapse-transition>
     <el-collapse-transition>
-      <section v-if="plaque_view == 'detail'" class="card-detail" >
+      <section v-if="plaque_view == 'detail'" class="card-detail">
         <p style="padding:0 1em;">{{ `Total artworks: ${plaque.entity.token_meta_id_list.length}` }}</p>
         <div style="display: flex; align-items: center; justify-content: space-between;padding: 0.5em 1em;">
           <el-button @click="plaque_view = 'settings'">Settings</el-button>
@@ -49,7 +56,7 @@
     </el-collapse-transition>
 
     <el-collapse-transition>
-      <section v-if="plaque_view == 'settings'" style="padding: 1em; display: flex; justify-content: space-between;" >
+      <section v-if="plaque_view == 'settings'" style="padding: 1em; display: flex; justify-content: space-between;">
         <el-button type="danger" plain @click="forgetPlaque">Forget Display</el-button>
         <el-button @click="plaque_view = 'detail'">Close<el-icon class="el-icon--right">
             <Close />
@@ -71,13 +78,21 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { ref } from "vue";
 import { updatePlaque } from "@/api/plaque";
 import { useTokenMetaStore } from "../stores/token-meta";
-
+import { showError } from "@/util/util";
 interface PlaqueCardProps {
   plaque: FirestoreDocument<Plaque>;
 }
+
 const props = defineProps<PlaqueCardProps>();
 const plaque_view = ref("simple"); // 3 modes - 'simple', 'detail', 'settings'
 const show_add_token_dialog = ref(false);
+const edit_plaque_name = ref(false);
+const updatePlaqueName = async () => {
+  await updatePlaque(props.plaque.id, { name: props.plaque.entity.name }).catch(err => {
+    showError(`Error updating plaque tokens - ${err}`)
+  })
+  edit_plaque_name.value = false;
+}
 const token_meta_store = useTokenMetaStore()
 
 interface TokenMetaMap {
@@ -172,11 +187,21 @@ el-card__body {
   padding: 0 !important;
 }
 
+.edit-name-input {
+  border: 0;
+  outline: 0;
+  background: transparent;
+  border-bottom: 1px solid black;
+  padding: 0 2px;
+  font-size: 1.5em;
+}
+.editIcon{
+  margin: 0 5px;
+}
 @media only screen and (max-width: 600px) {
   div.el-card {
     display: block;
     margin: 20px 10px 20px 10px;
-
     min-width: 250px !important;
   }
 }
