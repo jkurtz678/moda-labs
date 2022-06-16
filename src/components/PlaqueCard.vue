@@ -1,7 +1,12 @@
 <template>
   <el-card>
     <div style="display: flex; align-items: center; padding:1em">
-      <h1> {{ props.plaque.entity.name }}</h1>
+      <h1 v-if="!edit_plaque_name"> {{ props.plaque.entity.name }}</h1>
+      <input v-else v-model="props.plaque.entity.name" class="edit-name-input" />
+      <el-button :icon="Edit" v-if="!edit_plaque_name" @click="edit_plaque_name = true" class="editIcon" circle />
+      <el-button :icon="Select" v-if="edit_plaque_name && !edit_loading" @click="updatePlaqueName" class="editIcon"
+        circle />
+      <el-button loading v-if="edit_plaque_name && edit_loading" @click="updatePlaqueName" class="editIcon" />
       <div style="flex-grow: 1" />
       <el-tag class="ml-2" type="success">online</el-tag>
     </div>
@@ -75,13 +80,29 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { ref } from "vue";
 import { updatePlaque } from "@/api/plaque";
 import { useTokenMetaStore } from "../stores/token-meta";
-
+import { showError } from "@/util/util";
+import {
+  Edit,
+  Select,
+  Loading
+} from '@element-plus/icons-vue'
 interface PlaqueCardProps {
   plaque: FirestoreDocument<Plaque>;
 }
+
 const props = defineProps<PlaqueCardProps>();
 const plaque_view = ref("simple"); // 3 modes - 'simple', 'detail', 'settings'
 const show_add_token_dialog = ref(false);
+const edit_plaque_name = ref(false);
+const edit_loading = ref(false);
+const updatePlaqueName = async () => {
+  edit_loading.value = true;
+  await updatePlaque(props.plaque.id, { name: props.plaque.entity.name }).catch(err => {
+    showError(`Error updating plaque tokens - ${err}`)
+  })
+  edit_plaque_name.value = false;
+  edit_loading.value = false;
+}
 const token_meta_store = useTokenMetaStore()
 
 interface TokenMetaMap {
@@ -176,11 +197,24 @@ el-card__body {
   padding: 0 !important;
 }
 
+.edit-name-input {
+  border: 0;
+  outline: 0;
+  background: transparent;
+  border-bottom: 1px solid black;
+  padding: 0 2px;
+  font-size: 1.5em;
+}
+
+.editIcon {
+  margin: 0 1px;
+  border: none;
+}
+
 @media only screen and (max-width: 600px) {
   div.el-card {
     display: block;
     margin: 20px 10px 20px 10px;
-
     min-width: 250px !important;
   }
 }

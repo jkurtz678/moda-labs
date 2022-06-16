@@ -3,7 +3,7 @@
   <div class="dialog-container">
     <el-dialog center v-model="show_dialog" title="Add tokens to plaque" :close-on-click-modal="false"
       :fullscreen="screen_type == 'xs'">
-      <input type="text" v-model="search_filter" class="search-bar" placeholder="Search by artwork title or artist name" :prefix-icon="Search"/>
+      <input type="text" v-model="search_filter" class="search-bar" placeholder="Search by artwork title or artist name" />
       <el-card class="box-card" shadow="never">
         <div v-if="sort_token_metas.length == 0">No tokens found</div>
         <AddTokenItem v-for="token in sort_token_metas" :token="token" :in_list="Boolean(token_in_list_map[token.id])"
@@ -142,7 +142,7 @@ const clearList = () => {
 .dialog-footer {
   display: flex;
   align-items: center;
-  padding: 0px 5px 0px 5px;
+  padding: 0px 5px;
 }
 .search-bar {
   display: block;
@@ -150,7 +150,7 @@ const clearList = () => {
   margin: 20px auto;
   padding: 10px 45px;
   background: white url("../assets/search-icon.svg") no-repeat 15px center;
-  background-size: 15px 15px;
+  background-size: 20px 20px;
   font-size: 16px;
   border: none;
   border-radius: 5px;
