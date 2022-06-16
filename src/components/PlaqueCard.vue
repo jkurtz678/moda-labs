@@ -3,16 +3,10 @@
     <div style="display: flex; align-items: center; padding:1em">
       <h1 v-if="!edit_plaque_name"> {{ props.plaque.entity.name }}</h1>
       <input v-else v-model="props.plaque.entity.name" class="edit-name-input" />
-      <el-icon :size="16" color="gray" v-if="!edit_plaque_name" @click="edit_plaque_name = true" class="editIcon">
-        <Edit />
-      </el-icon>
-      <el-icon :size="16" color="green" v-if="edit_plaque_name && !edit_loading" @click="updatePlaqueName"
-        class="editIcon">
-        <Select />
-      </el-icon>
-      <el-icon class="is-loading" v-if="edit_plaque_name && edit_loading">
-        <Loading />
-      </el-icon>
+      <el-button :icon="Edit" v-if="!edit_plaque_name" @click="edit_plaque_name = true" class="editIcon" circle />
+      <el-button :icon="Select" v-if="edit_plaque_name && !edit_loading" @click="updatePlaqueName" class="editIcon"
+        circle />
+      <el-button loading v-if="edit_plaque_name && edit_loading" @click="updatePlaqueName" class="editIcon" />
       <div style="flex-grow: 1" />
       <el-tag class="ml-2" type="success">online</el-tag>
     </div>
@@ -87,6 +81,11 @@ import { ref } from "vue";
 import { updatePlaque } from "@/api/plaque";
 import { useTokenMetaStore } from "../stores/token-meta";
 import { showError } from "@/util/util";
+import {
+  Edit,
+  Select,
+  Loading
+} from '@element-plus/icons-vue'
 interface PlaqueCardProps {
   plaque: FirestoreDocument<Plaque>;
 }
@@ -208,7 +207,8 @@ el-card__body {
 }
 
 .editIcon {
-  margin: 0 5px;
+  margin: 0 1px;
+  border: none;
 }
 
 @media only screen and (max-width: 600px) {
