@@ -6,8 +6,12 @@
       <el-icon :size="16" color="gray" v-if="!edit_plaque_name" @click="edit_plaque_name = true" class="editIcon">
         <Edit />
       </el-icon>
-      <el-icon :size="16" color="green" v-else @click="updatePlaqueName" class="editIcon">
+      <el-icon :size="16" color="green" v-if="edit_plaque_name && !edit_loading" @click="updatePlaqueName"
+        class="editIcon">
         <Select />
+      </el-icon>
+      <el-icon class="is-loading" v-if="edit_plaque_name && edit_loading">
+        <Loading />
       </el-icon>
       <div style="flex-grow: 1" />
       <el-tag class="ml-2" type="success">online</el-tag>
@@ -87,11 +91,14 @@ const props = defineProps<PlaqueCardProps>();
 const plaque_view = ref("simple"); // 3 modes - 'simple', 'detail', 'settings'
 const show_add_token_dialog = ref(false);
 const edit_plaque_name = ref(false);
+const edit_loading = ref(false);
 const updatePlaqueName = async () => {
+  edit_loading.value = true;
   await updatePlaque(props.plaque.id, { name: props.plaque.entity.name }).catch(err => {
     showError(`Error updating plaque tokens - ${err}`)
   })
   edit_plaque_name.value = false;
+  edit_loading.value = false;
 }
 const token_meta_store = useTokenMetaStore()
 
@@ -195,9 +202,11 @@ el-card__body {
   padding: 0 2px;
   font-size: 1.5em;
 }
-.editIcon{
+
+.editIcon {
   margin: 0 5px;
 }
+
 @media only screen and (max-width: 600px) {
   div.el-card {
     display: block;
