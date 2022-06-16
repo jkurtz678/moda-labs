@@ -46,7 +46,11 @@
           <el-button @click="plaque_view = 'settings'">Settings</el-button>
           <el-button type="info" @click="show_add_token_dialog = true">Add Artwork</el-button>
         </div>
-        <div v-if="plaque_tokens.length == 0" style="padding: 1em;">No tokens added</div>
+        <hr />
+        <template v-if="plaque_tokens.length == 0">
+          <div style="padding: 1em;"> No tokens added</div>
+          <hr />
+        </template>
         <PlaqueTokenItem :token_meta="meta" v-for="meta in plaque_tokens" />
         <div style="display: flex; padding: 1em;">
           <el-button @click="clearTokens">Clear Tokens</el-button>

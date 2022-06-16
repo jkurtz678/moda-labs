@@ -45,7 +45,7 @@
                     </el-icon>
                     {{ loading_progress }}
                 </template>
-                <div>{{loading ? "UPLOADING" : "SUBMIT"}}</div>
+                <div>{{ loading ? "UPLOADING" : "SUBMIT" }}</div>
             </el-button>
         </el-form-item>
     </el-form>
@@ -56,11 +56,11 @@ import { reactive, ref } from "vue";
 import type { FormInstance, FormRules } from "element-plus";
 import { createTokenMeta } from "@/api/token-meta";
 import { uploadFile } from "@/api/storage";
-import { type TokenMeta, Blockchain, TokenPlatform} from "@/types/types";
+import { type TokenMeta, Blockchain, TokenPlatform } from "@/types/types";
 import { useAccountStore } from "@/stores/account"
 import { showError } from "@/util/util";
 
-import type { UploadProps, UploadUserFile} from "element-plus";
+import type { UploadProps, UploadUserFile } from "element-plus";
 import { Timestamp } from "firebase/firestore"
 import { ElMessage, ElMessageBox } from 'element-plus'
 
@@ -137,7 +137,8 @@ const submit = async (formEl: FormInstance | undefined) => {
 
     loading.value = true;
 
-    uploadFile(`${file.uid || ""}`, file.raw as File, progressCallback, successCallback)
+    const file_uri = `${file.uid}.${file.name.split(".").pop()}`;
+    uploadFile(file_uri, file.raw as File, progressCallback, successCallback)
         .catch(err => {
             console.error(err)
             loading.value = false;
@@ -146,8 +147,8 @@ const submit = async (formEl: FormInstance | undefined) => {
 };
 
 const uploadSuccess = (formEl: FormInstance, file: UploadUserFile) => {
-    form.media_id = `${file?.uid || ""}`
-    form.media_type = `.${file.name.split(".").pop() || ""}`
+    form.media_id = `${file.uid}`
+    form.media_type = `.${file.name.split(".").pop()}`
     console.log("upload success, sending form: ", form);
     createTokenMeta(form)
         .then((r) => {

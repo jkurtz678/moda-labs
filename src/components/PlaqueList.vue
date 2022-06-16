@@ -78,4 +78,13 @@ const createTestPlaque = async () => {
     justify-content: center;
     cursor: pointer;
 }
+
+@media only screen and (max-width: 600px) {
+  div.add-button-container {
+    display: block;
+    margin: 20px 10px 20px 10px;
+
+    min-width: 250px !important;
+  }
+}
 </style>

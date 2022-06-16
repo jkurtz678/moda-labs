@@ -3,6 +3,7 @@ import Web3Modal from "web3modal";
 import { ethers } from "ethers";
 import WalletConnectProvider from '@walletconnect/web3-provider/dist/umd/index.min.js'; // import index.min.js to fix node build issue https://github.com/WalletConnect/walletconnect-monorepo/issues/341#issuecomment-1079579976
 import { ElMessage } from 'element-plus'
+import { isMobileBrowser } from './util/util';
 
 interface ConnectWalletResponse {
   address: string;
@@ -12,13 +13,17 @@ interface ConnectWalletResponse {
 
 export async function connectWallet(): Promise<ConnectWalletResponse> {
 
-  const { ethereum } = window;
-  await ethereum.request({
-    method: 'wallet_requestPermissions',
-    params: [{ eth_accounts: {} }],
-  }).catch((err: Error) => {
-    throw `Error requesting wallet permissions - ${err}`
-  })
+  // this check is made to solve an issue with the browser extension when it is locked
+  if (!isMobileBrowser()) {
+    const { ethereum } = window;
+    await ethereum.request({
+      method: 'wallet_requestPermissions',
+      params: [{ eth_accounts: {} }],
+    }).catch((err: Error) => {
+      throw `Error requesting wallet permissions - ${err.message ? err.message : err}`
+    })
+  }
+
   // setup web3 modal
   console.log("setup web3 modal...");
   const web3_modal = new Web3Modal({
@@ -80,6 +85,12 @@ export async function connectWallet(): Promise<ConnectWalletResponse> {
 
   // get signature
   let signature = window.localStorage.getItem("account_signature") || ""
+
+  // skip signature on mobile for now, buggy and causing difficulty on login
+  if (isMobileBrowser() && !signature) {
+    signature = 'mobile-skip'
+  }
+
   if (!signature) {
     const plain =
       "MoDA Labs - proof of ownership. Please sign this message to prove ownership over your Ethereum account.";
