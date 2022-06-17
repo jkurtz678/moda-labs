@@ -1,5 +1,4 @@
 <template>
-  <hr />
   <div class="card-flex-container">
     <div style="display: flex; align-items: center; margin: 5px 25px 5px 0px;">
       <el-image :src="thumbnail_image" style="width:50px; height: 50px;" fit="contain" />
@@ -17,6 +16,7 @@
     </div>
   </div>
   <div class="card-body" v-if="isExpand.expanded">
+    <hr class="hr" />
     <div class="card-flex-container">
       <div class="card-flex-left">
         <div class="flex-column">
@@ -29,13 +29,14 @@
         <p class="card-title">Artist name</p>
         <div class="bold bigger-font description">{{ props.token_meta.entity.artist }}</div>
         <div :class="show_all ? 'description-all' : 'description-less'">{{ props.token_meta.entity.description }}</div>
-        <a @click="show_all = !show_all" class="link">
+        <a v-if="props.token_meta.entity.description!=''" @click="show_all = !show_all" class="link">
           <span v-if="show_all">Less</span>
           <span v-else> More</span>
         </a>
       </div>
     </div>
   </div>
+  <hr />
 </template>
 
 

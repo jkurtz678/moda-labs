@@ -3,7 +3,7 @@
   <div class="dialog-container">
     <el-dialog center v-model="show_dialog" title="Add tokens to plaque" :close-on-click-modal="false"
       :fullscreen="screen_type == 'xs'">
-      <input type="text" v-model="search_input" class="search-bar" placeholder="Please enter an artist or art name" />
+      <input type="text" v-model="search_filter" class="search-bar" placeholder="Search by artwork title or artist name" />
       <el-card class="box-card" shadow="never">
         <div v-if="sort_token_metas.length == 0">No tokens found</div>
         <AddTokenItem v-for="token in sort_token_metas" :token="token" :in_list="Boolean(token_in_list_map[token.id])"
@@ -39,8 +39,8 @@ interface AddTokenDialogProps {
 const props = defineProps<AddTokenDialogProps>();
 const new_token_meta_id_list = ref<string[]>([]);
 const save_loading = ref(false);
-const search_input = ref("");
-const emit = defineEmits(['update:show_add_token_dialog'])
+const search_filter = ref("");
+const emit = defineEmits(['update:show_add_token_dialog',])
 const { width, screen_type } = useBreakpoints();
 const plaque_store = usePlaqueStore();
 const token_meta_store = useTokenMetaStore();
@@ -73,9 +73,9 @@ const sort_token_metas = computed(() => {
       }
     }
   }
-  if (search_input.value.trim() !== '') {
+  if (search_filter.value.trim() !== '') {
     return sort_token_metas.filter((token) =>
-      token.entity.artist?.toLowerCase().includes(search_input.value.toLowerCase()) || token.entity.name?.toLowerCase().includes(search_input.value.toLowerCase())
+      token.entity.artist?.toLowerCase().includes(search_filter.value.toLowerCase()) || token.entity.name?.toLowerCase().includes(search_filter.value.toLowerCase())
     );
   }
   return sort_token_metas;

@@ -4,9 +4,8 @@
       <h1 v-if="!edit_plaque_name"> {{ props.plaque.entity.name }}</h1>
       <input v-else v-model="props.plaque.entity.name" class="edit-name-input" />
       <el-button :icon="Edit" v-if="!edit_plaque_name" @click="edit_plaque_name = true" class="editIcon" circle />
-      <el-button :icon="Select" v-if="edit_plaque_name && !edit_loading" @click="updatePlaqueName" class="editIcon"
-        circle />
-      <el-button loading v-if="edit_plaque_name && edit_loading" @click="updatePlaqueName" class="editIcon" />
+      <el-button :icon="Select" v-if="edit_plaque_name" :loading="edit_loading" @click="updatePlaqueName"
+        class="editIcon" circle :type="edit_loading ? '' : 'success'" text/>
       <div style="flex-grow: 1" />
       <el-tag class="ml-2" type="success">online</el-tag>
     </div>
@@ -40,7 +39,11 @@
           <el-button @click="plaque_view = 'settings'">Settings</el-button>
           <el-button type="info" @click="show_add_token_dialog = true">Add Artwork</el-button>
         </div>
-        <div v-if="plaque_tokens.length == 0" style="padding: 1em;">No tokens added</div>
+        <hr />
+        <template v-if="plaque_tokens.length == 0">
+          <div style="padding: 1em;"> No tokens added</div>
+          <hr />
+        </template>
         <PlaqueTokenItem :token_meta="meta" v-for="meta in plaque_tokens" />
         <div style="display: flex; padding: 1em;">
           <el-button @click="clearTokens">Clear Tokens</el-button>

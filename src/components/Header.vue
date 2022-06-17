@@ -15,7 +15,7 @@
                 <el-tab-pane label="Tokens" name="token-list"></el-tab-pane>
             </el-tabs>
             <div style="flex-grow: 1"></div>
-            <div style="margin-right: 10px;">{{ toolbar_address }}</div>
+            <div v-if="screen_type != 'xs'" style="margin-right: 10px;">{{ toolbar_address }}</div>
             <el-button @click="logout" style="margin-left: 1em;">Logout</el-button>
         </template>
     </div>
