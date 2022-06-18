@@ -15,27 +15,30 @@
       <div style="opacity: 0.5;">{{ platform }}</div>
     </div>
   </div>
-  <div class="card-body" v-if="isExpand.expanded">
-    <hr class="hr" />
-    <div class="card-flex-container">
-      <div class="card-flex-left">
-        <div class="flex-column">
-          <p class="card-title">Title</p>
-          <div class="bold bigger-font">{{ props.token_meta.entity.name }}</div>
-          <img style="width:80px" :src="getImageUrl('logo.png')" />
+  <el-collapse-transition>
+    <div class="card-body" v-if="isExpand.expanded">
+      <hr class="hr" />
+      <div style="display: flex; align-items: top;">
+        <div class="card-flex-left">
+          <div class="flex-column">
+            <p class="card-title">Title</p>
+            <div class="bold bigger-font">{{ props.token_meta.entity.name }}</div>
+            <img style="width:80px" :src="getImageUrl('logo.png')" />
+          </div>
+        </div>
+        <div class="card-flex-right">
+          <p class="card-title">Artist name</p>
+          <div class="bold bigger-font description">{{ props.token_meta.entity.artist }}</div>
+          <div :class="show_all ? 'description-all' : 'description-less'">{{ props.token_meta.entity.description }}
+          </div>
+          <a v-if="props.token_meta.entity.description != ''" @click="show_all = !show_all" class="link">
+            <span v-if="show_all">Less</span>
+            <span v-else> More</span>
+          </a>
         </div>
       </div>
-      <div class="card-flex-right">
-        <p class="card-title">Artist name</p>
-        <div class="bold bigger-font description">{{ props.token_meta.entity.artist }}</div>
-        <div :class="show_all ? 'description-all' : 'description-less'">{{ props.token_meta.entity.description }}</div>
-        <a v-if="props.token_meta.entity.description!=''" @click="show_all = !show_all" class="link">
-          <span v-if="show_all">Less</span>
-          <span v-else> More</span>
-        </a>
-      </div>
     </div>
-  </div>
+  </el-collapse-transition>
   <hr />
 </template>
 
@@ -113,6 +116,7 @@ const show_all = ref(false);
 .card-flex-container {
   display: flex;
   align-items: center;
+  
 }
 
 .image {
