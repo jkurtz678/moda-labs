@@ -125,10 +125,8 @@ const handleSave = async () => {
       token_meta.entity.platform = TokenPlatform.OpenseaArchive;
       const new_meta = await createTokenMeta(token_meta.entity)
       // update new_token_meta_id list id with newly created token meta
-      console.log("NEW META ID", new_meta.id)
       new_token_meta_id_list.value[i] = new_meta.id;
     }
-    console.log("NEW META ID LIST", new_token_meta_id_list.value)
     await updatePlaque(props.plaque_id, { token_meta_id_list: new_token_meta_id_list.value })
   } catch (err) {
     showError(`Error updating plaque tokens - ${err}`)

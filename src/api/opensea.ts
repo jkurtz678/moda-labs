@@ -9,7 +9,9 @@ export async function loadTokensByAccountID(wallet_address: string): Promise<Arr
             'X-API-KEY': OPENSEA_API_KEY
         }
     });
+
     const res_json = await res.json();
+    handleOpenseaFetchError(res, res_json) 
 
     return res_json.assets;
 }
@@ -45,9 +47,11 @@ export const loadTokensCreatedByAddress = async (wallet_address: string): Promis
                 }
             }
         );
-        const res_json = await res.json();
 
+        const res_json = await res.json();
+        handleOpenseaFetchError(res, res_json) 
         // add creator to fit with other opensea endpoint pattern
+
         if (res_json.asset_events) {
             token_list.push(...res_json.asset_events.map((e: any) => {
                 return { ...e.asset, creator: e.from_account };
@@ -62,4 +66,16 @@ export const loadTokensCreatedByAddress = async (wallet_address: string): Promis
         }
     }
     return token_list;
+}
+
+const handleOpenseaFetchError = (res: Response, body: any) => {
+    if (res.status >= 400) {
+        if(body.detail) {
+            throw body.detail
+        }
+        if(res.status == 429) {
+            throw "Error - opensea rejected request due to rate limiting"
+        }
+        throw "Error loading opensea tokens"
+    }
 }
