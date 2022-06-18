@@ -22,7 +22,7 @@
           <div class="flex-column">
             <p class="card-title">Title</p>
             <div class="bold bigger-font">{{ props.token_meta.entity.name }}</div>
-            <img style="width:80px" :src="getImageUrl('logo.png')" />
+            <img style="width:170px" :src="props.token_meta.entity.thumbnail_url || getImageUrl('logo.png')" />
           </div>
         </div>
         <div class="card-flex-right">
@@ -133,14 +133,14 @@ const show_all = ref(false);
 }
 
 .card-flex-left {
-  width: 25%;
+  width: 35%;
   margin: 5px;
   /* height: 100vh; */
   padding: 5px;
 }
 
 .card-flex-right {
-  width: 75%;
+  width: 65%;
   /* height: 50vh; */
   margin: 5px;
   padding: 5px;

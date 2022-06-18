@@ -35,7 +35,7 @@ const tokens = computed(() => {
 </script>
 <style scoped>
 .container-card {
-    min-width: 650px;
+    min-width: 700px;
     border-radius: 18px;
     height: 100%;
 }

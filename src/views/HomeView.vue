@@ -48,13 +48,16 @@ onMounted(async () => {
   }
 
   // then load all tokens and plaques in parallel 
-  const plaque_promise = plaque_store.loadPlaques(account_store.account.entity.wallet_address)
+  const address = account_store.get_account.entity.wallet_address
+  const plaque_promise = plaque_store.loadPlaques(address)
     .catch(err => (showError(`Error loading plaques - ${err}`)));
-  const archive_token_promise = token_meta_store.loadArchiveTokenMetas(account_store.get_account.entity.wallet_address)
+  const archive_token_promise = token_meta_store.loadArchiveTokenMetas(address)
     .catch(err => (showError(`Error loading archive token metas - ${err}`)));
-  const opensea_token_promise = token_meta_store.loadOpenseaTokenMetas(account_store.get_account.entity.wallet_address)
-    .catch(err => (showError(`Error loading opensea tokens - ${err}`)))
-  await Promise.all([plaque_promise, archive_token_promise, opensea_token_promise])
+  const opensea_minted_token_promise = token_meta_store.loadOpenseaMintedTokenMetas(address)
+    .catch(err => (showError(`Error loading opensea minted tokens - ${err}`)))
+const opensea_wallet_token_promise = token_meta_store.loadOpenseaWalletTokenMetas(address)
+    .catch(err => (showError(`Error loading opensea wallet tokens - ${err}`)))
+  await Promise.all([plaque_promise, archive_token_promise, opensea_minted_token_promise, opensea_wallet_token_promise])
 
   // if plaque_id is passed in the query params and the plaque is not in the store, attempt to add this plaque to this account
   const plaque_id_qp = route.query.plaque_id;

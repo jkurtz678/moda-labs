@@ -73,8 +73,9 @@ export enum Blockchain {
 }
 
 export enum TokenPlatform {
-    Archive = "archive", // token stored in moda archive
-    Opensea = "opensea" // token from opensea api, not stored in moda archive
+    Archive = "archive", // tokens uploaded directly to the moda archive 
+    Opensea = "opensea", // token from opensea api, not stored in moda archive
+    OpenseaArchive = "opensea_archive" // token from opensea api that has been added to moda archive
 }
 
 // OpenseaToken is the structure of tokens returned from the opensea API
@@ -95,4 +96,8 @@ export interface OpenseaToken {
 // getUniqueOpenseaID returns a unique identifier for opensea tokens
 export function getUniqueOpenseaID(opensea_token: OpenseaToken): string {
     return `${opensea_token.asset_contract.address}/${opensea_token.token_id}`
+}
+
+export function getTokenMetaUniqueChainID(t: FirestoreDocument<TokenMeta>): string {
+    return `${t.entity.asset_contract_address}/${t.entity.token_id}`
 }
