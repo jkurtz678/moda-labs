@@ -118,7 +118,7 @@ const handleSave = async () => {
       }
       // only create tokens for opensea tokens
       if (store_token.entity.platform != TokenPlatform.Opensea) {
-        return
+        continue
       }
       const token_meta: FirestoreDocument<TokenMeta> = JSON.parse(JSON.stringify(store_token));
       token_meta.entity.wallet_address = account_store.get_account.entity.wallet_address
