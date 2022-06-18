@@ -8,10 +8,9 @@
       <p class="bold">{{ props.token_meta?.entity?.artist }}</p>
     </div>
     <div style="flex: 1;text-align:right; padding-right:1em">
-      <el-icon @click="isExpand.expanded = !isExpand.expanded">
-        <ArrowRightBold v-if="!isExpand.expanded"></ArrowRightBold>
-        <ArrowDownBold v-if="isExpand.expanded"></ArrowDownBold>
-      </el-icon>
+      <el-button :icon="isExpand.expanded ? 'ArrowDownBold' : 'ArrowRightBold'"
+        @click="isExpand.expanded = !isExpand.expanded" text circle>
+      </el-button>
       <div style="opacity: 0.5;">{{ platform }}</div>
     </div>
   </div>
@@ -116,7 +115,7 @@ const show_all = ref(false);
 .card-flex-container {
   display: flex;
   align-items: center;
-  
+
 }
 
 .image {
