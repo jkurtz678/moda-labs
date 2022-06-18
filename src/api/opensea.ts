@@ -1,6 +1,6 @@
 import type { OpenseaToken, FirestoreDocument, TokenMeta } from "@/types/types";
 
-const OPENSEA_API_KEY = '742ea11e1d864fe2b23ac7cfe66a43f7';
+const OPENSEA_API_KEY = import.meta.env.VITE_OPENSEA_API_KEY;
 
 // loadTokensByAccountID returns all associated opensea tokens for a given account id
 export async function loadTokensByAccountID(wallet_address: string): Promise<Array<OpenseaToken>> {
