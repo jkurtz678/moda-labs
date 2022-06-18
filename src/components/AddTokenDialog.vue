@@ -3,7 +3,8 @@
   <div class="dialog-container">
     <el-dialog center v-model="show_dialog" title="Add tokens to plaque" :close-on-click-modal="false"
       :fullscreen="screen_type == 'xs'">
-      <input type="text" v-model="search_filter" class="search-bar" placeholder="Search by artwork title or artist name" />
+      <input type="text" v-model="search_filter" class="search-bar"
+        placeholder="Search by artwork title or artist name" />
       <el-card class="box-card" shadow="never">
         <div v-if="sort_token_metas.length == 0">No tokens found</div>
         <AddTokenItem v-for="token in sort_token_metas" :token="token" :in_list="Boolean(token_in_list_map[token.id])"
@@ -15,7 +16,7 @@
           <div>{{ `Tokens in playlist: ${new_token_meta_id_list.length}` }}</div>
           <div style="flex-grow: 1"></div>
           <el-button @click="clearList">Clear</el-button>
-          <el-button type="info" @click="updateList" :loading="save_loading">Save</el-button>
+          <el-button type="info" @click="handleSave" :loading="save_loading">Save</el-button>
         </span>
       </template>
     </el-dialog>
@@ -25,10 +26,12 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { updatePlaque } from "@/api/plaque"
+import { createTokenMeta } from "@/api/token-meta"
 import { usePlaqueStore } from "@/stores/plaque"
+import { useAccountStore } from "@/stores/account"
 import AddTokenItem from './AddTokenItem.vue';
 import { showError } from "@/util/util"
-import type { FirestoreDocument, TokenMeta, Plaque } from "@/types/types";
+import { type FirestoreDocument, type TokenMeta, type Plaque, TokenPlatform } from "@/types/types";
 import useBreakpoints from "@/composables/breakpoints"
 import { useTokenMetaStore } from "@/stores/token-meta";
 
@@ -41,9 +44,11 @@ const new_token_meta_id_list = ref<string[]>([]);
 const save_loading = ref(false);
 const search_filter = ref("");
 const emit = defineEmits(['update:show_add_token_dialog',])
-const { width, screen_type } = useBreakpoints();
+const { screen_type } = useBreakpoints();
 const plaque_store = usePlaqueStore();
 const token_meta_store = useTokenMetaStore();
+const account_store = useAccountStore();
+
 const show_dialog = computed({
   get() {
     return props.show_add_token_dialog
@@ -59,7 +64,7 @@ watch(show_dialog, (show) => {
 })
 
 const token_metas = computed(() => {
-  return token_meta_store.archive_token_meta_list;
+  return Object.values(token_meta_store.all_token_metas);
 })
 
 const sort_token_metas = computed(() => {
@@ -102,11 +107,33 @@ const updateLocalTokenList = (new_id: string) => {
     new_token_meta_id_list.value.push(new_id);
   }
 }
-const updateList = async () => {
+const handleSave = async () => {
   save_loading.value = true;
-  await updatePlaque(props.plaque_id, { token_meta_id_list: new_token_meta_id_list.value }).catch(err => {
+  // create archive token meta on remote for any tokens that are opensea tokens
+  try {
+    for (let [i, t_id] of new_token_meta_id_list.value.entries()) {
+      const store_token = token_meta_store.all_token_metas[t_id]
+      if (!store_token) {
+        throw "Failed to find store token for token: " + t_id;
+      }
+      // only create tokens for opensea tokens
+      if (store_token.entity.platform != TokenPlatform.Opensea) {
+        return
+      }
+      const token_meta: FirestoreDocument<TokenMeta> = JSON.parse(JSON.stringify(store_token));
+      token_meta.entity.wallet_address = account_store.get_account.entity.wallet_address
+      token_meta.entity.platform = TokenPlatform.OpenseaArchive;
+      const new_meta = await createTokenMeta(token_meta.entity)
+      // update new_token_meta_id list id with newly created token meta
+      console.log("NEW META ID", new_meta.id)
+      new_token_meta_id_list.value[i] = new_meta.id;
+    }
+    console.log("NEW META ID LIST", new_token_meta_id_list.value)
+    await updatePlaque(props.plaque_id, { token_meta_id_list: new_token_meta_id_list.value })
+  } catch (err) {
     showError(`Error updating plaque tokens - ${err}`)
-  })
+  }
+
   save_loading.value = false;
   show_dialog.value = false
 }
@@ -144,10 +171,11 @@ const clearList = () => {
   align-items: center;
   padding: 0px 5px;
 }
+
 .search-bar {
   display: block;
   width: 100%;
-  margin: 20px auto;
+  margin: 5px 0px 15px 0px;
   padding: 10px 45px;
   background: white url("../assets/search-icon.svg") no-repeat 15px center;
   background-size: 20px 20px;
@@ -156,5 +184,9 @@ const clearList = () => {
   border-radius: 5px;
   box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
     rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+}
+
+input[type="text"] {
+  font-family: "K2D", sans-serif;
 }
 </style> 

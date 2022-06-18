@@ -88,9 +88,9 @@ export interface OpenseaToken {
     token_id: string;
     description: string;
     permalink: string;
-    creator: { user: {username: string}};
+    creator: { user: { username: string } };
     orders: Array<any>;
-    external_link: string; 
+    external_link: string;
 }
 
 // getUniqueOpenseaID returns a unique identifier for opensea tokens
@@ -100,4 +100,15 @@ export function getUniqueOpenseaID(opensea_token: OpenseaToken): string {
 
 export function getTokenMetaUniqueChainID(t: FirestoreDocument<TokenMeta>): string {
     return `${t.entity.asset_contract_address}/${t.entity.token_id}`
+}
+
+export function getPlatformDisplay(plat: TokenPlatform): string {
+    switch (plat) {
+        case TokenPlatform.Opensea:
+            return "Opensea";
+        case TokenPlatform.OpenseaArchive:
+            return "Opensea Archive";
+        default:
+            return "Archive"
+    }
 }

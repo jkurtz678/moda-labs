@@ -22,7 +22,7 @@
           <div class="flex-column">
             <p class="card-title">Title</p>
             <div class="bold bigger-font">{{ props.token_meta.entity.name }}</div>
-            <img style="width:170px" :src="props.token_meta.entity.thumbnail_url || getImageUrl('logo.png')" />
+            <img style="width:150px" :src="props.token_meta.entity.thumbnail_url || getImageUrl('logo.png')" />
           </div>
         </div>
         <div class="card-flex-right">
@@ -45,6 +45,7 @@
 <script setup lang="ts">
 
 import type { FirestoreDocument, TokenMeta } from "../types/types";
+import { getPlatformDisplay } from "../types/types";
 import { ref, reactive, computed } from "vue";
 
 interface PlaqueTokenItem {
@@ -54,8 +55,7 @@ const props = defineProps<PlaqueTokenItem>();
 const isExpand = reactive({ expanded: false });
 
 const platform = computed(() => {
-  const platform = props.token_meta.entity.platform || "archive";
-  return platform.charAt(0).toUpperCase() + platform.slice(1);
+  return getPlatformDisplay(props.token_meta.entity.platform)
 })
 
 const thumbnail_image = computed(() => {
@@ -133,14 +133,14 @@ const show_all = ref(false);
 }
 
 .card-flex-left {
-  width: 35%;
+  width: 40%;
   margin: 5px;
   /* height: 100vh; */
   padding: 5px;
 }
 
 .card-flex-right {
-  width: 65%;
+  width: 60%;
   /* height: 50vh; */
   margin: 5px;
   padding: 5px;
