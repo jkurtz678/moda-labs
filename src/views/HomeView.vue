@@ -57,7 +57,10 @@ onMounted(async () => {
     .catch(err => (showError(`Error loading opensea minted tokens - ${err}`)))
 const opensea_wallet_token_promise = token_meta_store.loadOpenseaWalletTokenMetas(address)
     .catch(err => (showError(`Error loading opensea wallet tokens - ${err}`)))
-  await Promise.all([plaque_promise, archive_token_promise, opensea_minted_token_promise, opensea_wallet_token_promise])
+  await Promise.all([plaque_promise, archive_token_promise, opensea_minted_token_promise])
+
+  // delay opensea_wallet_load to possibly help with rate limit
+  await opensea_wallet_token_promise;
 
   // if plaque_id is passed in the query params and the plaque is not in the store, attempt to add this plaque to this account
   const plaque_id_qp = route.query.plaque_id;

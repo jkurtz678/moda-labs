@@ -63,8 +63,8 @@ export interface TokenMeta extends BaseDocument {
     asset_contract_address?: string; // contract address for ethereum token
     token_id?: string; // token id for ethereum token
     platform: TokenPlatform; // token id for ethereum token
-    thumbnail_url?: string; // url to thumbnail image 
-    media_url?: string; // url to media
+    external_thumbnail_url?: string; // url to thumbnail image from outside moda archives (e.g. from opensea servers)
+    external_media_url?: string; // url to media source file from outside moda archives (e.g. opensea servers)
 }
 
 export enum Blockchain {
@@ -111,4 +111,17 @@ export function getPlatformDisplay(plat: TokenPlatform): string {
         default:
             return "Archive"
     }
+}
+
+export function getTokenMetaThumbnailImageURL(token_meta: FirestoreDocument<TokenMeta>): string {
+    // first check if archive thumbnail image exist
+    // TODO
+
+    // then we check external thumbnail url
+    if(token_meta.entity.external_thumbnail_url) {
+        return token_meta.entity.external_thumbnail_url
+    }
+
+    // if none found return moda logo as placeholder image
+    return new URL(`../assets/logo.png`, import.meta.url).href
 }

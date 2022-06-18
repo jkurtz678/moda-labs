@@ -1,7 +1,8 @@
 <template>
   <div class="card-flex-container">
     <div style="display: flex; align-items: center; margin: 5px 25px 5px 0px;">
-      <el-image :src="thumbnail_image" style="width:50px; height: 50px;" fit="contain" />
+      <el-image :src="getTokenMetaThumbnailImageURL(props.token_meta)" style="width:50px; height: 50px;"
+        fit="contain" />
     </div>
     <div style="flex: 3 1 0%; text-align: left;">
       <p class="bold">{{ props.token_meta?.entity?.name }}</p>
@@ -16,13 +17,12 @@
   </div>
   <el-collapse-transition>
     <div class="card-body" v-if="isExpand.expanded">
-      <hr class="hr" />
       <div style="display: flex; align-items: top;">
         <div class="card-flex-left">
           <div class="flex-column">
             <p class="card-title">Title</p>
             <div class="bold bigger-font">{{ props.token_meta.entity.name }}</div>
-            <img style="width:150px" :src="props.token_meta.entity.thumbnail_url || getImageUrl('logo.png')" />
+            <img style="width:150px" :src="getTokenMetaThumbnailImageURL(props.token_meta)" />
           </div>
         </div>
         <div class="card-flex-right">
@@ -47,6 +47,7 @@
 import type { FirestoreDocument, TokenMeta } from "../types/types";
 import { getPlatformDisplay } from "../types/types";
 import { ref, reactive, computed } from "vue";
+import { getTokenMetaThumbnailImageURL } from "@/types/types"
 
 interface PlaqueTokenItem {
   token_meta: FirestoreDocument<TokenMeta>;
@@ -58,16 +59,6 @@ const platform = computed(() => {
   return getPlatformDisplay(props.token_meta.entity.platform)
 })
 
-const thumbnail_image = computed(() => {
-  if (props.token_meta?.entity.thumbnail_url) {
-    return props.token_meta?.entity.thumbnail_url
-  }
-  return getImageUrl('logo.png')
-})
-
-const getImageUrl = (filename: string) => {
-  return new URL(`../assets/${filename}`, import.meta.url).href
-}
 const show_all = ref(false);
 </script>
 

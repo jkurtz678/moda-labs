@@ -10,7 +10,6 @@
             <div v-if="tokens.length == 0">No tokens found</div>
             <PlaqueTokenItem v-for="token in tokens" :token_meta="token">
             </PlaqueTokenItem>
-            <hr class="hr" />
         </el-card>
     </div>
     <el-dialog v-model="show_dialog" title="Submit Moda Archives" top="2vh" :fullscreen="screen_type == 'xs'"

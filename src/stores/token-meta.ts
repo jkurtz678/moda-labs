@@ -81,8 +81,8 @@ const convertOpenseaToTokenMeta = (o: OpenseaToken): FirestoreDocument<TokenMeta
             asset_contract_address: o.asset_contract.address,
             token_id: o.token_id,
             platform: TokenPlatform.Opensea,
-            thumbnail_url: o.image_thumbnail_url,
-            media_url: o.animation_url ? o.animation_url : o.image_url,
+            external_thumbnail_url: o.image_thumbnail_url,
+            external_media_url: o.animation_url ? o.animation_url : o.image_url,
         }
     } as FirestoreDocument<TokenMeta>
 }
