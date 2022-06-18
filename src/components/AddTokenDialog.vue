@@ -144,6 +144,9 @@ const clearList = () => {
 </script>
 
 <style scoped>
+:deep .el-dialog {
+  margin-top: 3vh;
+}
 :deep .el-dialog.add-dialog {
   height: auto;
   max-height: 100vh;
