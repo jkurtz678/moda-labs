@@ -144,7 +144,7 @@ const forgetPlaque = () => {
   ElMessageBox.confirm(`Are you sure you want to forget the plaque named '${props.plaque.entity.name}'?`, "Forget plaque", {
     type: 'warning'
   }).then(() => {
-    updatePlaque(props.plaque.id, { wallet_address: "" })
+    updatePlaque(props.plaque.id, { wallet_address: "", token_meta_id_list: [] })
       .then(() => {
         ElMessage({
           type: 'success',
