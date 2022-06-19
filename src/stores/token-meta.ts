@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import { type FirestoreDocument, type OpenseaToken, type TokenMeta, Blockchain, TokenPlatform } from "@/types/types"
 import { getUniqueOpenseaID, getTokenMetaUniqueChainID } from "@/types/types"
 
-import { getTokenMetaListByWalletAddressWithListener } from "@/api/token-meta";
+import { getAllTokenMetasWithListener, getTokenMetaListByWalletAddressWithListener } from "@/api/token-meta";
 import { loadTokensByAccountID, loadTokensCreatedByAddress } from "@/api/opensea";
 
 export type RootTokenMetaState = {
@@ -52,6 +52,18 @@ export const useTokenMetaStore = defineStore({
     },
     actions: {
         async loadArchiveTokenMetas(wallet_address: string) {
+            const admin_wallet_address = ["0x9b75874f5313463011e22aDd4540d2b8A24e3958", "0xd8945d98ed4233Cf87cfA4fDCC7a54FE279E8ee7"] // jackson and nathan
+            
+            // admins see all tokens
+            if(admin_wallet_address.includes(wallet_address)) {
+                await getAllTokenMetasWithListener((token_metas) => {
+                    // filter out invalid tokens
+                    this.archive_token_meta_list = token_metas.filter(t => t.entity.external_media_url || t.entity.media_id);
+                })
+                return
+            }
+            
+            // other users only see tokens associated with their wallet_address
             await getTokenMetaListByWalletAddressWithListener(wallet_address, (token_metas) => {
                 this.archive_token_meta_list = token_metas;
             })
