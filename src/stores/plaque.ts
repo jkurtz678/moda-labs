@@ -36,6 +36,12 @@ export const usePlaqueStore = defineStore({
     actions: {
         async loadPlaques(wallet_address: string) {
             await getPlaquesByWalletAddressWithListener(wallet_address, (plaques) => {
+                // fix null token meta id list
+                for(let i = 0; i < plaques.length; i++) {
+                    if(plaques[i].entity.token_meta_id_list == null) {
+                        plaques[i].entity.token_meta_id_list = [];
+                    }
+                }    
                 this.plaques = plaques;
             })
         }
