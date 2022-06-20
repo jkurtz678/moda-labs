@@ -6,6 +6,8 @@
                     <span style="font-size: 18px;">Wallet Tokens</span>
                     <el-button icon="Plus" @click="show_dialog = true">Add token to archive</el-button>
                 </div>
+                <el-input v-model="search_filter" :prefix-icon="Search" style="margin-top: 20px;"
+                    placeholder="Search by artwork title or artist name"></el-input>
             </template>
             <div v-if="tokens.length == 0">No tokens found</div>
             <PlaqueTokenItem v-for="token in tokens" :token_meta="token">
@@ -23,13 +25,18 @@ import SubmitTokenForm from "./SubmitTokenForm.vue"
 import PlaqueTokenItem from "./PlaqueTokenItem.vue";
 import { useTokenMetaStore } from "../stores/token-meta";
 import useBreakpoints from "@/composables/breakpoints";
+import { Search } from '@element-plus/icons-vue'
 
 const { width, screen_type } = useBreakpoints();
 
 const token_meta_store = useTokenMetaStore()
+const search_filter = ref("")
 const show_dialog = ref(false);
 const tokens = computed(() => {
-    return Object.values(token_meta_store.all_token_metas);
+    const store_tokens = Object.values(token_meta_store.all_token_metas);
+    return store_tokens.filter((token) =>
+        token.entity.artist?.toLowerCase().includes(search_filter.value.toLowerCase()) || token.entity.name?.toLowerCase().includes(search_filter.value.toLowerCase())
+    );
 }) 
 </script>
 <style scoped>
