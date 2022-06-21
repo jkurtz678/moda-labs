@@ -2,7 +2,7 @@
 <template>
   <div class="dialog-container">
     <el-dialog center v-model="show_dialog" title="Add tokens to plaque" :close-on-click-modal="false"
-      :fullscreen="screen_type == 'xs'">
+      :fullscreen="screen_type == 'xs'" top="2vh">
       <input type="text" v-model="search_filter" class="search-bar"
         placeholder="Search by artwork title or artist name" />
       <el-card class="box-card" shadow="never">
@@ -142,9 +142,6 @@ const clearList = () => {
 </script>
 
 <style scoped>
-:deep .el-dialog {
-  margin-top: 3vh;
-}
 :deep .el-dialog.add-dialog {
   height: auto;
   max-height: 100vh;
