@@ -7,8 +7,8 @@
         placeholder="Search by artwork title or artist name" />
       <el-card class="box-card" shadow="never">
         <div v-if="sort_token_metas.length == 0">No tokens found</div>
-        <AddTokenItem v-for="token in sort_token_metas" :token_meta="token" :in_list="Boolean(token_in_list_map[token.id])"
-          @update_token_list="updateLocalTokenList"></AddTokenItem>
+        <AddTokenItem v-for="token in sort_token_metas" :token_meta="token"
+          :in_list="Boolean(token_in_list_map[token.id])" @update_token_list="updateLocalTokenList"></AddTokenItem>
         <hr class="hr" />
       </el-card>
       <template #footer>
@@ -154,6 +154,12 @@ const clearList = () => {
   border-top: 1px solid #dcdfe6;
   max-height: 75vh;
   overflow-y: scroll;
+}
+
+@media only screen and (max-width: 650px) {
+  :deep .el-dialog__body {
+    padding: 0px !important;
+  }
 }
 
 .dialog-container {
