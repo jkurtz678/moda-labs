@@ -17,6 +17,17 @@ export const getPlaquesByWalletAddressWithListener = async (wallet_address: stri
     })
 };
 
+export const getPlaquesByWalletAddressListWithListener = async (wallet_address_list: string[], onChange: (arr: Array<FirestoreDocument<Plaque>>) => void) => {
+    const q = query(plaques_ref, where("wallet_address", "in", wallet_address_list));
+    const unsubscribe = await onSnapshot(q, (query_snapshot) => {
+        const plaques: FirestoreDocument<Plaque>[] = [];
+        query_snapshot.forEach((doc) => {
+            plaques.push({ id: doc.id, entity: doc.data() as Plaque })
+        })
+        onChange(plaques)
+    })
+};
+
 export const createPlaque = async (plaque: Plaque): Promise<FirestoreDocument<Plaque>> => {
     const document = await addDoc(plaques_ref, {
         ...BaseEntity.createBaseEntity(),

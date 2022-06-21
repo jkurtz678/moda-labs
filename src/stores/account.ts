@@ -3,6 +3,7 @@ import type { FirestoreDocument, Account } from "@/types/types"
 import { getAccountByAddress, createAccount } from "@/api/account"
 import { ElMessage } from 'element-plus'
 import { connectWallet } from "@/web3Interface"
+import { getAdminWalletAddressList } from '@/util/util'
 
 export type RootAccountState = {
   account: FirestoreDocument<Account> | null
@@ -25,6 +26,10 @@ export const useAccountStore = defineStore({
       }
 
       return state.account;
+    },
+    is_wallet_address_admin: (state): Boolean => {
+      const admin_wallet_address_list = getAdminWalletAddressList(); 
+      return admin_wallet_address_list.includes(state.account?.entity?.wallet_address || "");
     }
   },
   actions: {

@@ -1,6 +1,8 @@
 import { defineStore } from "pinia";
 import type { FirestoreDocument, Plaque } from "@/types/types"
-import { getPlaquesByWalletAddressWithListener } from "@/api/plaque";
+import { getPlaquesByWalletAddressWithListener, getPlaquesByWalletAddressListWithListener } from "@/api/plaque";
+import { useAccountStore } from "./account";
+import { getAdminWalletAddressList } from "@/util/util";
 
 export type RootPlaqueState = {
     plaques: FirestoreDocument<Plaque>[],
@@ -35,13 +37,26 @@ export const usePlaqueStore = defineStore({
     },
     actions: {
         async loadPlaques(wallet_address: string) {
+            const account_store = useAccountStore();
+            if (account_store.is_wallet_address_admin) {
+                await getPlaquesByWalletAddressListWithListener(getAdminWalletAddressList(), (plaques) => {
+                    // fix null token meta id list
+                    for (let i = 0; i < plaques.length; i++) {
+                        if (plaques[i].entity.token_meta_id_list == null) {
+                            plaques[i].entity.token_meta_id_list = [];
+                        }
+                    }
+                    this.plaques = plaques;
+                })
+                return
+            }
             await getPlaquesByWalletAddressWithListener(wallet_address, (plaques) => {
                 // fix null token meta id list
-                for(let i = 0; i < plaques.length; i++) {
-                    if(plaques[i].entity.token_meta_id_list == null) {
+                for (let i = 0; i < plaques.length; i++) {
+                    if (plaques[i].entity.token_meta_id_list == null) {
                         plaques[i].entity.token_meta_id_list = [];
                     }
-                }    
+                }
                 this.plaques = plaques;
             })
         }

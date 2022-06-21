@@ -4,6 +4,8 @@ import { getUniqueOpenseaID, getTokenMetaUniqueChainID } from "@/types/types"
 
 import { getAllTokenMetasWithListener, getTokenMetaListByWalletAddressWithListener } from "@/api/token-meta";
 import { loadTokensByAccountID, loadTokensCreatedByAddress } from "@/api/opensea";
+import { getAdminWalletAddressList } from "@/util/util";
+import { useAccountStore } from "./account";
 
 export type RootTokenMetaState = {
     archive_token_meta_list: FirestoreDocument<TokenMeta>[];
@@ -52,10 +54,9 @@ export const useTokenMetaStore = defineStore({
     },
     actions: {
         async loadArchiveTokenMetas(wallet_address: string) {
-            const admin_wallet_address = ["0x9b75874f5313463011e22aDd4540d2b8A24e3958", "0xd8945d98ed4233Cf87cfA4fDCC7a54FE279E8ee7"] // jackson and nathan
-            
             // admins see all tokens
-            if(admin_wallet_address.includes(wallet_address)) {
+            const account_store = useAccountStore();
+            if(account_store.is_wallet_address_admin) {
                 await getAllTokenMetasWithListener((token_metas) => {
                     // filter out invalid tokens
                     this.archive_token_meta_list = token_metas.filter(t => t.entity.external_media_url || t.entity.media_id);
