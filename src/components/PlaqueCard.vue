@@ -213,7 +213,7 @@ el-card__body {
 @media only screen and (max-width: 600px) {
   div.el-card {
     display: block;
-    margin: 20px 10px 20px 10px;
+    margin: 20px 0px 20px 0px;
     min-width: 250px !important;
   }
 }

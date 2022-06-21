@@ -49,7 +49,6 @@ const tokens = computed(() => {
 @media only screen and (max-width: 650px) {
     .container-card {
         display: block;
-        margin: 1em;
         width: 100%;
         min-width: 250px !important;
     }

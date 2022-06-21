@@ -17,7 +17,7 @@
   </div>
   <el-collapse-transition>
     <div class="card-body" v-if="isExpand.expanded">
-      <div style="display: flex; align-items: top;">
+      <div style="display: flex; align-items: top; text-align:left;">
         <div class="card-flex-left">
           <div class="flex-column">
             <p class="card-title">Title</p>
@@ -27,7 +27,7 @@
         </div>
         <div class="card-flex-right">
           <p class="card-title">Artist name</p>
-          <div class="bold bigger-font description">{{ props.token_meta.entity.artist }}</div>
+          <div class="bold bigger-font description" >{{ props.token_meta.entity.artist }}</div>
           <div :class="show_all ? 'description-all' : 'description-less'">{{ props.token_meta.entity.description }}
           </div>
           <a v-if="props.token_meta.entity.description != ''" @click="show_all = !show_all" class="link">
