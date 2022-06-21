@@ -12,12 +12,12 @@
         <hr class="hr" />
       </el-card>
       <template #footer>
-        <span class="dialog-footer">
+        <div class="dialog-footer">
           <div>{{ `Tokens in playlist: ${new_token_meta_id_list.length}` }}</div>
           <div style="flex-grow: 1"></div>
           <el-button @click="clearList">Clear</el-button>
           <el-button type="info" @click="handleSave" :loading="save_loading">Save</el-button>
-        </span>
+        </div>
       </template>
     </el-dialog>
   </div>
@@ -144,7 +144,6 @@ const clearList = () => {
 <style scoped>
 :deep .el-dialog.add-dialog {
   height: auto;
-  max-height: 100vh;
   overflow-y: auto;
   margin: 4vh auto;
 }
@@ -153,7 +152,7 @@ const clearList = () => {
   padding: 10px calc(var(--el-dialog-padding-primary) + 5px) 30px;
   position: relative;
   border-top: 1px solid #dcdfe6;
-  max-height: 79vh;
+  max-height: 75vh;
   overflow-y: scroll;
 }
 
@@ -167,7 +166,7 @@ const clearList = () => {
 .dialog-footer {
   display: flex;
   align-items: center;
-  padding: 0px 5px;
+  padding: 0px 5px 25px 0px;
 }
 
 .search-bar {
