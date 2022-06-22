@@ -6,6 +6,7 @@ import { getAllTokenMetasWithListener, getTokenMetaListByWalletAddressWithListen
 import { loadTokensByAccountID, loadTokensCreatedByAddress } from "@/api/opensea";
 import { getAdminWalletAddressList } from "@/util/util";
 import { useAccountStore } from "./account";
+import type { Firestore } from "firebase/firestore";
 
 export type RootTokenMetaState = {
     archive_token_meta_list: FirestoreDocument<TokenMeta>[];
@@ -49,7 +50,14 @@ export const useTokenMetaStore = defineStore({
                 token_meta_map[t.id] = t
             })
             return token_meta_map;
-
+        },
+        sorted_all_token_metas(state): FirestoreDocument<TokenMeta>[] {
+            const token_metas: FirestoreDocument<TokenMeta>[] = JSON.parse(JSON.stringify(Object.values(this.all_token_metas)));
+            return token_metas.sort((a, b) => {
+                const text_a = a.entity.artist?.toLowerCase()+a.entity.name.toLowerCase()
+                const text_b = b.entity.artist?.toLowerCase()+b.entity.name.toLowerCase()
+                return (text_a < text_b) ? -1 : (text_a > text_b) ? 1 : 0;
+            })
         }
     },
     actions: {

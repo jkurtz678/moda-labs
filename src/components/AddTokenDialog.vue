@@ -64,7 +64,7 @@ watch(show_dialog, (show) => {
 })
 
 const token_metas = computed(() => {
-  return Object.values(token_meta_store.all_token_metas);
+  return token_meta_store.sorted_all_token_metas;
 })
 
 const sort_token_metas = computed(() => {

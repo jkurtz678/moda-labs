@@ -33,7 +33,7 @@ const token_meta_store = useTokenMetaStore()
 const search_filter = ref("")
 const show_dialog = ref(false);
 const tokens = computed(() => {
-    const store_tokens = Object.values(token_meta_store.all_token_metas);
+    const store_tokens = token_meta_store.sorted_all_token_metas;
     return store_tokens.filter((token) =>
         token.entity.artist?.toLowerCase().includes(search_filter.value.toLowerCase()) || token.entity.name?.toLowerCase().includes(search_filter.value.toLowerCase())
     );
