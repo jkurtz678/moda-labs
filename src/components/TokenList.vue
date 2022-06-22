@@ -18,6 +18,7 @@
         width="75%">
         <SubmitTokenForm></SubmitTokenForm>
     </el-dialog>
+    <!-- <TokenDialog></TokenDialog> -->
 </template>
 <script setup lang="ts">
 import { computed, ref } from "vue";
@@ -26,6 +27,7 @@ import PlaqueTokenItem from "./PlaqueTokenItem.vue";
 import { useTokenMetaStore } from "../stores/token-meta";
 import useBreakpoints from "@/composables/breakpoints";
 import { Search } from '@element-plus/icons-vue'
+import TokenDialog from './TokenDialog.vue'
 
 const { width, screen_type } = useBreakpoints();
 
