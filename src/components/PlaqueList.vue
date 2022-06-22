@@ -1,6 +1,6 @@
 <template>
     <!-- <div v-if="plaque_store.plaques.length == 0" style="padding: 1em;">No plaques connected</div> -->
-    <PlaqueCard :plaque="plaque" v-for="plaque in plaque_store.plaques" :key="plaque.id" />
+    <PlaqueCard :plaque="plaque" v-for="plaque in sorted_plaques" :key="plaque.id" />
     <div class='add-button-container'>
         <div style="display: flex; align-items: center; justify-content: center; height: 100%">
             <div class="add-button" @click="show_add_plaque_dialog = true">
@@ -25,7 +25,7 @@
 
 <script setup lang="ts">
 import PlaqueCard from '@/components/PlaqueCard.vue'
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { usePlaqueStore } from "@/stores/plaque"
 import { useRouter } from 'vue-router';
 import { createPlaque } from "@/api/plaque"
@@ -33,6 +33,7 @@ import { Timestamp } from "firebase/firestore"
 import { useAccountStore } from "@/stores/account"
 import { ElMessage } from 'element-plus'
 import useBreakpoints from "@/composables/breakpoints"
+import type {FirestoreDocument, Plaque} from "@/types/types"
 
 const add_test_plaque_loading = ref(false);
 const { width, screen_type } = useBreakpoints();
@@ -55,6 +56,15 @@ const createTestPlaque = async () => {
     add_test_plaque_loading.value = false;
     show_add_plaque_dialog.value = false;
 }
+
+const sorted_plaques = computed(() => {
+    const plaques: FirestoreDocument<Plaque>[] = JSON.parse(JSON.stringify(plaque_store.plaques));
+    return plaques.sort((a, b) => {
+        const text_a = a.entity.name.toLowerCase()
+        const text_b = b.entity.name.toLowerCase()
+        return (text_a < text_b) ? -1 : (text_a > text_b) ? 1 : 0;
+    })
+})
 </script>
 
 <style scoped>
