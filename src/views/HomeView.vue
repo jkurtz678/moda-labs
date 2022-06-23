@@ -18,10 +18,12 @@ import { useTokenMetaStore } from "@/stores/token-meta"
 import { ElLoading, ElMessage } from 'element-plus'
 import { showError } from "@/util/util";
 import { updatePlaque } from "@/api/plaque";
+import { useGalleryStore } from "@/stores/gallery";
 
 const account_store = useAccountStore();
 const plaque_store = usePlaqueStore();
 const token_meta_store = useTokenMetaStore();
+const gallery_store = useGalleryStore();
 const router = useRouter();
 const initial_load_done = ref(false);
 const route = useRoute()
@@ -41,7 +43,9 @@ onMounted(async () => {
   }
 
   // load account first
-  await account_store.loadAccount(wallet_address, signature, ens_name)
+  const account_promise = account_store.loadAccount(wallet_address, signature, ens_name)
+  const gallery_promise = gallery_store.loadGalleryList(wallet_address)
+  await Promise.all([account_promise, gallery_promise])
   if (account_store.account == null) {
     showError("Error - failed to load account")
     return

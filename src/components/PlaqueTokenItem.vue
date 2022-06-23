@@ -34,6 +34,7 @@
             <span v-if="show_all">Less</span>
             <span v-else> More</span>
           </a>
+          <a v-if="token_meta.public_link" :href="token_meta.public_link" target="_blank">Qr-code link</a>
         </div>
       </div>
     </div>
@@ -57,6 +58,10 @@ const isExpand = reactive({ expanded: false });
 
 const platform = computed(() => {
   return getPlatformDisplay(props.token_meta.entity.platform)
+})
+
+const token_meta = computed(() => {
+  return props.token_meta.entity
 })
 
 const show_all = ref(false);

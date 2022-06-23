@@ -78,6 +78,11 @@ export enum TokenPlatform {
     OpenseaArchive = "opensea_archive" // token from opensea api that has been added to moda archive
 }
 
+export interface Gallery extends BaseDocument {
+    name: string;
+    wallet_address_list: string[];
+}
+
 // OpenseaToken is the structure of tokens returned from the opensea API
 export interface OpenseaToken {
     image_url: string;
@@ -125,3 +130,4 @@ export function getTokenMetaThumbnailImageURL(token_meta: FirestoreDocument<Toke
     // if none found return moda logo as placeholder image
     return new URL(`../assets/logo.png`, import.meta.url).href
 }
+
