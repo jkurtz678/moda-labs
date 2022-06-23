@@ -27,14 +27,18 @@
         </div>
         <div class="card-flex-right">
           <p class="card-title">Artist name</p>
-          <div class="bold bigger-font description" >{{ props.token_meta.entity.artist }}</div>
+          <div class="bold bigger-font description">{{ props.token_meta.entity.artist }}</div>
           <div :class="show_all ? 'description-all' : 'description-less'">{{ props.token_meta.entity.description }}
           </div>
-          <a v-if="props.token_meta.entity.description != ''" @click="show_all = !show_all" class="link">
-            <span v-if="show_all">Less</span>
-            <span v-else> More</span>
-          </a>
-          <a v-if="token_meta.public_link" :href="token_meta.public_link" target="_blank">Qr-code link</a>
+          <div>
+            <a v-if="props.token_meta.entity.description != ''" @click="show_all = !show_all" class="link">
+              <span v-if="show_all">Less</span>
+              <span v-else> More</span>
+            </a>
+          </div>
+          <div>
+            <a v-if="token_meta.public_link" :href="token_meta.public_link" target="_blank">Qr-code link</a>
+          </div>
         </div>
       </div>
     </div>
