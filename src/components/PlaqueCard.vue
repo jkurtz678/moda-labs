@@ -12,7 +12,7 @@
     <el-collapse-transition>
       <section v-show="plaque_view == 'simple'" class="card-simple">
         <hr>
-        <el-row style="margin-bottom: 8px;padding:1em">
+        <el-row style="padding:1em">
           <el-col :span="12">
             <div style="font-size: var(--el-font-size-extra-small)">title</div>
             <span>{{ first_token?.entity.name || "N/A" }}</span>
@@ -208,6 +208,10 @@ el-card__body {
 .editIcon {
   margin: 0 1px;
   border: none;
+}
+
+span {
+  overflow-wrap: break-word;
 }
 
 @media only screen and (max-width: 600px) {
