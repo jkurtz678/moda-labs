@@ -142,13 +142,13 @@ const clearList = () => {
 </script>
 
 <style scoped>
-:deep .el-dialog.add-dialog {
+:deep(.el-dialog.add-dialog) {
   height: auto;
   overflow-y: auto;
   margin: 4vh auto;
 }
 
-:deep .el-dialog__body {
+:deep(.el-dialog__body) {
   padding: 10px calc(var(--el-dialog-padding-primary) + 5px) 30px;
   position: relative;
   border-top: 1px solid #dcdfe6;
@@ -157,7 +157,7 @@ const clearList = () => {
 }
 
 @media only screen and (max-width: 650px) {
-  :deep .el-dialog__body {
+  :deep(.el-dialog__body) {
     padding: 0px !important;
   }
 }
