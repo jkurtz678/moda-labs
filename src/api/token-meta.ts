@@ -1,7 +1,7 @@
 import firebaseConfig from "../firebaseConfig"
 import { getFirestore } from "firebase/firestore";
 import type { TokenMeta, FirestoreDocument } from "@/types/types";
-import { collection, addDoc, getDocs, getDoc, documentId, where, query, onSnapshot } from "firebase/firestore";
+import { collection, addDoc, getDocs, getDoc, documentId, doc, updateDoc, where, query, onSnapshot } from "firebase/firestore";
 import { BaseEntity } from "@/types/types";
 
 const db = getFirestore(firebaseConfig)
@@ -17,12 +17,20 @@ export const createTokenMeta = async (meta: TokenMeta): Promise<FirestoreDocumen
     return { id: document.id, entity: snapshot.data() as TokenMeta }
 }
 
+// updateTokenMeta updates an existing token meta object
+export const updateTokenMeta = async (token_meta_id: string, update_data: Partial<TokenMeta>): Promise<FirestoreDocument<TokenMeta>> => {
+    const ref = doc(db, "token-meta", token_meta_id)
+    await updateDoc(ref, update_data)
+    const snapshot = await getDoc(ref)
+    return { id: snapshot.id, entity: snapshot.data() as TokenMeta }
+}
+
 // getAllTokenMetasWithListener returns a list of all archive token metas with a firebase listener callback
-export const getAllTokenMetasWithListener = async (onChange: (arr: FirestoreDocument< TokenMeta>[]) => void) => {
+export const getAllTokenMetasWithListener = async (onChange: (arr: FirestoreDocument<TokenMeta>[]) => void) => {
     const unsubscribe = await onSnapshot(query(token_meta_ref), (query_snapshot) => {
         const token_metas: FirestoreDocument<TokenMeta>[] = [];
         query_snapshot.forEach((doc) => {
-            token_metas.push({ id: doc.id, entity: doc.data() as TokenMeta})
+            token_metas.push({ id: doc.id, entity: doc.data() as TokenMeta })
         })
         onChange(token_metas)
     })
@@ -34,7 +42,7 @@ export const getTokenMetaListByWalletAddressWithListener = async (wallet_address
     const unsubscribe = await onSnapshot(q, (query_snapshot) => {
         const token_metas: FirestoreDocument<TokenMeta>[] = [];
         query_snapshot.forEach((doc) => {
-            token_metas.push({ id: doc.id, entity: doc.data() as TokenMeta})
+            token_metas.push({ id: doc.id, entity: doc.data() as TokenMeta })
         })
         onChange(token_metas)
     })

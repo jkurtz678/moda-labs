@@ -40,6 +40,7 @@ interface AddTokenDialogProps {
   plaque_id: string;
 }
 const props = defineProps<AddTokenDialogProps>();
+  
 const new_token_meta_id_list = ref<string[]>([]);
 const save_loading = ref(false);
 const search_filter = ref("");

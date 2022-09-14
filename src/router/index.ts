@@ -24,7 +24,23 @@ const router = createRouter({
         {
           path: "token-list",
           name: "token-list",
-          component: () => import('@/components/TokenList.vue')
+          component: () => import('@/components/TokenList.vue'),
+          children: [
+            {
+              path: "new",
+              name: "new-token",
+              components: {
+                default: () => import('@/components/SubmitTokenDialog.vue')
+              }
+            },
+            {
+              path: ":token_meta_id",
+              name: "edit-token",
+              components: {
+                default: () => import('@/components/SubmitTokenDialog.vue')
+              }
+            },
+          ]
         },
         {
           path: "qr-scan",

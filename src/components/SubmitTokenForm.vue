@@ -26,7 +26,7 @@
         <el-form-item label="Public Link" prop="public_link">
             <el-input v-model="form.public_link" />
         </el-form-item>
-        <el-form-item>
+        <el-form-item v-if="!props.token_meta_id">
             <el-upload class="upload-demo" :auto-upload="false" action="" :on-remove="handleRemove"
                 :before-remove="beforeRemove" :limit="1" drag :file-list="file_list">
                 <el-icon class="el-icon--upload">
@@ -52,21 +52,27 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from "vue";
+import { reactive, ref, onMounted } from "vue";
 import type { FormInstance, FormRules } from "element-plus";
-import { createTokenMeta } from "@/api/token-meta";
+import { createTokenMeta, updateTokenMeta } from "@/api/token-meta";
 import { uploadFile } from "@/api/storage";
 import { type TokenMeta, Blockchain, TokenPlatform } from "@/types/types";
 import { useAccountStore } from "@/stores/account"
+import { useTokenMetaStore } from "@/stores/token-meta"
 import { showError } from "@/util/util";
 
 import type { UploadProps, UploadUserFile } from "element-plus";
 import { Timestamp } from "firebase/firestore"
 import { ElMessage, ElMessageBox } from 'element-plus'
 
+interface SubmitTokenFormProps {
+    token_meta_id?: string;
+}
+const props = defineProps<SubmitTokenFormProps>();
+
 const formRef = ref<FormInstance>();
 const file_uid = ref<string>();
-const form = reactive<TokenMeta>({
+const form = ref<TokenMeta>({
     name: "",
     artist: "",
     description: "",
@@ -91,7 +97,13 @@ const rules = reactive<FormRules>({
 const loading = ref(false);
 const loading_progress = ref("0%");
 const account_store = useAccountStore();
+const token_meta_store = useTokenMetaStore();
 
+onMounted(() => {
+    if (props.token_meta_id) {
+        form.value = { ...token_meta_store.all_token_metas[props.token_meta_id].entity }
+    }
+})
 
 const beforeRemove: UploadProps["beforeRemove"] = (uploadFile, uploadFiles) => {
     return ElMessageBox.confirm(`Cancel the upload of ${uploadFile.name} ?`).then(
@@ -99,8 +111,9 @@ const beforeRemove: UploadProps["beforeRemove"] = (uploadFile, uploadFiles) => {
         () => false
     );
 };
-const handleRemove = () => {
 
+const handleRemove = () => {
+    // TODO
 }
 
 const submit = async (formEl: FormInstance | undefined) => {
@@ -113,18 +126,29 @@ const submit = async (formEl: FormInstance | undefined) => {
         return;
     }
     // make sure wallet address is added
-    form.wallet_address = account_store.get_account.entity.wallet_address
+    form.value.wallet_address = account_store.get_account.entity.wallet_address
 
     // clear out asset contract and token_id if off chain
-    if (form.blockchain != 'ethereum') {
-        form.asset_contract_address = ""
-        form.token_id = ""
+    if (form.value.blockchain != 'ethereum') {
+        form.value.asset_contract_address = ""
+        form.value.token_id = ""
     }
 
+    if (props.token_meta_id) {
+        updateToken(props.token_meta_id);
+        return
+    }
+
+    // continue to file upload
     if (file_list?.value?.length !== 1) {
         showError(`Please add a file to upload`);
         return;
     }
+
+    startFileUpload(formEl);
+};
+
+const startFileUpload = (formEl: FormInstance) => {
     const file = file_list.value[0]
 
     const progressCallback = (progress: number) => {
@@ -144,13 +168,13 @@ const submit = async (formEl: FormInstance | undefined) => {
             loading.value = false;
             showError(`Error uploading file to moda archive - ${err}`);
         });
-};
+}
 
 const uploadSuccess = (formEl: FormInstance, file: UploadUserFile) => {
-    form.media_id = `${file.uid}`
-    form.media_type = `.${file.name.split(".").pop()}`
+    form.value.media_id = `${file.uid}`
+    form.value.media_type = `.${file.name.split(".").pop()}`
     console.log("upload success, sending form: ", form);
-    createTokenMeta(form)
+    createTokenMeta(form.value)
         .then((r) => {
             formEl.resetFields();
             file_list.value = [];
@@ -163,8 +187,20 @@ const uploadSuccess = (formEl: FormInstance, file: UploadUserFile) => {
             showError(`Error uploading metadata to moda archive - ${err}`);
         })
         .finally(() => (loading.value = false))
-
 }
+
+const updateToken = (token_meta_id: string) => {
+    loading.value = true;
+    updateTokenMeta(token_meta_id, form.value).then(() => {
+        ElMessage({
+            type: 'success',
+            message: 'Successfully updated token',
+        })
+    }).catch((err) => {
+        showError(`Error updating token metadata - ${err}`);
+    }).finally(() => (loading.value = false))
+}
+
 </script>
 
 <style>
