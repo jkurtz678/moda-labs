@@ -28,7 +28,7 @@
         </el-form-item>
         <el-form-item v-if="!props.token_meta_id">
             <el-upload class="upload-demo" :auto-upload="false" action="" :on-remove="handleRemove"
-                :before-remove="beforeRemove" :limit="1" drag :file-list="file_list">
+                :before-remove="beforeRemove" :limit="1" drag v-model:file-list="file_list">
                 <el-icon class="el-icon--upload">
                     <upload-filled />
                 </el-icon>
