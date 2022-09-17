@@ -48,7 +48,7 @@ export const getTokenMetaListByWalletAddressWithListener = async (wallet_address
     })
 };
 
-/* export const getTokenMetaListByIDListWithListener = async (token_meta_id_list: string[], onChange: (arr: FirestoreDocument<TokenMeta>[]) => void) => {
+export const getTokenMetaListByIDListWithListener = async (token_meta_id_list: string[], onChange: (arr: FirestoreDocument<TokenMeta>[]) => void) => {
     // in filters will error if array is empty
     if (token_meta_id_list.length == 0) {
         return;
@@ -61,4 +61,4 @@ export const getTokenMetaListByWalletAddressWithListener = async (wallet_address
         })
         onChange(metas)
     })
-} */
+}

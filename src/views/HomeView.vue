@@ -53,14 +53,27 @@ onMounted(async () => {
 
   // then load all tokens and plaques in parallel 
   const address = account_store.get_account.entity.wallet_address
+  const is_guest = account_store.is_guest;
+
   const plaque_promise = plaque_store.loadPlaques(address)
     .catch(err => (showError(`Error loading plaques - ${err}`)));
-  const archive_token_promise = token_meta_store.loadArchiveTokenMetas(address)
-    .catch(err => (showError(`Error loading archive token metas - ${err}`)));
-  const opensea_minted_token_promise = token_meta_store.loadOpenseaMintedTokenMetas(address)
-    .catch(err => (showError(`Error loading opensea minted tokens - ${err}`)))
-const opensea_wallet_token_promise = token_meta_store.loadOpenseaWalletTokenMetas(address)
-    .catch(err => (showError(`Error loading opensea wallet tokens - ${err}`)))
+
+  let opensea_wallet_token_promise;
+  let opensea_minted_token_promise;
+  let archive_token_promise;
+  if (is_guest) {
+    archive_token_promise = token_meta_store.loadDemoTokens();
+    opensea_wallet_token_promise = Promise.resolve();
+    opensea_minted_token_promise = Promise.resolve();
+  } else {
+    opensea_wallet_token_promise = token_meta_store.loadOpenseaWalletTokenMetas(address)
+      .catch(err => (showError(`Error loading opensea wallet tokens - ${err}`)))
+    opensea_minted_token_promise = token_meta_store.loadOpenseaMintedTokenMetas(address)
+      .catch(err => (showError(`Error loading opensea minted tokens - ${err}`)))
+    archive_token_promise = token_meta_store.loadArchiveTokenMetas(address)
+      .catch(err => (showError(`Error loading archive token metas - ${err}`)));
+  }
+
   await Promise.all([plaque_promise, archive_token_promise, opensea_minted_token_promise])
 
   // delay opensea_wallet_load to possibly help with rate limit

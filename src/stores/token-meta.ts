@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import { type FirestoreDocument, type OpenseaToken, type TokenMeta, Blockchain, TokenPlatform } from "@/types/types"
 import { getUniqueOpenseaID, getTokenMetaUniqueChainID } from "@/types/types"
 
-import { getAllTokenMetasWithListener, getTokenMetaListByWalletAddressWithListener } from "@/api/token-meta";
+import { getAllTokenMetasWithListener, getTokenMetaListByIDListWithListener, getTokenMetaListByWalletAddressWithListener } from "@/api/token-meta";
 import { loadTokensByAccountID, loadTokensCreatedByAddress } from "@/api/opensea";
 import { getAdminWalletAddressList } from "@/util/util";
 import { useAccountStore } from "./account";
@@ -85,6 +85,12 @@ export const useTokenMetaStore = defineStore({
         async loadOpenseaWalletTokenMetas(wallet_address: string) {
             await loadTokensByAccountID(wallet_address).then(tokens => {
                 this.opensea_wallet_token_meta_list = tokens;
+            })
+        },
+        async loadDemoTokens() {
+            const demo_token_meta_ids = ["I3h1A70LYU2LBF6DHJMP", "I0Th1mBUBCXYHa27g6na", "CUzOrMmnsyMSUKy7ST7M"];
+            await getTokenMetaListByIDListWithListener(demo_token_meta_ids, (token_metas) => {
+                this.archive_token_meta_list = token_metas;
             })
         }
     }

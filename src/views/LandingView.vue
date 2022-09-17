@@ -30,6 +30,7 @@
                     install Metamask
                 </el-link> and then refresh the page.
             </el-alert>
+            <el-button @click="continueAsGuest">Continue as Guest</el-button>
             <el-button @click='whatsNew'>What's New</el-button>
         </el-card>
     </el-container>
@@ -93,6 +94,15 @@ const connect = () => {
             loading.value = false;
         });
 }
+
+const continueAsGuest = () => {
+    account_store.loginAsGuest();
+    if (route.query.redir && typeof route.query.redir === 'string') {
+        window.location.assign(route.query.redir);
+        return
+    }
+    router.push({ name: "plaque-list" });
+}
 </script>
 
 <style scoped>
@@ -101,5 +111,10 @@ const connect = () => {
     padding-top: 40px;
     padding-bottom: 40px;
     border: 0px;
+}
+.el-button {
+    margin-right: 16px;
+    margin-left: 0px;
+    margin-bottom: 16px;
 }
 </style>

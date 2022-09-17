@@ -4,6 +4,7 @@ import { getAccountByAddress, createAccount } from "@/api/account"
 import { ElMessage } from 'element-plus'
 import { connectWallet } from "@/web3Interface"
 import { getAdminWalletAddressList } from '@/util/util'
+import { v4 as uuidv4 } from "uuid";
 
 export type RootAccountState = {
   account: FirestoreDocument<Account> | null
@@ -30,6 +31,9 @@ export const useAccountStore = defineStore({
     is_wallet_address_admin: (state): Boolean => {
       const admin_wallet_address_list = getAdminWalletAddressList(); 
       return admin_wallet_address_list.includes(state.account?.entity?.wallet_address || "");
+    },
+    is_guest: (state): Boolean => {
+      return Boolean(state.account?.entity.wallet_address.endsWith("guest"));
     }
   },
   actions: {
@@ -51,6 +55,11 @@ export const useAccountStore = defineStore({
       if (ens_name) {
         window.localStorage.setItem("account_ens_name", ens_name);
       }
+    },
+    async loginAsGuest() {
+      const guest_id = uuidv4() + "_guest";
+      window.localStorage.setItem("account_address", guest_id);
+      window.localStorage.setItem("account_signature", guest_id);
     },
     logout() {
       window.localStorage.removeItem("account_address");

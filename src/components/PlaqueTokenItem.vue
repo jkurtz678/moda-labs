@@ -9,7 +9,7 @@
       <p class="bold">{{ props.token_meta?.entity?.artist }}</p>
     </div>
     <div style="flex: 1;text-align:right; padding-right:1em">
-      <el-button icon="Edit" text circle @click="router.push({name: 'edit-token', params: {'token_meta_id': props.token_meta.id}})"></el-button>
+      <el-button v-if="!account_store.is_guest" icon="Edit" text circle @click="router.push({name: 'edit-token', params: {'token_meta_id': props.token_meta.id}})"></el-button>
       <el-button :icon="isExpand.expanded ? 'ArrowDownBold' : 'ArrowRightBold'"
         @click="isExpand.expanded = !isExpand.expanded" text circle>
       </el-button>
@@ -55,7 +55,9 @@ import { getPlatformDisplay } from "../types/types";
 import { ref, reactive, computed } from "vue";
 import { getTokenMetaThumbnailImageURL } from "@/types/types"
 import { useRouter } from 'vue-router';
+import { useAccountStore } from "@/stores/account"
 
+const account_store = useAccountStore();
 const router = useRouter();
 
 interface PlaqueTokenItem {
