@@ -1,1 +1,0 @@
-import{k as r,l as o,s as u,c as t}from"./index.365b2284.js";function a(){let e=r(window.innerWidth);const n=()=>e.value=window.innerWidth;o(()=>window.addEventListener("resize",n)),u(()=>window.removeEventListener("resize",n));const i=t(()=>e.value<650?"xs":e.value>=650&&e.value<1200?"md":e.value>=1200?"lg":null);return{width:t(()=>e.value),screen_type:i}}export{a as u};
