@@ -1,5 +1,4 @@
 <template>
-    <!-- <div v-if="plaque_store.plaques.length == 0" style="padding: 1em;">No plaques connected</div> -->
     <PlaqueCard :plaque="plaque" v-for="plaque in sorted_plaques" :key="plaque.id" />
     <div class='add-button-container'>
         <div style="display: flex; align-items: center; justify-content: center; height: 100%">
@@ -58,7 +57,7 @@ const createTestPlaque = async () => {
 }
 
 const sorted_plaques = computed(() => {
-    const plaques: FirestoreDocument<Plaque>[] = JSON.parse(JSON.stringify(plaque_store.plaques));
+    const plaques: FirestoreDocument<Plaque>[] = JSON.parse(JSON.stringify(plaque_store.all_plaques));
     return plaques.sort((a, b) => {
         const text_a = a.entity.name.toLowerCase()
         const text_b = b.entity.name.toLowerCase()

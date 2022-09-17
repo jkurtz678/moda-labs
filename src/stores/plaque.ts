@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import type { FirestoreDocument, Plaque } from "@/types/types"
-import { getPlaquesByWalletAddressWithListener, getPlaquesByWalletAddressListWithListener } from "@/api/plaque";
+import { getPlaquesByWalletAddressWithListener, getPlaquesByWalletAddressListWithListener, getPlaqueListByIDListWithListener} from "@/api/plaque";
 import { useAccountStore } from "./account";
 import { useGalleryStore } from "./gallery";
 
@@ -8,6 +8,7 @@ import { getAdminWalletAddressList } from "@/util/util";
 
 export type RootPlaqueState = {
     plaques: FirestoreDocument<Plaque>[],
+    demo_plaques: FirestoreDocument<Plaque>[],
 }
 interface PlaqueMap {
     [id: string]: FirestoreDocument<Plaque>;
@@ -16,14 +17,18 @@ export const usePlaqueStore = defineStore({
     id: 'plaque',
     state: () => ({
         plaques: [],
+        demo_plaques: [],
     } as RootPlaqueState),
     getters: {
         plaque_map: (state): PlaqueMap => {
             const plaque_map: PlaqueMap = {};
-            state.plaques.forEach((p) => {
+            state.plaques.concat(state.demo_plaques).forEach((p) => {
                 plaque_map[p.id] = p;
             });
             return plaque_map;
+        },
+        all_plaques: (state): FirestoreDocument<Plaque>[] => {
+            return state.plaques.concat(state.demo_plaques);
         },
         meta_in_playlist: (getters: any) => (plaque_id: string, token_meta_id: string): boolean => {
             const plaque: FirestoreDocument<Plaque> = getters.plaque_map[plaque_id]
@@ -31,7 +36,7 @@ export const usePlaqueStore = defineStore({
         },
         token_meta_id_list: (state): string[] => {
             let token_meta_id_list: string[] = [];
-            state.plaques.forEach(p => {
+            state.plaques.concat(state.demo_plaques).forEach(p => {
                 token_meta_id_list.push(...p.entity.token_meta_id_list);
             })
             return token_meta_id_list;
@@ -39,7 +44,6 @@ export const usePlaqueStore = defineStore({
     },
     actions: {
         async loadPlaques(wallet_address: string) {
-            const account_store = useAccountStore();
             const gallery_store = useGalleryStore();
             if (gallery_store.gallery_list.length > 0) {
                 await getPlaquesByWalletAddressListWithListener(gallery_store.get_address_list_for_galleries, (plaques) => {
@@ -62,6 +66,13 @@ export const usePlaqueStore = defineStore({
                 }
                 this.plaques = plaques;
             })
+        },
+        async loadDemoPlaques() {
+            const demo_plaque_id_list = ["p2iD3rHnX4KI2KAZKsLQ", "CeLCxgh7oEoCOS2ilHBS"]
+            await getPlaqueListByIDListWithListener(demo_plaque_id_list, (demo_plaques: FirestoreDocument<Plaque>[]) => {
+                console.log("DEMO PLAQUES", demo_plaques)
+                this.demo_plaques = demo_plaques;
+            } )
         }
     }
 })

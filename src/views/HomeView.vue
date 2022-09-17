@@ -58,6 +58,11 @@ onMounted(async () => {
   const plaque_promise = plaque_store.loadPlaques(address)
     .catch(err => (showError(`Error loading plaques - ${err}`)));
 
+  let load_demo_plaques = Promise.resolve();
+  if(account_store.is_wallet_address_admin) {
+    load_demo_plaques = plaque_store.loadDemoPlaques().catch(err => (showError(`Error loading demo plaques - ${err}`)))
+  }
+
   let opensea_wallet_token_promise;
   let opensea_minted_token_promise;
   let archive_token_promise;
@@ -74,7 +79,7 @@ onMounted(async () => {
       .catch(err => (showError(`Error loading archive token metas - ${err}`)));
   }
 
-  await Promise.all([plaque_promise, archive_token_promise, opensea_minted_token_promise])
+  await Promise.all([plaque_promise, archive_token_promise, opensea_minted_token_promise, load_demo_plaques])
 
   // delay opensea_wallet_load to possibly help with rate limit
   await opensea_wallet_token_promise;

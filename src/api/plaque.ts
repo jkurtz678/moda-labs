@@ -1,7 +1,7 @@
 import { BaseEntity, type FirestoreDocument, type Plaque } from "@/types/types"
 import firebaseConfig from "../firebaseConfig"
 import { getFirestore } from "firebase/firestore";
-import { collection, getDoc, where, query, doc, onSnapshot, updateDoc, addDoc } from "firebase/firestore";
+import { collection, getDoc, where, query, doc, onSnapshot, updateDoc, addDoc, documentId } from "firebase/firestore";
 
 const db = getFirestore(firebaseConfig)
 const plaques_ref = collection(db, "plaque")
@@ -42,4 +42,19 @@ export const updatePlaque = async (plaque_id: string, update_data: Partial<Plaqu
     await updateDoc(ref, update_data)
     const snapshot = await getDoc(ref)
     return { id: snapshot.id, entity: snapshot.data() as Plaque }
+}
+
+export const getPlaqueListByIDListWithListener = async (plaque_id_list: string[], onChange: (arr: FirestoreDocument<Plaque>[]) => void) => {
+    // in filters will error if array is empty
+    if (plaque_id_list.length == 0) {
+        return;
+    }
+    const q = query(plaques_ref, where(documentId(), "in", plaque_id_list));
+    const unsubscribe = await onSnapshot(q, (query_snapshot) => {
+        const metas: FirestoreDocument<Plaque>[] = [];
+        query_snapshot.forEach((doc) => {
+            metas.push({ id: doc.id, entity: doc.data() as Plaque})
+        })
+        onChange(metas)
+    })
 }
