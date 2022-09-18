@@ -68,7 +68,7 @@ export const usePlaqueStore = defineStore({
             })
         },
         async loadDemoPlaques() {
-            const demo_plaque_id_list = ["p2iD3rHnX4KI2KAZKsLQ", "CeLCxgh7oEoCOS2ilHBS"]
+            const demo_plaque_id_list = ["p2iD3rHnX4KI2KAZKsLQ", "iFVwGoCqFpoLTUDSPh2x"]
             await getPlaqueListByIDListWithListener(demo_plaque_id_list, (demo_plaques: FirestoreDocument<Plaque>[]) => {
                 console.log("DEMO PLAQUES", demo_plaques)
                 this.demo_plaques = demo_plaques;
