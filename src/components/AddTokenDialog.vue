@@ -122,7 +122,7 @@ const handleSave = async () => {
         continue
       }
       const token_meta: FirestoreDocument<TokenMeta> = JSON.parse(JSON.stringify(store_token));
-      token_meta.entity.wallet_address = account_store.get_account.entity.wallet_address
+      token_meta.entity.user_id = account_store.get_account.entity.user_id
       token_meta.entity.platform = TokenPlatform.OpenseaArchive;
       const new_meta = await createTokenMeta(token_meta.entity)
       // update new_token_meta_id list id with newly created token meta

@@ -20,7 +20,9 @@
                 experience for viewing digital art at the quality intended by the artist.
             </p>
             <br />
-            <el-button v-if="metamask_supported" :loading="loading" @click="connect">Connect Wallet</el-button>
+            <el-button @click="$router.push('login')">Login</el-button>
+            <el-button @click='whatsNew' link type="primary">What's New</el-button>
+            <!--<el-button v-if="metamask_supported" :loading="loading" @click="connect">Connect Wallet</el-button>
             <el-alert v-else type="warning" show-icon title="Install Metamask" style="margin-bottom: 1.5em"
                 :closable="false">
                 The Metamask extension was not detected on your browser.
@@ -29,8 +31,7 @@
                     href="https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en">
                     install Metamask
                 </el-link> and then refresh the page.
-            </el-alert>
-            <el-button @click='whatsNew'>What's New</el-button>
+            </el-alert> -->
         </el-card>
     </el-container>
 </template>

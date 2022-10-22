@@ -11,6 +11,7 @@ const router = createRouter({
       path: '/home',
       name: 'home',
       component: () => import('@/views/HomeView.vue'),
+      redirect: "/home/plaque-list",
       children: [
         {
           path: "",
@@ -50,9 +51,19 @@ const router = createRouter({
       ]
     },
     {
+      path: '/sign-up',
+      name: 'sign-up',
+      component: () => import('@/views/SignUpView.vue'),
+    },
+    {
       path: '/login',
       name: 'login',
       component: () => import('@/views/LoginView.vue'),
+    },
+    {
+      path: '/forgot-password',
+      name: 'forgot-password',
+      component: () => import('@/views/ForgotPasswordView.vue'),
     },
     {
       path: '/landing',

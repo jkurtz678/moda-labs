@@ -37,8 +37,8 @@ export const getAllTokenMetasWithListener = async (onChange: (arr: FirestoreDocu
 }
 
 // getTokenMetasWithListener returns a list of archive token metas that match the given wallet address, uses firebase listener callback
-export const getTokenMetaListByWalletAddressWithListener = async (wallet_address: string, onChange: (arr: Array<FirestoreDocument<TokenMeta>>) => void) => {
-    const q = query(token_meta_ref, where("wallet_address", "==", wallet_address));
+export const getTokenMetaListByUserIDWithListener = async (user_id: string, onChange: (arr: Array<FirestoreDocument<TokenMeta>>) => void) => {
+    const q = query(token_meta_ref, where("user_id", "==", user_id));
     const unsubscribe = await onSnapshot(q, (query_snapshot) => {
         const token_metas: FirestoreDocument<TokenMeta>[] = [];
         query_snapshot.forEach((doc) => {

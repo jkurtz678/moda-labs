@@ -81,7 +81,7 @@ const form = ref<TokenMeta>({
     updated_at: Timestamp.now(),
     media_id: "",
     media_type: "",
-    wallet_address: "",
+    user_id: "",
     blockchain: Blockchain.Ethereum,
     asset_contract_address: "",
     token_id: "",
@@ -125,8 +125,8 @@ const submit = async (formEl: FormInstance | undefined) => {
     if (!valid) {
         return;
     }
-    // make sure wallet address is added
-    form.value.wallet_address = account_store.get_account.entity.wallet_address
+    // make sure user id is added
+    form.value.user_id = account_store.get_account.id
 
     // clear out asset contract and token_id if off chain
     if (form.value.blockchain != 'ethereum') {

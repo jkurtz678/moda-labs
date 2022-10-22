@@ -6,8 +6,9 @@ import { collection, getDoc, where, query, doc, onSnapshot, updateDoc, addDoc } 
 const db = getFirestore(firebaseConfig)
 const plaques_ref = collection(db, "plaque")
 
-export const getPlaquesByWalletAddressWithListener = async (wallet_address: string, onChange: (arr: Array<FirestoreDocument<Plaque>>) => void) => {
-    const q = query(plaques_ref, where("wallet_address", "==", wallet_address));
+// getPlaquesByUserIDWithListener returns a list of plaques for a given user id
+export const getPlaquesByUserIDWithListener = async (user_id: string, onChange: (arr: Array<FirestoreDocument<Plaque>>) => void) => {
+    const q = query(plaques_ref, where("user_id", "==", user_id));
     const unsubscribe = await onSnapshot(q, (query_snapshot) => {
         const plaques: FirestoreDocument<Plaque>[] = [];
         query_snapshot.forEach((doc) => {
@@ -17,8 +18,9 @@ export const getPlaquesByWalletAddressWithListener = async (wallet_address: stri
     })
 };
 
-export const getPlaquesByWalletAddressListWithListener = async (wallet_address_list: string[], onChange: (arr: Array<FirestoreDocument<Plaque>>) => void) => {
-    const q = query(plaques_ref, where("wallet_address", "in", wallet_address_list));
+// getPlaquesByUserIDListWithListener returns a list of plaques for a given user id
+export const getPlaquesByUserIDListWithListener = async (user_id_list: string[], onChange: (arr: Array<FirestoreDocument<Plaque>>) => void) => {
+    const q = query(plaques_ref, where("user_id", "in", user_id_list));
     const unsubscribe = await onSnapshot(q, (query_snapshot) => {
         const plaques: FirestoreDocument<Plaque>[] = [];
         query_snapshot.forEach((doc) => {
@@ -28,6 +30,7 @@ export const getPlaquesByWalletAddressListWithListener = async (wallet_address_l
     })
 };
 
+// createPlaque creates a new plaque
 export const createPlaque = async (plaque: Plaque): Promise<FirestoreDocument<Plaque>> => {
     const document = await addDoc(plaques_ref, {
         ...BaseEntity.createBaseEntity(),
@@ -37,6 +40,7 @@ export const createPlaque = async (plaque: Plaque): Promise<FirestoreDocument<Pl
     return { id: snapshot.id, entity: snapshot.data() as Plaque }
 }
 
+// updatePlaque updates a plaque
 export const updatePlaque = async (plaque_id: string, update_data: Partial<Plaque>): Promise<FirestoreDocument<Plaque>> => {
     const ref = doc(db, "plaque", plaque_id)
     await updateDoc(ref, update_data)

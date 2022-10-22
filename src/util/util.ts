@@ -10,8 +10,8 @@ export function isMobileBrowser(): Boolean {
 }
 
 // returns list of allowed admins, these users can see each other's plaques and tokens
-export function getAdminWalletAddressList(): string[] {
-    const admin_wallet_address_list = [
+export function getAdminUserIDList(): string[] {
+    const admin_user_id_list = [
         "0x9b75874f5313463011e22aDd4540d2b8A24e3958", // jackson
         "0xd8945d98ed4233Cf87cfA4fDCC7a54FE279E8ee7", // nathan
         "0x2ee434a49C4C5A254669d05E1602c656017bAC1f", // ryan
@@ -19,5 +19,5 @@ export function getAdminWalletAddressList(): string[] {
         "0xEa53074F2972F2EE9C00410b127e107F29c7D4E3" // caroline
     ];
 
-    return admin_wallet_address_list
+    return admin_user_id_list
 }

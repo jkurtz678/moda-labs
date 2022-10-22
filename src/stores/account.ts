@@ -1,16 +1,16 @@
 import { defineStore } from 'pinia'
 import type { FirestoreDocument, Account } from "@/types/types"
-import { getAccountByAddress, createAccount } from "@/api/account"
+import { getAccountByAddress, createAccount, getAccountByID } from "@/api/account"
 import { ElMessage } from 'element-plus'
 import { connectWallet } from "@/web3Interface"
-import { getAdminWalletAddressList } from '@/util/util'
+import { getAdminUserIDList } from '@/util/util'
 
 export type RootAccountState = {
   account: FirestoreDocument<Account> | null
 }
 interface CachedAccountData {
-  wallet_address: string | null;
-  signature: string | null; 
+  user_id: string | null;
+  signature: string | null;
   ens_name: string | null;
 }
 export const useAccountStore = defineStore({
@@ -27,22 +27,18 @@ export const useAccountStore = defineStore({
 
       return state.account;
     },
-    is_wallet_address_admin: (state): Boolean => {
-      const admin_wallet_address_list = getAdminWalletAddressList(); 
-      return admin_wallet_address_list.includes(state.account?.entity?.wallet_address || "");
+    is_user_id_admin: (state): Boolean => {
+      const admin_user_id_list = getAdminUserIDList();
+      return admin_user_id_list.includes(state.account?.entity?.user_id || "");
     }
   },
   actions: {
     // loadAccount will retrieve an account by a given address, creating if it does not exist
-    async loadAccount(address: string, signature: string, ens_name: string | null) {
-      const accounts = await getAccountByAddress(address);
-
-      if (accounts.length > 0) {
-        this.account = accounts[0];
-        return;
-      }
-
-      this.account = await createAccount(address, signature, ens_name)
+    async loadAccount(document_id: string) {
+      this.account = await getAccountByID(document_id);
+    },
+    async setAccount(account: FirestoreDocument<Account> | null) {
+      this.account = account;
     },
     async login() {
       const { address, signature, ens_name } = await connectWallet()
@@ -62,7 +58,7 @@ export const useAccountStore = defineStore({
       const address = window.localStorage.getItem("account_address");
       const signature = window.localStorage.getItem("account_signature");
       const ens_name = window.localStorage.getItem("account_ens_name");
-      return { wallet_address: address, signature: signature, ens_name: ens_name }
+      return { user_id: address, signature: signature, ens_name: ens_name }
     }
   }
 })

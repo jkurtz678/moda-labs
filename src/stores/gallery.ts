@@ -1,7 +1,7 @@
 
 import { defineStore } from "pinia";
 import type { FirestoreDocument, Gallery} from "@/types/types"
-import { getGalleriesForAddress } from "@/api/gallery";
+import { getGalleriesForUserID } from "@/api/gallery";
 
 export type RootGalleryState = {
     gallery_list: FirestoreDocument<Gallery>[];
@@ -12,13 +12,13 @@ export const useGalleryStore = defineStore({
         gallery_list: [],
     } as RootGalleryState),
     getters: {
-        get_address_list_for_galleries: (state): string[] => {
-            return Array<string>().concat.apply(Array<string>(), state.gallery_list.map(g => g.entity.wallet_address_list));
+        get_user_id_list_for_galleries: (state): string[] => {
+            return Array<string>().concat.apply(Array<string>(), state.gallery_list.map(g => g.entity.user_id_list));
         }
     },
     actions: {
-        async loadGalleryList(wallet_address: string) {
-            this.gallery_list = await getGalleriesForAddress(wallet_address)
+        async loadGalleryList(user_id: string) {
+            this.gallery_list = await getGalleriesForUserID(user_id)
         }
     }
 })

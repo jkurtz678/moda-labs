@@ -2,9 +2,9 @@ import { defineStore } from "pinia";
 import { type FirestoreDocument, type OpenseaToken, type TokenMeta, Blockchain, TokenPlatform } from "@/types/types"
 import { getUniqueOpenseaID, getTokenMetaUniqueChainID } from "@/types/types"
 
-import { getAllTokenMetasWithListener, getTokenMetaListByWalletAddressWithListener } from "@/api/token-meta";
+import { getAllTokenMetasWithListener, getTokenMetaListByUserIDWithListener } from "@/api/token-meta";
 import { loadTokensByAccountID, loadTokensCreatedByAddress } from "@/api/opensea";
-import { getAdminWalletAddressList } from "@/util/util";
+import { getAdminUserIDList } from "@/util/util";
 import { useAccountStore } from "./account";
 import type { Firestore } from "firebase/firestore";
 
@@ -61,10 +61,10 @@ export const useTokenMetaStore = defineStore({
         }
     },
     actions: {
-        async loadArchiveTokenMetas(wallet_address: string) {
+        async loadArchiveTokenMetas(user_id: string) {
             // admins see all tokens
             const account_store = useAccountStore();
-            if(account_store.is_wallet_address_admin) {
+            if(account_store.is_user_id_admin) {
                 await getAllTokenMetasWithListener((token_metas) => {
                     // filter out invalid tokens
                     this.archive_token_meta_list = token_metas.filter(t => t.entity.external_media_url || t.entity.media_id);
@@ -72,18 +72,18 @@ export const useTokenMetaStore = defineStore({
                 return
             }
             
-            // other users only see tokens associated with their wallet_address
-            await getTokenMetaListByWalletAddressWithListener(wallet_address, (token_metas) => {
+            // other users only see tokens associated with their user_id
+            await getTokenMetaListByUserIDWithListener(user_id, (token_metas) => {
                 this.archive_token_meta_list = token_metas;
             })
         },
-        async loadOpenseaMintedTokenMetas(wallet_address: string) {
-            await loadTokensCreatedByAddress(wallet_address).then(tokens => {
+        async loadOpenseaMintedTokenMetas(user_id: string) {
+            await loadTokensCreatedByAddress(user_id).then(tokens => {
                 this.opensea_minted_token_meta_list = tokens;
             })
         },
-        async loadOpenseaWalletTokenMetas(wallet_address: string) {
-            await loadTokensByAccountID(wallet_address).then(tokens => {
+        async loadOpenseaWalletTokenMetas(user_id: string) {
+            await loadTokensByAccountID(user_id).then(tokens => {
                 this.opensea_wallet_token_meta_list = tokens;
             })
         }

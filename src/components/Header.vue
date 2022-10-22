@@ -16,21 +16,25 @@
             </el-tabs>
             <div style="flex-grow: 1"></div>
             <div v-if="screen_type != 'xs'" style="margin-right: 10px;">{{ toolbar_address }}</div>
-            <el-button @click="logout" style="margin-left: 1em;">Logout</el-button>
+            <el-button @click="logout" style="margin-left: 1em;" :loading="logout_loading">Logout</el-button>
         </template>
     </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { useRouter, useRoute } from 'vue-router';
 import { useAccountStore } from "@/stores/account"
 import useBreakpoints from "@/composables/breakpoints"
+import { signOut } from "firebase/auth";
+import { auth } from "@/firebaseConfig"
 import type { TabsPaneContext } from 'element-plus'
+import { showError } from "@/util/util";
 
 const router = useRouter();
 const route = useRoute();
 const account_store = useAccountStore();
+const logout_loading = ref(false);
 const { width, screen_type } = useBreakpoints();
 
 const handleClick = (tab: TabsPaneContext, event: Event) => {
@@ -47,13 +51,27 @@ const toolbar_address = computed(() => {
     if (account.entity.ens_name) {
         return account.entity.ens_name;
     }
+    if (account.entity.email) {
+        return account.entity.email;
+    }
     const address = account.entity.wallet_address;
-    return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`
+    if (address) {
+        return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`
+    }
+    return ""
 })
 
 const logout = () => {
-    account_store.logout();
-    router.push({ name: "landing", query: { redir: window.location.href } });
+    logout_loading.value = true;
+    signOut(auth)
+        .then(() => {
+            // onAuthStateChanged will redirect to login
+            //router.push({ name: "login", query: { redir: window.location.href } });
+        }).catch((error) => {
+            showError(error)
+        }).finally(() => {
+            logout_loading.value = false;
+        })
 }
 
 const getImageUrl = (filename: string) => {
@@ -64,4 +82,5 @@ const getImageUrl = (filename: string) => {
 </script>
 
 <style scoped>
+
 </style>
