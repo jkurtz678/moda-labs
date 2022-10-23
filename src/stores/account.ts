@@ -29,7 +29,7 @@ export const useAccountStore = defineStore({
     },
     is_user_id_admin: (state): Boolean => {
       const admin_user_id_list = getAdminUserIDList();
-      return admin_user_id_list.includes(state.account?.entity?.user_id || "");
+      return admin_user_id_list.includes(state.account?.id || "");
     }
   },
   actions: {
