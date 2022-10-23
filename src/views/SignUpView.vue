@@ -7,20 +7,22 @@
                 </div>
 
             </template>
-            <el-form ref="form_ref" :model="form" :rules="rules" label-position="left" label-width="140px">
+            <el-form ref="form_ref" :model="form" :rules="rules" label-position="left" label-width="140px"
+                @keyup.enter.native="submit(form_ref)">
                 <el-form-item label="Username" prop="email">
                     <el-input v-model="form.email" />
                 </el-form-item>
                 <el-form-item label="Password" prop="password">
-                    <el-input v-model="form.password" type="password" />
+                    <el-input v-model="form.password" type="password" show-password />
                 </el-form-item>
                 <el-form-item label="Confirm Password" prop="confirm_password">
                     <el-input v-model="form.confirm_password" type="password" show-password />
                 </el-form-item>
-                <div style="display:flex; justify-content: space-between;">
-                    <el-button @click="submit(form_ref)" :loading="loading">Sign Up</el-button>
-                    <el-button type="primary" link @click="router.push('login')">Return to login
-                    </el-button>
+                <el-button @click="submit(form_ref)" color="#000000" :loading="loading" style="width: 100%">Sign Up
+                </el-button>
+                <div>
+                    <el-button type="primary" link @click="router.push('login')" style="width: 100%; margin-top: 15px;">
+                        Return to login</el-button>
                 </div>
             </el-form>
         </el-card>

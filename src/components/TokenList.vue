@@ -4,7 +4,7 @@
             <template #header>
                 <div class="card-header">
                     <span style="font-size: 18px;">Wallet Tokens</span>
-                    <el-button icon="Plus" @click="router.push({ name: 'new-token' })">Add token to archive</el-button>
+                    <el-button icon="Plus" @click="router.push({ name: 'new-token' })" color="#000000">Add token to archive</el-button>
                 </div>
                 <el-input v-model="search_filter" :prefix-icon="Search" style="margin-top: 20px;"
                     placeholder="Search by artwork title or artist name"></el-input>

@@ -14,7 +14,7 @@
                     <el-input v-model="form.email" type="email" />
                 </el-form-item>
                 <div style="display: flex; justify-content: space-between; margin-top: 30px;">
-                    <el-button @click="submit(form_ref)" :loading="loading">Send Reset Password Email</el-button>
+                    <el-button @click="submit(form_ref)" color="#000000" :loading="loading">Send Reset Password Email</el-button>
                     <el-button type="primary" link @click="router.push('login')">Return to Login</el-button>
                 </div>
             </el-form>

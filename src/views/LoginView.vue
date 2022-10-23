@@ -3,7 +3,7 @@
         <el-card class="login-card" style="margin-top: 80px;">
             <template #header>
                 <el-image :src="getImageUrl('logo.png')"
-                    style="height: 170px; width: 170px; margin: auto; display: block;"></el-image>
+                    style="height: 170px; width: 170px; margin: auto; display: block; margin-bottom: 15px;"></el-image>
                 <div class="card-header">
                     <span>Login to MoDA Labs</span>
                 </div>
@@ -17,7 +17,7 @@
                     <el-input v-model="form.password" type="password" />
                 </el-form-item>
                 <div style="display:flex; justify-content: space-between;">
-                    <el-button @click="submit(form_ref)" :loading="loading">Login</el-button>
+                    <el-button @click="submit(form_ref)" color="#000000" :loading="loading">Login</el-button>
                     <el-button type="primary" link @click="router.push('forgot-password')">Forgot Password?</el-button>
                 </div>
             </el-form>

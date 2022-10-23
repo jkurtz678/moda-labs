@@ -38,7 +38,7 @@
             </el-upload>
         </el-form-item>
         <el-form-item>
-            <el-button @click="submit(formRef)" :loading="loading">
+            <el-button @click="submit(formRef)" :loading="loading" color="#000000">
                 <template #loading>
                     <el-icon class="is-loading" style="margin-right: 4px">
                         <Loading />

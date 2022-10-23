@@ -11,13 +11,14 @@
             </div>
         </div>
     </div>
-    <el-dialog v-model="show_add_plaque_dialog" title="Add plaque" :width="screen_type == 'xs' ? '90%' : '50%'">
+    <el-dialog v-model="show_add_plaque_dialog" title="Add plaque" :width="screen_type == 'xs' ? '90%' : '50%'"
+        style="max-width: 500px;">
         <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
-            <el-button @click="router.push('qr-scan'); show_add_plaque_dialog = false;" icon="camera"
+            <el-button @click="router.push('qr-scan'); show_add_plaque_dialog = false;" icon="camera" color="#000000"
                 style="margin: 10px 12px 10px 0px;">Scan Plaque QR
                 Code</el-button>
             <el-button icon="plus" @click="createTestPlaque" :loading="add_test_plaque_loading"
-                style="margin: 10px 0px 10px 0px;">Add test plaque
+                style="margin: 10px 0px 10px 0px;" color="#000000">Add test plaque
             </el-button>
         </div>
     </el-dialog>
@@ -33,7 +34,7 @@ import { Timestamp } from "firebase/firestore"
 import { useAccountStore } from "@/stores/account"
 import { ElMessage } from 'element-plus'
 import useBreakpoints from "@/composables/breakpoints"
-import type {FirestoreDocument, Plaque} from "@/types/types"
+import type { FirestoreDocument, Plaque } from "@/types/types"
 
 const add_test_plaque_loading = ref(false);
 const { width, screen_type } = useBreakpoints();
@@ -90,11 +91,11 @@ const sorted_plaques = computed(() => {
 }
 
 @media only screen and (max-width: 600px) {
-  div.add-button-container {
-    display: block;
-    margin: 20px 10px 20px 10px;
+    div.add-button-container {
+        display: block;
+        margin: 20px 10px 20px 10px;
 
-    min-width: 250px !important;
-  }
+        min-width: 250px !important;
+    }
 }
 </style>

@@ -5,7 +5,7 @@
         </el-image>
         <template v-if="router.currentRoute.value.name == 'qr-scan'">
             <div style="flex-grow: 1"></div>
-            <el-button icon="close" @click="router.push('plaque-list')">
+            <el-button icon="close" color="#000000" @click="router.push('plaque-list')">
                 Cancel
             </el-button>
         </template>
