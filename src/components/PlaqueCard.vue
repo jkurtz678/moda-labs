@@ -5,7 +5,7 @@
       <input v-else v-model="props.plaque.entity.name" class="edit-name-input" />
       <el-button :icon="Edit" v-if="!edit_plaque_name" @click="edit_plaque_name = true" class="editIcon" circle />
       <el-button :icon="Select" v-if="edit_plaque_name" :loading="edit_loading" @click="updatePlaqueName"
-        class="editIcon" circle :type="edit_loading ? '' : 'success'" text/>
+        class="editIcon" circle :type="edit_loading ? '' : 'success'" text />
       <div style="flex-grow: 1" />
       <el-tag class="ml-2" type="success">online</el-tag>
     </div>
@@ -22,10 +22,12 @@
             {{ first_token?.entity.artist || "N/A" }}
           </el-col>
         </el-row>
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-right: 1em">
-          <div style="padding:1em">{{ `Total artworks: ${plaque.entity.token_meta_id_list.length}` }}</div>
+        <div style="padding:0.3em 1em">{{ `Total artworks: ${plaque.entity.token_meta_id_list.length}` }}</div>
+        <div
+          style="display: flex; justify-content: space-between; align-items: center; margin-right: 1em; padding: 1em;">
+          <el-button type="info" @click="show_add_token_dialog = true">Add Artwork</el-button>
           <el-button @click="plaque_view = 'detail'">
-            View <el-icon class="el-icon--right">
+            Details<el-icon class="el-icon--right">
               <ArrowRight />
             </el-icon>
           </el-button>
@@ -37,16 +39,16 @@
         <p style="padding:0 1em;">{{ `Total artworks: ${plaque.entity.token_meta_id_list.length}` }}</p>
         <div style="display: flex; align-items: center; justify-content: space-between;padding: 0.5em 1em;">
           <el-button @click="plaque_view = 'settings'">Settings</el-button>
-          <el-button type="info" @click="show_add_token_dialog = true">Add Artwork</el-button>
+          <el-button @click="clearTokens">Clear Artwork</el-button>
         </div>
         <hr />
         <template v-if="plaque_tokens.length == 0">
-          <div style="padding: 1em;"> No tokens added</div>
+          <div style="padding: 1em;">No artwork added</div>
           <hr />
         </template>
         <PlaqueTokenItem :token_meta="meta" v-for="meta in plaque_tokens" />
         <div style="display: flex; padding: 1em;">
-          <el-button @click="clearTokens">Clear Tokens</el-button>
+          <el-button type="info" @click="show_add_token_dialog = true">Add Artwork</el-button>
           <div style="flex-grow: 1"></div>
           <el-button @click="plaque_view = 'simple'">Close<el-icon class="el-icon--right">
               <Close />

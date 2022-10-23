@@ -1,19 +1,19 @@
 
 <template>
   <div class="dialog-container">
-    <el-dialog center v-model="show_dialog" title="Add tokens to plaque" :close-on-click-modal="false"
+    <el-dialog center v-model="show_dialog" title="Add artwork to plaque" :close-on-click-modal="false"
       :fullscreen="screen_type == 'xs'" top="2vh">
       <input type="text" v-model="search_filter" class="search-bar"
         placeholder="Search by artwork title or artist name" />
       <el-card class="box-card" shadow="never">
-        <div v-if="sort_token_metas.length == 0">No tokens found</div>
+        <div v-if="sort_token_metas.length == 0">No artwork found</div>
         <AddTokenItem v-for="token in sort_token_metas" :token_meta="token"
           :in_list="Boolean(token_in_list_map[token.id])" @update_token_list="updateLocalTokenList"></AddTokenItem>
         <hr class="hr" />
       </el-card>
       <template #footer>
         <div class="dialog-footer">
-          <div>{{ `Tokens in playlist: ${new_token_meta_id_list.length}` }}</div>
+          <div>{{ `Artwork in playlist: ${new_token_meta_id_list.length}` }}</div>
           <div style="flex-grow: 1"></div>
           <el-button @click="clearList">Clear</el-button>
           <el-button type="info" @click="handleSave" :loading="save_loading">Save</el-button>
@@ -122,7 +122,7 @@ const handleSave = async () => {
         continue
       }
       const token_meta: FirestoreDocument<TokenMeta> = JSON.parse(JSON.stringify(store_token));
-      token_meta.entity.user_id = account_store.get_account.entity.user_id
+      token_meta.entity.user_id = account_store.get_account.id
       token_meta.entity.platform = TokenPlatform.OpenseaArchive;
       const new_meta = await createTokenMeta(token_meta.entity)
       // update new_token_meta_id list id with newly created token meta
@@ -170,10 +170,10 @@ const clearList = () => {
   height: 100%;
 }
 
-.dialog-footer {
+.dialog-footer { 
   display: flex;
   align-items: center;
-  padding: 0px 5px 25px 0px;
+  padding: 0px 5px 25px 5px;
 }
 
 .search-bar {
