@@ -12,7 +12,8 @@
         <template v-else>
             <el-tabs v-model="route.name" @tab-click="handleClick">
                 <el-tab-pane label="Plaques" name="plaque-list"></el-tab-pane>
-                <el-tab-pane label="Tokens" name="token-list"></el-tab-pane>
+                <el-tab-pane label="Artwork" name="token-list"></el-tab-pane>
+                <el-tab-pane label="Galleries" name="gallery-list"></el-tab-pane>
             </el-tabs>
             <div style="flex-grow: 1"></div>
             <div v-if="screen_type != 'xs'" style="margin-right: 10px;">{{ toolbar_address }}</div>

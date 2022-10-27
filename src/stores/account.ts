@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import type { FirestoreDocument, Account } from "@/types/types"
-import { getAccountByAddress, createAccount, getAccountByID } from "@/api/account"
+import { getAccountByID } from "@/api/account"
 import { ElMessage } from 'element-plus'
 import { connectWallet } from "@/web3Interface"
 import { getAdminUserIDList } from '@/util/util'

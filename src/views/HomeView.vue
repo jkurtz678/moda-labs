@@ -58,7 +58,6 @@ onMounted(async () => {
   })
 });
 
-
 // loadAppData is the initial load for app data for the user
 async function loadAppData(user_id: string) {
   await account_store.loadAccount(user_id)
@@ -70,13 +69,19 @@ async function loadAppData(user_id: string) {
   // then load all tokens and plaques in parallel 
   const plaque_promise = plaque_store.loadPlaques(user_id)
     .catch(err => (showError(`Error loading plaques - ${err}`)));
+  const gallery_plaque_promise = plaque_store.loadGalleryPlaques(gallery_store.gallery_list)
+    .catch(err => (showError(`Error loading gallery plaques - ${err}`)));
+  /* const gallery_plaque_promise = plaque_store.loadGalleryPlaques(gallery_store.gallery_list)
+    .catch(err => (showError(`Error loading gallery plaques - ${err}`))); */
   const archive_token_promise = token_meta_store.loadArchiveTokenMetas(user_id)
     .catch(err => (showError(`Error loading archive token metas - ${err}`)));
+  const gallery_token_promise = token_meta_store.loadGalleryTokenMetas(gallery_store.gallery_list)
+    .catch(err => (showError(`Error loading token metas - ${err}`)));
   /* const opensea_minted_token_promise = token_meta_store.loadOpenseaMintedTokenMetas(user_id)
     .catch(err => (showError(`Error loading opensea minted tokens - ${err}`)))
   const opensea_wallet_token_promise = token_meta_store.loadOpenseaWalletTokenMetas(user_id)
     .catch(err => (showError(`Error loading opensea wallet tokens - ${err}`))) */
-  await Promise.all([plaque_promise, archive_token_promise])
+  await Promise.all([plaque_promise, gallery_plaque_promise, archive_token_promise, gallery_token_promise ])
 
   // delay opensea_wallet_load to possibly help with rate limit
   // await opensea_wallet_token_promise;

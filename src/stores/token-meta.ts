@@ -1,8 +1,8 @@
 import { defineStore } from "pinia";
-import { type FirestoreDocument, type OpenseaToken, type TokenMeta, Blockchain, TokenPlatform } from "@/types/types"
+import { type FirestoreDocument, type OpenseaToken, type TokenMeta, Blockchain, TokenPlatform, type Gallery } from "@/types/types"
 import { getUniqueOpenseaID, getTokenMetaUniqueChainID } from "@/types/types"
 
-import { getAllTokenMetasWithListener, getTokenMetaListByUserIDWithListener } from "@/api/token-meta";
+import { getAllTokenMetasWithListener, getTokenMetaListByIDList, getTokenMetaListByUserIDWithListener } from "@/api/token-meta";
 import { loadTokensByAccountID, loadTokensCreatedByAddress } from "@/api/opensea";
 import { getAdminUserIDList } from "@/util/util";
 import { useAccountStore } from "./account";
@@ -12,6 +12,7 @@ export type RootTokenMetaState = {
     archive_token_meta_list: FirestoreDocument<TokenMeta>[];
     opensea_minted_token_meta_list: OpenseaToken[];
     opensea_wallet_token_meta_list: OpenseaToken[];
+    gallery_token_meta_list: FirestoreDocument<TokenMeta>[];
 }
 interface TokenMetaMap {
     [id: string]: FirestoreDocument<TokenMeta>;
@@ -22,6 +23,7 @@ export const useTokenMetaStore = defineStore({
         archive_token_meta_list: [],
         opensea_minted_token_meta_list: [],
         opensea_wallet_token_meta_list: [],
+        gallery_token_meta_list: [],
     } as RootTokenMetaState),
     getters: {
         archive_token_meta_map: (state): TokenMetaMap => {
@@ -47,6 +49,10 @@ export const useTokenMetaStore = defineStore({
                 if (token_meta_map[getTokenMetaUniqueChainID(t)]) {
                     delete token_meta_map[getTokenMetaUniqueChainID(t)]
                 }
+                token_meta_map[t.id] = t
+            })  
+            // add gallery tokens
+            state.gallery_token_meta_list.forEach((t) => {
                 token_meta_map[t.id] = t
             })
             return token_meta_map;
@@ -86,7 +92,20 @@ export const useTokenMetaStore = defineStore({
             await loadTokensByAccountID(user_id).then(tokens => {
                 this.opensea_wallet_token_meta_list = tokens;
             })
-        }
+        },
+        async loadGalleryTokenMetas(gallery_list: FirestoreDocument<Gallery>[]) {
+            const token_meta_id_list: string[] = [];
+            gallery_list.forEach(g => {
+                token_meta_id_list.push(...g.entity.token_meta_id_list);
+            })
+            // getTokenMetaListByIDList in increments of 10 
+            const token_meta_list: FirestoreDocument<TokenMeta>[] = [];
+            for (let i = 0; i < token_meta_id_list.length; i += 10) {
+                const token_meta_list_chunk = await getTokenMetaListByIDList(token_meta_id_list.slice(i, i + 10));
+                token_meta_list.push(...token_meta_list_chunk);
+            }
+            this.gallery_token_meta_list = token_meta_list;
+        },
     }
 })
 

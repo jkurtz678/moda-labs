@@ -9,8 +9,8 @@
         </el-form-item>
         <el-form-item label="Blockchain">
             <el-radio-group v-model="form.blockchain">
-                <el-radio label="ethereum">Ethereum</el-radio>
                 <el-radio label="off_chain">Off-chain</el-radio>
+                <el-radio label="ethereum">Ethereum</el-radio>
             </el-radio-group>
         </el-form-item>
         <el-form-item v-if="form.blockchain == 'ethereum'" label="Asset Contract Address" style="max-width: 550px;"
@@ -82,7 +82,7 @@ const form = ref<TokenMeta>({
     media_id: "",
     media_type: "",
     user_id: "",
-    blockchain: Blockchain.Ethereum,
+    blockchain: Blockchain.OffChain,
     asset_contract_address: "",
     token_id: "",
     platform: TokenPlatform.Archive

@@ -59,7 +59,7 @@ const createTestPlaque = async () => {
 }
 
 const sorted_plaques = computed(() => {
-    const plaques: FirestoreDocument<Plaque>[] = JSON.parse(JSON.stringify(plaque_store.plaques));
+    const plaques: FirestoreDocument<Plaque>[] = JSON.parse(JSON.stringify(plaque_store.all_plaque_list));
     return plaques.sort((a, b) => {
         const text_a = a.entity.name.toLowerCase()
         const text_b = b.entity.name.toLowerCase()

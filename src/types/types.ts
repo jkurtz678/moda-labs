@@ -70,7 +70,7 @@ export interface TokenMeta extends BaseDocument {
 
 export enum Blockchain {
     Ethereum = "ethereum", // nft on ethereum blockchain, has a asset_contract_adress and token_id that can link it to the token on ethereum
-    OffChain = "off-chain" // off chain art, stored in moda archive but cannot be found on chain
+    OffChain = "off_chain" // off chain art, stored in moda archive but cannot be found on chain
 }
 
 export enum TokenPlatform {
@@ -83,6 +83,7 @@ export enum TokenPlatform {
 export interface Gallery extends BaseDocument {
     name: string;
     user_id_list: string[];
+    plaque_id_list: string[];
     token_meta_id_list: string[];
 }
 

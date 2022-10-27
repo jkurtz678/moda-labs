@@ -8,7 +8,7 @@
 import { ref } from "vue";
 import SubmitTokenForm from "./SubmitTokenForm.vue";
 import useBreakpoints from "@/composables/breakpoints";
-import { useRouter, useRoute} from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 
 const router = useRouter();
 const route = useRoute();

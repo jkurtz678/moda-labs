@@ -1,6 +1,6 @@
 import { BaseEntity, type FirestoreDocument, type Plaque } from "@/types/types"
 import firebaseConfig from "../firebaseConfig"
-import { getFirestore } from "firebase/firestore";
+import { documentId, getDocs, getFirestore } from "firebase/firestore";
 import { collection, getDoc, where, query, doc, onSnapshot, updateDoc, addDoc } from "firebase/firestore";
 
 const db = getFirestore(firebaseConfig)
@@ -46,4 +46,22 @@ export const updatePlaque = async (plaque_id: string, update_data: Partial<Plaqu
     await updateDoc(ref, update_data)
     const snapshot = await getDoc(ref)
     return { id: snapshot.id, entity: snapshot.data() as Plaque }
+}
+
+// getPlaqueByIdList returns a list of plaques for a given list of plaque ids
+export const getPlaquesByPlaqueIDList = async (plaque_id_list: string[]): Promise<FirestoreDocument<Plaque>[]> => {
+    console.log("getPlaquesByPlaqueIDList", plaque_id_list) // eslint-disable-line no-console
+    if( plaque_id_list.length == 0 ) {
+        return [];
+    } 
+
+    const q = query(plaques_ref, where(documentId(), "in", plaque_id_list));
+    const query_snapshot = await getDocs(q);
+    const plaques: FirestoreDocument<Plaque>[] = [];
+    query_snapshot.forEach((doc) => {
+        plaques.push({ id: doc.id, entity: doc.data() as Plaque })
+    })
+    
+    console.log("retPlaques", plaques) // eslint-disable-line no-console
+    return plaques
 }

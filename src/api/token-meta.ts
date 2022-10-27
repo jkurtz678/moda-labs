@@ -61,4 +61,18 @@ export const getTokenMetaListByUserIDWithListener = async (user_id: string, onCh
         })
         onChange(metas)
     })
-} */
+} */ 
+
+export const getTokenMetaListByIDList = async (token_meta_id_list: string[]): Promise<FirestoreDocument<TokenMeta>[]> => {
+    // in filters will error if array is empty
+    if (token_meta_id_list.length == 0) {
+        return [];
+    }
+    const q = query(token_meta_ref, where(documentId(), "in", token_meta_id_list));
+    const query_snapshot = await getDocs(q);
+    const metas: FirestoreDocument<TokenMeta>[] = [];
+    query_snapshot.forEach((doc) => {
+        metas.push({ id: doc.id, entity: doc.data() as TokenMeta })
+    })
+    return metas;
+}

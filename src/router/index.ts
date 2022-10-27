@@ -44,6 +44,26 @@ const router = createRouter({
           ]
         },
         {
+          path: "gallery-list",
+          name: "gallery-list",
+          component: () => import('@/components/GalleryList.vue'),
+          children: [
+            {
+              path: "new",
+              name: "new-gallery",
+              components: {
+                default: () => import('@/components/GalleryDetailDialog.vue')
+              }
+            },
+            {
+              path: ":gallery_id",
+              name: "edit-gallery",
+              components: {
+                default: () => import('@/components/GalleryDetailDialog.vue')
+              }
+            }]
+        },
+        {
           path: "qr-scan",
           name: "qr-scan",
           component: () => import('@/components/QrScan.vue')

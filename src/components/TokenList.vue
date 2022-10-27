@@ -3,13 +3,13 @@
         <el-card class="container-card">
             <template #header>
                 <div class="card-header">
-                    <span style="font-size: 18px;">Wallet Tokens</span>
-                    <el-button icon="Plus" @click="router.push({ name: 'new-token' })" color="#000000">Add token to archive</el-button>
+                    <span style="font-size: 18px;">Artwork</span>
+                    <el-button icon="Plus" @click="router.push({ name: 'new-token' })" color="#000000">Add artwork to archive</el-button>
                 </div>
                 <el-input v-model="search_filter" :prefix-icon="Search" style="margin-top: 20px;"
                     placeholder="Search by artwork title or artist name"></el-input>
             </template>
-            <div v-if="tokens.length == 0">No tokens found</div>
+            <div v-if="tokens.length == 0">No artwork found</div>
             <PlaqueTokenItem v-for="token in tokens" :token_meta="token" >
             </PlaqueTokenItem>
         </el-card>
