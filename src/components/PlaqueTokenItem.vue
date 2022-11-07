@@ -1,15 +1,15 @@
 <template>
   <div class="card-flex-container">
     <div style="display: flex; align-items: center; margin: 5px 25px 5px 0px;">
-      <el-image :src="getTokenMetaThumbnailImageURL(props.token_meta)" style="width:50px; height: 50px;"
-        fit="contain" />
+      <el-image :src="thumbnail_url" style="width:50px; height: 50px;" fit="contain" />
     </div>
     <div style="flex: 3 1 0%; text-align: left;">
       <p class="bold">{{ props.token_meta?.entity?.name }}</p>
       <p class="bold">{{ props.token_meta?.entity?.artist }}</p>
     </div>
     <div style="flex: 1;text-align:right; padding-right:1em">
-      <el-button icon="Edit" text circle @click="router.push({name: 'edit-token', params: {'token_meta_id': props.token_meta.id}})"></el-button>
+      <el-button icon="Edit" text circle
+        @click="router.push({ name: 'edit-token', params: { 'token_meta_id': props.token_meta.id } })"></el-button>
       <el-button :icon="isExpand.expanded ? 'ArrowDownBold' : 'ArrowRightBold'"
         @click="isExpand.expanded = !isExpand.expanded" text circle>
       </el-button>
@@ -23,18 +23,19 @@
           <div class="flex-column">
             <p class="card-title">Title</p>
             <div class="bold bigger-font">{{ props.token_meta.entity.name }}</div>
-            <img style="width:150px" :src="getTokenMetaThumbnailImageURL(props.token_meta)" />
+            <img style="width:150px" :src="thumbnail_url" />
           </div>
         </div>
         <div class="card-flex-right">
           <p class="card-title">Artist name</p>
           <div class="bold bigger-font description">{{ props.token_meta.entity.artist }}</div>
-          <div :class="show_all ? 'description-all' : 'description-less'">{{ props.token_meta.entity.description }}
+          <div>{{ token_description }}
           </div>
           <div>
-            <a v-if="props.token_meta.entity.description != ''" @click="show_all = !show_all" class="link">
-              <span v-if="show_all">Less</span>
-              <span v-else> More</span>
+            <a v-if="props.token_meta.entity.description && props.token_meta.entity.description.length > 200"
+              @click="show_full_description = !show_full_description" class="link">
+              <span v-if="show_full_description">Less</span>
+              <span v-else>More</span>
             </a>
           </div>
           <div>
@@ -50,9 +51,9 @@
 
 <script setup lang="ts">
 
+import { ref, reactive, computed, onMounted, watch, watchEffect } from "vue";
 import type { FirestoreDocument, TokenMeta } from "../types/types";
 import { getPlatformDisplay } from "../types/types";
-import { ref, reactive, computed } from "vue";
 import { getTokenMetaThumbnailImageURL } from "@/types/types"
 import { useRouter } from 'vue-router';
 
@@ -62,8 +63,31 @@ interface PlaqueTokenItem {
   token_meta: FirestoreDocument<TokenMeta>;
 }
 const props = defineProps<PlaqueTokenItem>();
-const emit = defineEmits(['edit_token'])
 const isExpand = reactive({ expanded: false });
+const thumbnail_url = ref(new URL(`../assets/logo.png`, import.meta.url).href);
+const show_full_description = ref(false);
+
+// needs to be watchEffect because we want it to trigger initially AND we want it to run again when the props.token_meta changes
+watchEffect(async () => {
+  thumbnail_url.value = await getTokenMetaThumbnailImageURL(props.token_meta);
+  // if firebase archive thumbnail is not found, try again in 5 seconds
+  if (thumbnail_url.value.includes("logo.png")) {
+    setTimeout(async () => {
+      thumbnail_url.value = await getTokenMetaThumbnailImageURL(props.token_meta);
+    }, 5000);
+  }
+});
+
+const token_description = computed(() => {
+  if (!props.token_meta.entity.description) {
+    return "No artwork description";
+  }
+
+  if (show_full_description.value || props.token_meta.entity.description.length < 200) {
+    return props.token_meta.entity.description;
+  }
+  return `${props.token_meta.entity.description.substring(0, 200)}...`;
+});
 
 const platform = computed(() => {
   return getPlatformDisplay(props.token_meta.entity.platform)
@@ -73,7 +97,6 @@ const token_meta = computed(() => {
   return props.token_meta.entity
 })
 
-const show_all = ref(false);
 </script>
 
 <style>

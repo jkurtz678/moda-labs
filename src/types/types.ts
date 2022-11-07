@@ -1,5 +1,5 @@
 import { Timestamp } from "firebase/firestore"
-import type { StringFormat } from "firebase/storage";
+import { getDownloadURL, getStorage, ref } from "firebase/storage";
 
 // BaseDocument contains fields that all firestore documents should include
 export interface BaseDocument {
@@ -125,12 +125,21 @@ export function getPlatformDisplay(plat: TokenPlatform): string {
 }
 
 // getTokenMetaThumbnailImageURL returns the url to the thumbnail image for a token meta
-export function getTokenMetaThumbnailImageURL(token_meta: FirestoreDocument<TokenMeta>): string {
-    // first check if archive thumbnail image exist
-    // TODO
+export async function getTokenMetaThumbnailImageURL(token_meta: FirestoreDocument<TokenMeta>): Promise<string> {
+    // first check if archive thumbnail image exist in firebase storage
+    const storage = getStorage();
+    const path_ref = ref(storage, `thumb_${token_meta.entity.media_id}.jpg`);
+    try {
+       const url = await getDownloadURL(path_ref) 
+       console.log(`getTokenMetaThumbnailImageURL - found url for image ${token_meta.entity.name}`, url)
+       return url
+    } catch (err){
+        console.log(`getTokenMetaThumbnailImageURL - failed to find archive thumbnail image ${token_meta.entity.name}`, err)
+    }
+
 
     // then we check external thumbnail url
-    if(token_meta.entity.external_thumbnail_url) {
+    if (token_meta.entity.external_thumbnail_url) {
         return token_meta.entity.external_thumbnail_url
     }
 
