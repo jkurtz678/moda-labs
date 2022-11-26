@@ -51,11 +51,11 @@
 
 <script setup lang="ts">
 
-import { ref, reactive, computed, onMounted, watch, watchEffect } from "vue";
+import { ref, reactive, computed } from "vue";
 import type { FirestoreDocument, TokenMeta } from "../types/types";
 import { getPlatformDisplay } from "../types/types";
-import { getTokenMetaThumbnailImageURL } from "@/types/types"
 import { useRouter } from 'vue-router';
+import useThumbnail from "@/composables/thumbnail-image";
 
 const router = useRouter();
 
@@ -64,19 +64,9 @@ interface PlaqueTokenItem {
 }
 const props = defineProps<PlaqueTokenItem>();
 const isExpand = reactive({ expanded: false });
-const thumbnail_url = ref(new URL(`../assets/logo.png`, import.meta.url).href);
 const show_full_description = ref(false);
 
-// needs to be watchEffect because we want it to trigger initially AND we want it to run again when the props.token_meta changes
-watchEffect(async () => {
-  thumbnail_url.value = await getTokenMetaThumbnailImageURL(props.token_meta);
-  // if firebase archive thumbnail is not found, try again in 5 seconds
-  if (thumbnail_url.value.includes("logo.png")) {
-    setTimeout(async () => {
-      thumbnail_url.value = await getTokenMetaThumbnailImageURL(props.token_meta);
-    }, 12000);
-  }
-});
+const thumbnail_url = useThumbnail(props.token_meta);
 
 const token_description = computed(() => {
   if (!props.token_meta.entity.description) {

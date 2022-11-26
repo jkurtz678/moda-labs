@@ -97,9 +97,16 @@ const generateThumbnail = async (object: any) => {
         await spawn('convert', [temp_local_file, '-thumbnail', `${THUMB_MAX_WIDTH}x${THUMB_MAX_HEIGHT}>`, temp_local_thumb_file], { capture: ['stdout', 'stderr'] });
         fs.unlinkSync(temp_local_file);
     } else {
-        //const url = await file.publicUrl()
-        const url_list = await file.getSignedUrl({ action: 'read', expires: '03-09-2491' })
-        const url = url_list[0]
+
+        // signing is broken on the emulator, use publicURL for local file urls
+        let url: string;
+        if (process.env.FUNCTIONS_EMULATOR) {
+            url = await file.publicUrl()
+        } else {
+            const url_list = await file.getSignedUrl({ action: 'read', expires: '03-09-2491' })
+            url = url_list[0]
+        }
+        
         //const url = await file.getDownloadURL()
         functions.logger.log("media cloud url: ", url)
         functions.logger.log(`Creating thumbnail for video ${url} with ffmpeg`);
