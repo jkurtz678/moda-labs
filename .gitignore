@@ -10,6 +10,9 @@ node_modules
 .env.local
 .env.*.local
 emulator-data/*
+firebase-export-*
+functions/localServiceAccountKey.json
+
 
 # Log files
 npm-debug.log*

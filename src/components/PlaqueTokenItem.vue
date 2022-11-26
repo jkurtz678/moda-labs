@@ -74,7 +74,7 @@ watchEffect(async () => {
   if (thumbnail_url.value.includes("logo.png")) {
     setTimeout(async () => {
       thumbnail_url.value = await getTokenMetaThumbnailImageURL(props.token_meta);
-    }, 5000);
+    }, 12000);
   }
 });
 
