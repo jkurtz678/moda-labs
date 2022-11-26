@@ -132,7 +132,7 @@ const generateThumbnail = async (object: any) => {
 }
 
 // generateThumbnail upon media upload
-exports.autoGenerateThumbnail = functions.storage.object().onFinalize(async (object: any) => {
+exports.autoGenerateThumbnail = functions.runWith({memory: "2GB", timeoutSeconds: 360}).storage.object().onFinalize(async (object: any) => {
     await generateThumbnail(object);
 })
 
@@ -190,7 +190,7 @@ const validateFirebaseIdToken = async (req: any, res: any, next: any) => {
 };
 
 // generateThumbnail upon user request with filepath as a query parameter
-const generateThumbnailHandler = functions.https.onRequest(async (req: any, res: any) => {
+const generateThumbnailHandler = functions.runWith({memory: "2GB", timeoutSeconds: 360}).https.onRequest(async (req: any, res: any) => {
     functions.logger.log("generateThumbnail user", req.user)
     const file_path = req.query.filepath;
     functions.logger.log("generateThumbnail called with filepath: ", file_path);
@@ -207,7 +207,7 @@ const generateThumbnailHandler = functions.https.onRequest(async (req: any, res:
 });
 
 // generateAllThumnailsHandler iterates through all firestore token metas and creates thumbnails for all media
-const generateAllThumbnailsHandler = functions.runWith({memory: "2GB", timeoutSeconds: 300}).https.onRequest(async (req: any, res: any) => {
+const generateAllThumbnailsHandler = functions.runWith({memory: "2GB", timeoutSeconds: 360}).https.onRequest(async (req: any, res: any) => {
     functions.logger.log("generateAllThumbnails user", req.user)
     const token_metas = await admin.firestore().collection('token-meta').get();
     functions.logger.log(`generateAllThumbnails starting generation for ${token_metas.size} tokens`);
@@ -252,4 +252,4 @@ const admin_whitelist = [
     "S1rNu5NLTz4NYaWf1kGWSBd8f2Vp", // jkurtz678@gmail.com local
     "9jtkHhU6XOVK2TUxYHawnP2yULD3" // jkurtz678@gmail.com live
 ];
-exports.app = functions.https.onRequest(app);
+exports.app = functions.runWith({memory: "2GB", timeoutSeconds: 360}).https.onRequest(app);
