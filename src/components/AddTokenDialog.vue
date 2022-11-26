@@ -129,6 +129,9 @@ const handleSave = async () => {
       new_token_meta_id_list.value[i] = new_meta.id;
     }
     await updatePlaque(props.plaque_id, { token_meta_id_list: new_token_meta_id_list.value })
+
+    // update local store plaque
+    plaque_store.plaque_map[props.plaque_id].entity.token_meta_id_list = new_token_meta_id_list.value;
   } catch (err) {
     showError(`Error updating plaque tokens - ${err}`)
   }

@@ -9,8 +9,7 @@
             <p class="bold">{{ props.token_meta.entity.artist }}</p>
         </div>
         <div style="margin-right: 35px; opacity: 0.5;">{{ platform }}</div>
-        <el-button :icon="in_list ? 'close' : 'plus'" :type="in_list ? 'danger' : 'success'" plain circle
-            @click="emit('update_token_list', props.token_meta.id)" />
+        <el-checkbox v-model="in_list" />
     </div>
 </template>
 
@@ -33,6 +32,16 @@ const emit = defineEmits(['update_token_list'])
 
 const platform = computed(() => {
     return getPlatformDisplay(props.token_meta.entity.platform)
+})
+
+// checkbox computed v-model
+const in_list = computed({
+    get() {
+        return props.in_list
+    },
+    set() {
+        emit('update_token_list', props.token_meta.id)
+    }
 })
 
 </script>

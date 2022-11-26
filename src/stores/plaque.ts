@@ -62,6 +62,7 @@ export const usePlaqueStore = defineStore({
                 return
             } */
             await getPlaquesByUserIDWithListener(user_id, (plaques) => {
+                console.log("plaque_listener", plaques)
                 // fix null token meta id list
                 for (let i = 0; i < plaques.length; i++) {
                     if (plaques[i].entity.token_meta_id_list == null) {
