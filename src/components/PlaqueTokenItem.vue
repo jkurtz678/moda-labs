@@ -42,7 +42,7 @@
         </template>
       </el-collapse-transition>
     </div>
-    <div style="flex: 1; text-align:right; padding-right:1em">
+    <div style="flex: 1; text-align:right; padding-right:1em; white-space: nowrap;">
       <el-button icon="Edit" text circle
         @click="router.push({ name: 'edit-token', params: { 'token_meta_id': props.token_meta.id } })"></el-button>
       <el-button :icon="expanded ? 'ArrowDownBold' : 'ArrowRightBold'" @click="expanded = !expanded" text circle>
@@ -140,7 +140,7 @@ const token_meta = computed(() => {
 .card-flex-container {
   display: flex;
   align-items: top;
-  max-width: 700px;
+  max-width: 658px;
 }
 
 .image {
