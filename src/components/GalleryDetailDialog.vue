@@ -29,14 +29,14 @@
                         </el-button>
                     </div>
                 </el-row>
-                <div style="margin-bottom: 1.5em; overflow-y: auto; max-height: 250px;">
+                <div style="margin-bottom: 1.5em;">
                     <div class="header">Plaque</div>
                     <PlaqueSelectList v-model:selected_plaque_id_list="gallery.plaque_id_list"
                         :plaque_list="plaque_list">
                     </PlaqueSelectList>
                     <div>{{ `Plaques in gallery: ${gallery.plaque_id_list.length}` }}</div>
                 </div>
-                <div style="overflow-y: auto; max-height: 250px;" >
+                <div >
                     <div class="header">Artwork</div>
                     <TokenSelectList v-model:selected_token_meta_id_list="gallery.token_meta_id_list"
                         :token_meta_list="token_meta_list">

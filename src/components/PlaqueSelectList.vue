@@ -1,6 +1,6 @@
 <template>
     <el-input type="text" v-model="search_filter" :prefix-icon="Search" placeholder="Search by plaque name" />
-    <div style="padding-top: 10px;">
+    <div style="margin-top: 10px; overflow-y: auto; max-height: 250px;">
         <div v-if="filtered_plaque_list.length == 0">No plaque found</div>
         <AddPlaqueItem v-for="plaque in filtered_plaque_list" :plaque="plaque"
             :in_list="Boolean(selected_plaque_set.has(plaque.id))" @update_plaque_list="updateSelectedPlaqueList">

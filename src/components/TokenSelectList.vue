@@ -1,7 +1,7 @@
 <template>
     <el-input type="text" v-model="search_filter" :prefix-icon="Search"
         placeholder="Search by artwork title or artist name" />
-    <div style="padding-top: 10px;">
+    <div style="margin-top: 10px; overflow-y: auto; max-height: 250px;">
         <div v-if="filtered_token_meta_list.length == 0">No artwork found</div>
         <AddTokenItem v-for="token in filtered_token_meta_list" :token_meta="token"
             :in_list="Boolean(selected_token_meta_set.has(token.id))" @update_token_list="updateSelectedTokenList">
