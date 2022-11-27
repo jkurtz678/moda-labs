@@ -1,13 +1,13 @@
 <template>
     <div class="gallery-dialog">
         <el-dialog v-model="show_dialog" title="Edit Gallery" @close="router.push({ name: 'gallery-list' })" top="2vh"
-            width="60%" :fullscreen="screen_type == 'xs'">
+            :width="screen_type == 'lg' ? '38%' : '60%'" :fullscreen="screen_type == 'xs'">
             <el-form ref="form_ref" :model="gallery" :rules="rules">
-                <el-form-item prop="name" style="max-width: 280px; margin-bottom: 2em;">
+                <el-form-item prop="name" style="max-width: 280px; margin-bottom: 1.5em;">
                     <div>Gallery Name</div>
                     <el-input v-model="gallery.name" placeholder="Name" />
                 </el-form-item>
-                <el-row style="display: block; margin-bottom: 2em;">
+                <el-row style="display: block; margin-bottom: 1.5em;">
                     <div class="header">Users</div>
                     <el-table :data="account_list" style="width: 100%">
                         <el-table-column prop="entity.email" label="Email" />
@@ -29,14 +29,14 @@
                         </el-button>
                     </div>
                 </el-row>
-                <div style="margin-bottom: 2em;">
+                <div style="margin-bottom: 1.5em; overflow-y: auto; max-height: 250px;">
                     <div class="header">Plaque</div>
                     <PlaqueSelectList v-model:selected_plaque_id_list="gallery.plaque_id_list"
                         :plaque_list="plaque_list">
                     </PlaqueSelectList>
                     <div>{{ `Plaques in gallery: ${gallery.plaque_id_list.length}` }}</div>
                 </div>
-                <div>
+                <div style="overflow-y: auto; max-height: 250px;" >
                     <div class="header">Artwork</div>
                     <TokenSelectList v-model:selected_token_meta_id_list="gallery.token_meta_id_list"
                         :token_meta_list="token_meta_list">

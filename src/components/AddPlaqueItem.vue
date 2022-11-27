@@ -1,7 +1,7 @@
 <template>
     <hr class="hr" />
     <div class="card-flex-container">
-        <div style="flex: 3 1 0%; padding: 10px;">
+        <div style="flex: 3 1 0%; padding: 0px 10px;">
             <p class="bold">{{ props.plaque.entity.name }}</p>
             <!-- <p class="bold">{{ props.plaque.entity.artist }}</p> -->
         </div>

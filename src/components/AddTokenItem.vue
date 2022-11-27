@@ -1,7 +1,7 @@
 <template>
     <hr class="hr" />
     <div class="card-flex-container">
-        <div style="display: flex; align-items: center; margin: 5px 25px 5px 0px;">
+        <div style="display: flex; align-items: center; margin: 3px 25px 3px 0px;">
             <el-image :src="thumbnail_url" style="width: 50px; height: 50px;" fit="contain" />
         </div>
         <div style="flex: 3 1 0%">
