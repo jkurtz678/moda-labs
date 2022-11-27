@@ -1,0 +1,1 @@
+import{d as t}from"./types.01590581.js";import{r as u,M as l}from"./index.461c042d.js";function s(e){const a=u(new URL("/assets/logo.61e654f6.png",self.location).href);return l(async()=>{a.value=await t(e.value),a.value.includes("logo.png")&&setTimeout(async()=>{a.value=await t(e.value)},12e3)}),a}export{s as u};
