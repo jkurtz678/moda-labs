@@ -140,7 +140,7 @@ const token_meta = computed(() => {
 .card-flex-container {
   display: flex;
   align-items: top;
-
+  max-width: 700px;
 }
 
 .image {
