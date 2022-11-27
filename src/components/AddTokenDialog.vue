@@ -3,14 +3,7 @@
   <div class="dialog-container">
     <el-dialog center v-model="show_dialog" title="Add artwork to plaque" :close-on-click-modal="false"
       :fullscreen="screen_type == 'xs'" top="2vh">
-      <input type="text" v-model="search_filter" class="search-bar"
-        placeholder="Search by artwork title or artist name" />
-      <el-card class="box-card" shadow="never">
-        <div v-if="sort_token_metas.length == 0">No artwork found</div>
-        <AddTokenItem v-for="token in sort_token_metas" :token_meta="token"
-          :in_list="Boolean(token_in_list_map[token.id])" @update_token_list="updateLocalTokenList"></AddTokenItem>
-        <hr class="hr" />
-      </el-card>
+      <TokenSelectList v-model:selected_token_meta_id_list="new_token_meta_id_list" :token_meta_list="token_meta_list"></TokenSelectList> 
       <template #footer>
         <div class="dialog-footer">
           <div>{{ `Artwork in playlist: ${new_token_meta_id_list.length}` }}</div>
@@ -29,11 +22,11 @@ import { updatePlaque } from "@/api/plaque"
 import { createTokenMeta } from "@/api/token-meta"
 import { usePlaqueStore } from "@/stores/plaque"
 import { useAccountStore } from "@/stores/account"
-import AddTokenItem from './AddTokenItem.vue';
 import { showError } from "@/util/util"
 import { type FirestoreDocument, type TokenMeta, type Plaque, TokenPlatform } from "@/types/types";
 import useBreakpoints from "@/composables/breakpoints"
 import { useTokenMetaStore } from "@/stores/token-meta";
+import TokenSelectList from "./TokenSelectList.vue";
 
 interface AddTokenDialogProps {
   show_add_token_dialog: boolean;
@@ -43,7 +36,6 @@ const props = defineProps<AddTokenDialogProps>();
   
 const new_token_meta_id_list = ref<string[]>([]);
 const save_loading = ref(false);
-const search_filter = ref("");
 const emit = defineEmits(['update:show_add_token_dialog',])
 const { screen_type } = useBreakpoints();
 const plaque_store = usePlaqueStore();
@@ -64,50 +56,14 @@ watch(show_dialog, (show) => {
   }
 })
 
-const token_metas = computed(() => {
-  return token_meta_store.sorted_all_token_metas;
-})
-
-const sort_token_metas = computed(() => {
-  const sort_token_metas: FirestoreDocument<TokenMeta>[] = [];
-  if (token_metas?.value) {
-    for (let token of token_metas?.value) {
-      if (plaque_store.meta_in_playlist(props.plaque_id, token.id)) {
-        sort_token_metas.unshift(token)
-      } else {
-        sort_token_metas.push(token)
-      }
-    }
-  }
-  if (search_filter.value.trim() !== '') {
-    return sort_token_metas.filter((token) =>
-      token.entity.artist?.toLowerCase().includes(search_filter.value.toLowerCase()) || token.entity.name?.toLowerCase().includes(search_filter.value.toLowerCase())
-    );
-  }
-  return sort_token_metas;
-})
 const plaque = computed((): FirestoreDocument<Plaque> => {
   return plaque_store.plaque_map[props.plaque_id];
 })
 
-interface InListMap {
-  [id: string]: boolean;
-}
-const token_in_list_map = computed((): InListMap => {
-  const in_list_map: InListMap = {}
-  new_token_meta_id_list.value.forEach((t) => {
-    in_list_map[t] = true;
-  })
-  return in_list_map;
-});
+const token_meta_list = computed(() => {
+  return token_meta_store.sorted_all_token_metas;
+})
 
-const updateLocalTokenList = (new_id: string) => {
-  if (new_token_meta_id_list.value.some(id => id === new_id)) {
-    new_token_meta_id_list.value = new_token_meta_id_list.value.filter(id => id != new_id);
-  } else {
-    new_token_meta_id_list.value.push(new_id);
-  }
-}
 const handleSave = async () => {
   save_loading.value = true;
   // create archive token meta on remote for any tokens that are opensea tokens
@@ -177,20 +133,6 @@ const clearList = () => {
   display: flex;
   align-items: center;
   padding: 0px 5px 25px 5px;
-}
-
-.search-bar {
-  display: block;
-  width: 100%;
-  margin: 5px 0px 15px 0px;
-  padding: 10px 45px;
-  background: white url("../assets/search-icon.svg") no-repeat 15px center;
-  background-size: 20px 20px;
-  font-size: 16px;
-  border: none;
-  border-radius: 5px;
-  box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
-    rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
 }
 
 input[type="text"] {

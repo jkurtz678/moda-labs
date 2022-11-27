@@ -9,13 +9,13 @@
             <p class="bold">{{ props.token_meta.entity.artist }}</p>
         </div>
         <div style="margin-right: 35px; opacity: 0.5;">{{ platform }}</div>
-        <el-checkbox v-model="in_list" />
+        <el-checkbox v-model="in_list" style="margin-right: 10px;"/>
     </div>
 </template>
 
 <script setup lang="ts">
 
-import { computed, ref, watchEffect } from "vue";
+import { computed, toRef } from "vue";
 import { getPlatformDisplay } from "@/types/types";
 import type { FirestoreDocument, TokenMeta } from "@/types/types";
 import useThumbnail from "@/composables/thumbnail-image";
@@ -26,7 +26,9 @@ interface AddTokenItemProps {
 }
 
 const props = defineProps<AddTokenItemProps>();
-const thumbnail_url = useThumbnail(props.token_meta);
+
+// use toRef to make token_meta param stay reactive
+const thumbnail_url = useThumbnail(toRef(props, "token_meta"));
 
 const emit = defineEmits(['update_token_list'])
 

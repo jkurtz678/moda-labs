@@ -1,7 +1,7 @@
 <template>
     <div class="gallery-dialog">
         <el-dialog v-model="show_dialog" title="Edit Gallery" @close="router.push({ name: 'gallery-list' })" top="2vh"
-            width="75%" :fullscreen="screen_type == 'xs'" >
+            width="75%" :fullscreen="screen_type == 'xs'">
             <el-form ref="form_ref" :model="gallery" :rules="rules">
                 <el-form-item prop="name" style="max-width: 280px; margin-bottom: 2em;">
                     <div>Gallery Name</div>
@@ -29,26 +29,20 @@
                         </el-button>
                     </div>
                 </el-row>
-                <el-row style="margin-bottom: 2em;">
+                <div style="margin-bottom: 2em;">
                     <div class="header">Plaque</div>
-                    <el-table ref="plaque_table_ref" :data="plaque_list" style="width: 100%"
-                        @selection-change="handlePlaqueSelectionChange">
-                        <el-table-column type="selection" />
-                        <el-table-column prop="entity.name" label="Name" />
-                    </el-table>
+                    <PlaqueSelectList v-model:selected_plaque_id_list="gallery.plaque_id_list"
+                        :plaque_list="plaque_list">
+                    </PlaqueSelectList>
                     <div>{{ `Plaques in gallery: ${gallery.plaque_id_list.length}` }}</div>
-                </el-row>
-                <el-row>
+                </div>
+                <div>
                     <div class="header">Artwork</div>
-                    <el-table ref="token_meta_table_ref" :data="token_meta_list" style="width: 100%"
-                        @selection-change="handleTokenSelectionChange">
-                        <el-table-column type="selection" />
-                        <el-table-column prop="entity.name" label="Title" />
-                        <el-table-column prop="entity.artist" label="Artist" />
-                        <el-table-column prop="entity.platform" label="Platform" />
-                    </el-table>
+                    <TokenSelectList v-model:selected_token_meta_id_list="gallery.token_meta_id_list"
+                        :token_meta_list="token_meta_list">
+                    </TokenSelectList>
                     <div>{{ `Artwork in gallery: ${gallery.token_meta_id_list.length}` }}</div>
-                </el-row>
+                </div>
             </el-form>
             <template #footer>
                 <div class="dialog-footer">
@@ -74,6 +68,8 @@ import { showError } from '@/util/util';
 import { useGalleryStore } from '@/stores/gallery';
 import useBreakpoints from '@/composables/breakpoints';
 import { usePlaqueStore } from '@/stores/plaque';
+import TokenSelectList from "./TokenSelectList.vue";
+import PlaqueSelectList from './PlaqueSelectList.vue';
 
 const show_dialog = ref(true);
 const gallery = ref<Gallery>({
@@ -94,9 +90,6 @@ const add_user_email = ref("");
 
 const router = useRouter();
 const route = useRoute();
-
-const plaque_table_ref = ref<InstanceType<typeof ElTable>>()
-const token_meta_table_ref = ref<InstanceType<typeof ElTable>>()
 
 const account_store = useAccountStore();
 const plaque_store = usePlaqueStore();
@@ -139,25 +132,11 @@ onMounted(async () => {
                 showError(err);
             })
 
-        gallery.value.plaque_id_list.forEach((plaque_id) => {
-            plaque_table_ref.value!.toggleRowSelection(plaque_store.plaque_map[plaque_id], true);
-        })
-        gallery.value.token_meta_id_list.forEach((token_meta_id) => {
-            token_meta_table_ref.value!.toggleRowSelection(token_meta_store.all_token_metas[token_meta_id], true);
-        })
-
     } else { // new gallery
         loaded_accounts.value.push(account_store.get_account);
         gallery.value.user_id_list = [account_store.get_account.id];
     }
 })
-
-const handlePlaqueSelectionChange = (selection: FirestoreDocument<Plaque>[]) => {
-    gallery.value.plaque_id_list = selection.map(p => p.id);
-}
-const handleTokenSelectionChange = (selected_tokens: FirestoreDocument<TokenMeta>[]) => {
-    gallery.value.token_meta_id_list = selected_tokens.map((token_meta) => token_meta.id);
-}
 
 const handleSave = async (form_el: FormInstance | undefined) => {
     if (!form_el) {

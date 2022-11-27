@@ -51,7 +51,7 @@
 
 <script setup lang="ts">
 
-import { ref, reactive, computed } from "vue";
+import { ref, reactive, computed, toRef } from "vue";
 import type { FirestoreDocument, TokenMeta } from "../types/types";
 import { getPlatformDisplay } from "../types/types";
 import { useRouter } from 'vue-router';
@@ -66,7 +66,8 @@ const props = defineProps<PlaqueTokenItem>();
 const isExpand = reactive({ expanded: false });
 const show_full_description = ref(false);
 
-const thumbnail_url = useThumbnail(props.token_meta);
+// use toRef to make token_meta param stay reactive
+const thumbnail_url = useThumbnail(toRef(props, "token_meta"));
 
 const token_description = computed(() => {
   if (!props.token_meta.entity.description) {
