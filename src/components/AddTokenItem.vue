@@ -4,7 +4,7 @@
         <div style="display: flex; align-items: center; margin: 3px 25px 3px 0px;">
             <el-image :src="thumbnail_url" style="width: 50px; height: 50px;" fit="contain" />
         </div>
-        <div style="flex: 3 1 0%">
+        <div style="flex: 3 1 0%; text-align: left; align-items: center;">
             <p class="bold">{{ props.token_meta.entity.name }}</p>
             <p class="bold">{{ props.token_meta.entity.artist }}</p>
         </div>
@@ -49,6 +49,11 @@ const in_list = computed({
 </script>
 
 <style scoped>
+.card-flex-container {
+    display: flex;
+    align-items: center;
+}
+
 .card-flex-container:hover {
     background-color: #f5f5f5;
 }
