@@ -1,13 +1,13 @@
 <template>
     <div class="gallery-dialog">
         <el-dialog v-model="show_dialog" title="Edit Gallery" @close="router.push({ name: 'gallery-list' })" top="2vh"
-            :width="screen_type == 'lg' ? '38%' : '60%'" :fullscreen="screen_type == 'xs'">
+            :width="screen_type == 'lg' ? '35%' : '60%'" :fullscreen="screen_type == 'xs'">
             <el-form ref="form_ref" :model="gallery" :rules="rules">
-                <el-form-item prop="name" style="max-width: 280px; margin-bottom: 1.5em;">
+                <el-form-item prop="name" style="max-width: 280px; margin-bottom: 1em;">
                     <div>Gallery Name</div>
                     <el-input v-model="gallery.name" placeholder="Name" />
                 </el-form-item>
-                <el-row style="display: block; margin-bottom: 1.5em;">
+                <el-row style="display: block;">
                     <div class="header">Users</div>
                     <el-table :data="account_list" style="width: 100%">
                         <el-table-column prop="entity.email" label="Email" />
@@ -29,7 +29,7 @@
                         </el-button>
                     </div>
                 </el-row>
-                <div style="margin-bottom: 1.5em;">
+                <div style="margin-bottom: 1em;">
                     <div class="header">Plaque</div>
                     <PlaqueSelectList v-model:selected_plaque_id_list="gallery.plaque_id_list"
                         :plaque_list="plaque_list">
@@ -39,7 +39,7 @@
                 <div >
                     <div class="header">Artwork</div>
                     <TokenSelectList v-model:selected_token_meta_id_list="gallery.token_meta_id_list"
-                        :token_meta_list="token_meta_list">
+                        :token_meta_list="token_meta_list" :max_height="350">
                     </TokenSelectList>
                     <div>{{ `Artwork in gallery: ${gallery.token_meta_id_list.length}` }}</div>
                 </div>
@@ -225,7 +225,7 @@ const removeUser = (i: number) => {
     padding: 10px calc(var(--el-dialog-padding-primary) + 5px) 30px;
     position: relative;
     border-top: 1px solid #dcdfe6;
-    max-height: 75vh;
+    max-height: 80vh;
     overflow-y: scroll;
 }
 
