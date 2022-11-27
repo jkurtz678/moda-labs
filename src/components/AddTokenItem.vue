@@ -9,7 +9,7 @@
             <p class="bold">{{ props.token_meta.entity.artist }}</p>
         </div>
         <div style="margin-right: 35px; opacity: 0.5;">{{ platform }}</div>
-        <el-checkbox v-model="in_list" style="margin-right: 10px;"/>
+        <el-checkbox v-model="in_list" style="margin-right: 10px;" />
     </div>
 </template>
 
@@ -47,3 +47,9 @@ const in_list = computed({
 })
 
 </script>
+
+<style scoped>
+.card-flex-container:hover {
+    background-color: #f5f5f5;
+}
+</style>

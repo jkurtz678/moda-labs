@@ -1,7 +1,7 @@
 <template>
     <div class="gallery-dialog">
         <el-dialog v-model="show_dialog" title="Edit Gallery" @close="router.push({ name: 'gallery-list' })" top="2vh"
-            width="75%" :fullscreen="screen_type == 'xs'">
+            width="60%" :fullscreen="screen_type == 'xs'">
             <el-form ref="form_ref" :model="gallery" :rules="rules">
                 <el-form-item prop="name" style="max-width: 280px; margin-bottom: 2em;">
                     <div>Gallery Name</div>
