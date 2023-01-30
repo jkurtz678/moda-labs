@@ -2,6 +2,7 @@ import { BaseEntity, type FirestoreDocument, type Plaque } from "@/types/types"
 import firebaseConfig from "../firebaseConfig"
 import { documentId, getDocs, getFirestore } from "firebase/firestore";
 import { collection, getDoc, where, query, doc, onSnapshot, updateDoc, addDoc } from "firebase/firestore";
+import { kMaxLength } from "buffer";
 
 const db = getFirestore(firebaseConfig)
 const plaques_ref = collection(db, "plaque")
@@ -29,6 +30,16 @@ export const getPlaquesByUserIDListWithListener = async (user_id_list: string[],
         onChange(plaques)
     })
 };
+
+
+// getPlaqueByPlaqueIDWithListener returns listens to changes to plaque and calls on change handler
+export const getPlaqueByPlaqueIDWithListener = async (plaque_id: string, onChange: (plaque: FirestoreDocument<Plaque>) => void) => {
+    const ref = doc(db, "plaque", plaque_id)
+    const unsubscribe = await onSnapshot(ref, (doc) => {
+        const plaque: FirestoreDocument<Plaque> = {id: doc.id, entity: doc.data() as Plaque}
+        onChange(plaque);
+    })
+}
 
 // createPlaque creates a new plaque
 export const createPlaque = async (plaque: Plaque): Promise<FirestoreDocument<Plaque>> => {

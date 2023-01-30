@@ -95,6 +95,11 @@ const router = createRouter({
       name: 'submit',
       component: () => import('@/views/SubmitView.vue')
     },
+    {
+      path: '/preview-plaque/:plaque_id',
+      name: 'preview-plaque',
+      component: () => import('@/views/PlaquePreview.vue')
+    }
     /*  {
        path: '/login',
        name: 'login',

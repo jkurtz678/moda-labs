@@ -57,14 +57,22 @@
         </div>
       </section>
     </el-collapse-transition>
-
     <el-collapse-transition>
-      <section v-if="plaque_view == 'settings'" style="padding: 1em; display: flex; justify-content: space-between;">
-        <el-button type="danger" plain @click="forgetPlaque">Forget Display</el-button>
-        <el-button @click="plaque_view = 'detail'">Close<el-icon class="el-icon--right">
-            <Close />
-          </el-icon>
-        </el-button>
+      <section v-if="plaque_view == 'settings'" style="padding: 1em;">
+        <div style="display: flex; justify-content: space-between;">
+          <el-button>Preview Art</el-button>
+          <el-button @click="previewPlaque">Preview
+            Plaque</el-button>
+        </div>
+        <div style="padding: 1em 0em;">
+          <el-button type="danger" plain @click="forgetPlaque">Forget Display</el-button>
+        </div>
+        <div style="display: flex; justify-content: end;">
+          <el-button @click="plaque_view = 'detail'">Close<el-icon class="el-icon--right">
+              <Close />
+            </el-icon>
+          </el-button>
+        </div>
       </section>
     </el-collapse-transition>
 
@@ -81,6 +89,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { ref } from "vue";
 import { updatePlaque } from "@/api/plaque";
 import { useTokenMetaStore } from "../stores/token-meta";
+import { useRouter } from 'vue-router';
 import { showError } from "@/util/util";
 import {
   Edit,
@@ -92,6 +101,7 @@ interface PlaqueCardProps {
 }
 
 const props = defineProps<PlaqueCardProps>();
+const router = useRouter();
 const plaque_view = ref("simple"); // 3 modes - 'simple', 'detail', 'settings'
 const show_add_token_dialog = ref(false);
 const edit_plaque_name = ref(false);
@@ -157,6 +167,10 @@ const forgetPlaque = () => {
         ElMessage({ message: `Error forgetting plaque - ${err}`, type: 'error', showClose: true, duration: 12000 });
       })
   })
+}
+const previewPlaque = () => {
+  const link = router.resolve({ name: 'preview-plaque', params: { plaque_id: props.plaque.id } });
+  window.open(link.href);
 }
 </script>
 
