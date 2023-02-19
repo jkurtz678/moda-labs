@@ -1,9 +1,5 @@
 <template>
     <div class="background">
-        <!-- <div class="fullscreen-btn-container">
-        <el-button class="fullscreen-btn" text size="small" @click="toggleFullscreen">fullscreen</el-button>
-    </div>
-    <Edit></Edit> -->
         <div class="center">
             <div :class="show_content ? 'container show' : 'container'">
                 <div v-show="status == Status.STATUS_LOADING">
@@ -15,22 +11,22 @@
                     </div>
                     <div style="margin-top: 10px; font-size: 30px;">Preparing art</div>
                 </div>
-                <div v-show="status == Status.STATUS_QR_SCAN">
+                <!-- <div v-show="status == Status.STATUS_QR_SCAN">
                     <div id="scan-qrcode" style="display: flex; justify-content: center;"></div>
                     <div style="margin-top: 10px; font-size: 30px;">Scan to cast art</div>
-                </div>
+                </div> -->
                 <div v-show="status == Status.STATUS_NO_VALID_TOKENS">
                     <div style="font-size: 30px;">No art selected</div>
                 </div>
                 <div v-show="status == Status.STATUS_ERROR">
                     <div style="font-size: 30px;">Error loading art. Please try a different piece.</div>
                 </div>
-                <div v-show="status == Status.STATUS_NO_INTERNET">
+                <!-- <div v-show="status == Status.STATUS_NO_INTERNET">
                     <div style="font-size: 30px;">No internet connection. Please connect to wifi.</div>
                 </div>
                 <div v-show="status == Status.STATUS_INVALID_DISPLAY">
                     <div style="font-size: 30px;">Please connect a secondary monitor to cast art</div>
-                </div>
+                </div> -->
 
                 <div v-show="status == Status.STATUS_DISPLAY">
                     <div class="title">{{ active_token_meta?.entity?.name }}</div>
@@ -40,8 +36,7 @@
                             <div>{{ active_token_meta?.entity?.description }}</div>
                         </div>
                         <div class="col" style="display: flex; justify-content: center; padding-top: 25px;">
-                            <div v-show="active_token_meta?.entity?.public_link" id="plaque-qrcode">
-                            </div>
+                            <QrcodeVue :value="active_token_meta?.entity?.public_link" :size="220" level="H" />
                         </div>
                     </div>
                 </div>
@@ -58,6 +53,7 @@ import type { FirestoreDocument, Plaque, TokenMeta } from "@/types/types";
 import { getPlaqueByPlaqueIDWithListener } from "@/api/plaque";
 import { getTokenMetaListByIDList } from "@/api/token-meta";
 import { useRoute } from "vue-router";
+import QrcodeVue from 'qrcode.vue'
 
 const route = useRoute();
 
@@ -70,7 +66,8 @@ enum Status {
     STATUS_INVALID_DISPLAY,
     STATUS_DISPLAY
 }
-const status = ref<Status>(Status.STATUS_LOADING);
+//const status = ref<Status>(Status.STATUS_LOADING);
+const loading = ref(true);
 const show_content = ref(true);
 const plaque = ref<FirestoreDocument<Plaque>>();
 const token_list = ref<FirestoreDocument<TokenMeta>[]>([]);
@@ -80,18 +77,32 @@ const active_token_meta = computed(() => {
     return token_list.value[active_token_index.value]
 })
 
+const status = computed(() => {
+    if (loading.value) return Status.STATUS_LOADING
+
+    if (!plaque.value || !token_list.value) return Status.STATUS_ERROR
+
+    if (token_list.value.length == 0) return Status.STATUS_NO_VALID_TOKENS
+
+    return Status.STATUS_DISPLAY
+})
+
 onMounted(() => {
     const plaque_id = route?.params?.plaque_id;
-    if (!plaque_id || typeof plaque_id != "string" ) return;
-
+    if (!plaque_id || typeof plaque_id != "string") return;
     show_content.value = false
     getPlaqueByPlaqueIDWithListener(plaque_id, (p) => {
+        loading.value = true
         show_content.value = false
         plaque.value = p;
-        getTokenMetaListByIDList(p.entity.token_meta_id_list).then(t_list=> {
-            token_list.value = t_list;
-            status.value = Status.STATUS_DISPLAY
-            show_content.value = true
+        getTokenMetaListByIDList(p.entity.token_meta_id_list).then(t_list => {
+            //fade in, update data
+            setTimeout(() => {
+                token_list.value = t_list;
+                //this.updateQrCode()
+                show_content.value = true;
+                loading.value = false;
+            }, 500)
         })
     })
 })
