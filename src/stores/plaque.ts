@@ -69,7 +69,8 @@ export const usePlaqueStore = defineStore({
                         plaques[i].entity.token_meta_id_list = [];
                     }
                 }
-                this.plaque_list = plaques;
+                //this.plaque_list = plaques;
+                this.plaque_list.splice(0, this.plaque_list.length, ...plaques)
             })
         },
         async loadGalleryPlaques(gallery_list: FirestoreDocument<Gallery>[]) {

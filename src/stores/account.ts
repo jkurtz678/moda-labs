@@ -3,7 +3,7 @@ import type { FirestoreDocument, Account } from "@/types/types"
 import { getAccountByID } from "@/api/account"
 import { ElMessage } from 'element-plus'
 import { connectWallet } from "@/web3Interface"
-import { getAdminUserIDList } from '@/util/util'
+import { getAdminEmailList } from '@/util/util'
 
 export type RootAccountState = {
   account: FirestoreDocument<Account> | null
@@ -27,9 +27,10 @@ export const useAccountStore = defineStore({
 
       return state.account;
     },
-    is_user_id_admin: (state): Boolean => {
-      const admin_user_id_list = getAdminUserIDList();
-      return admin_user_id_list.includes(state.account?.id || "");
+    is_user_admin: (state): Boolean => {
+      const admin_email_list = getAdminEmailList();
+      
+      return admin_email_list.includes(state.account?.entity?.email || "");
     }
   },
   actions: {

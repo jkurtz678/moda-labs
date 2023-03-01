@@ -16,7 +16,15 @@
                 <el-tab-pane label="Galleries" name="gallery-list"></el-tab-pane>
             </el-tabs>
             <div style="flex-grow: 1"></div>
-            <div v-if="screen_type != 'xs'" style="margin-right: 10px;">{{ toolbar_address }}</div>
+            <div v-if="screen_type != 'xs'" style="margin-right: 10px;">{{ toolbar_address }}<el-button v-if="account_store.is_user_admin" type="info" round size="small" style="margin-left: 8px">Admin</el-button></div>
+            <!--- beginning of view-as system -->
+            <!-- <el-popover placement="bottom" :width="400" trigger="click">
+                <template #reference>
+                    <el-button style="margin-right: 16px">Click to activate</el-button>
+                </template>
+                <el-select-v2 v-model="" style="width: 240px" multiple filterable remote :remote-method=""
+                    clearable :loading="false" placeholder="Please enter a keyword" />
+            </el-popover> -->
             <el-button @click="logout" style="margin-left: 1em;" :loading="logout_loading">Logout</el-button>
         </template>
     </div>
@@ -82,6 +90,4 @@ const getImageUrl = (filename: string) => {
 
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

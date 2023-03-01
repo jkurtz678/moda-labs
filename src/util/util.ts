@@ -9,6 +9,7 @@ export function isMobileBrowser(): Boolean {
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
 }
 
+// deprecated: use getAdminEmailList
 // returns list of allowed admins, these users can see each other's plaques and tokens
 export function getAdminUserIDList(): string[] {
     const admin_user_id_list = [
@@ -20,4 +21,11 @@ export function getAdminUserIDList(): string[] {
     ];
 
     return admin_user_id_list
+}
+
+// returns list of emails of admin users
+export function getAdminEmailList(): string[] {
+    return [
+        "jkurtz678@gmail.com",
+    ];
 }
