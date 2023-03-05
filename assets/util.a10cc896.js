@@ -1,0 +1,1 @@
+import{q as e}from"./index.f9ccb009.js";function o(r){e({message:r,type:"error",showClose:!0,duration:8e3})}function t(){return/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)}function n(){return["jkurtz678@gmail.com"]}export{n as g,t as i,o as s};
