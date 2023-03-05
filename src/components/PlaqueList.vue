@@ -1,6 +1,9 @@
 <template>
-    <!-- <div v-if="plaque_store.plaques.length == 0" style="padding: 1em;">No plaques connected</div> -->
-    <PlaqueCard :plaque="plaque" v-for="plaque in sorted_plaques" :key="plaque.id" />
+    <div class='subheader'>
+        <el-input v-model="search_filter" :prefix-icon="Search" placeholder="Search plaques" style="max-width: 350px" clearable></el-input>
+    </div>
+    <div style="padding-bottom: 40px;"></div>
+    <PlaqueCard :plaque="plaque" v-for="plaque in filtered_plaques" :key="plaque.id" />
     <div class='add-button-container'>
         <div style="display: flex; align-items: center; justify-content: center; height: 100%">
             <div class="add-button" @click="show_add_plaque_dialog = true">
@@ -35,12 +38,14 @@ import { useAccountStore } from "@/stores/account"
 import { ElMessage } from 'element-plus'
 import useBreakpoints from "@/composables/breakpoints"
 import type { FirestoreDocument, Plaque } from "@/types/types"
+import { Search } from '@element-plus/icons-vue'
 
 const add_test_plaque_loading = ref(false);
 const { width, screen_type } = useBreakpoints();
 const show_add_plaque_dialog = ref(false);
 const router = useRouter();
 const account_store = useAccountStore();
+const search_filter = ref("")
 
 const plaque_store = usePlaqueStore();
 const createTestPlaque = async () => {
@@ -66,6 +71,17 @@ const sorted_plaques = computed(() => {
         return (text_a < text_b) ? -1 : (text_a > text_b) ? 1 : 0;
     })
 })
+
+const filtered_plaques = computed(() => {
+    if(!search_filter) {
+        return sorted_plaques.value
+    }
+
+    return sorted_plaques.value.filter(p => 
+        p.entity.name.toLowerCase().includes(search_filter.value.toLowerCase())
+    ) 
+})
+
 </script>
 
 <style scoped>
@@ -88,6 +104,16 @@ const sorted_plaques = computed(() => {
     align-items: center;
     justify-content: center;
     cursor: pointer;
+}
+
+.subheader {
+    background-color: white;
+    position: fixed;
+    top: 75px;
+    left: 0px;
+    right: 0px;
+    padding: 0px 25px 10px;
+    z-index: 5;
 }
 
 @media only screen and (max-width: 600px) {

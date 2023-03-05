@@ -19,7 +19,18 @@ export const getPlaquesByUserIDWithListener = async (user_id: string, onChange: 
     })
 };
 
-// getPlaquesByUserIDListWithListener returns a list of plaques for a given user id
+// getAllPlaquesWithListener returns a list of all plaques with a firebase listener callback
+export const getAllPlaquesWithListener = async (onChange: (arr: FirestoreDocument<Plaque>[]) => void) => {
+    const unsubscribe = await onSnapshot(query(plaques_ref), (query_snapshot) => {
+        const plaques: FirestoreDocument<Plaque>[] = [];
+        query_snapshot.forEach((doc) => {
+            plaques.push({ id: doc.id, entity: doc.data() as Plaque})
+        })
+        onChange(plaques)
+    })
+}
+
+// getPlaquesByUserIDListWithListener returns a list of plaques for a given user id list
 export const getPlaquesByUserIDListWithListener = async (user_id_list: string[], onChange: (arr: Array<FirestoreDocument<Plaque>>) => void) => {
     const q = query(plaques_ref, where("user_id", "in", user_id_list));
     const unsubscribe = await onSnapshot(q, (query_snapshot) => {

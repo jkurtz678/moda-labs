@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import type { FirestoreDocument, Gallery, Plaque } from "@/types/types"
-import { getPlaquesByUserIDWithListener, getPlaquesByUserIDListWithListener, getPlaquesByPlaqueIDList } from "@/api/plaque";
+import { getPlaquesByUserIDWithListener, getAllPlaquesWithListener, getPlaquesByPlaqueIDList } from "@/api/plaque";
 import { useAccountStore } from "./account";
 import { useGalleryStore } from "./gallery";
 
@@ -15,7 +15,7 @@ interface PlaqueMap {
 export const usePlaqueStore = defineStore({
     id: 'plaque',
     state: () => ({
-        plaque_list: [], 
+        plaque_list: [],
         gallery_plaque_list: [],
     } as RootPlaqueState),
     getters: {
@@ -48,9 +48,9 @@ export const usePlaqueStore = defineStore({
     },
     actions: {
         async loadPlaques(user_id: string) {
-            /* const gallery_store = useGalleryStore();
-            if (gallery_store.gallery_list.length > 0) {
-                await getPlaquesByUserIDListWithListener(gallery_store.get_user_id_list_for_galleries, (plaques) => {
+            const account_store = useAccountStore();
+            if (account_store.is_user_admin) {
+                await getAllPlaquesWithListener((plaques) => {
                     // fix null token meta id list
                     for (let i = 0; i < plaques.length; i++) {
                         if (plaques[i].entity.token_meta_id_list == null) {
@@ -59,18 +59,16 @@ export const usePlaqueStore = defineStore({
                     }
                     this.plaque_list = plaques;
                 })
-                return
-            } */
+                return;
+            }
             await getPlaquesByUserIDWithListener(user_id, (plaques) => {
-                console.log("plaque_listener", plaques)
                 // fix null token meta id list
                 for (let i = 0; i < plaques.length; i++) {
                     if (plaques[i].entity.token_meta_id_list == null) {
                         plaques[i].entity.token_meta_id_list = [];
                     }
                 }
-                //this.plaque_list = plaques;
-                this.plaque_list.splice(0, this.plaque_list.length, ...plaques)
+                this.plaque_list = plaques;
             })
         },
         async loadGalleryPlaques(gallery_list: FirestoreDocument<Gallery>[]) {
