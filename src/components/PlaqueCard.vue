@@ -4,8 +4,8 @@
       <h1 v-if="!edit_plaque_name"> {{ props.plaque.entity.name }}</h1>
       <input v-else v-model="props.plaque.entity.name" class="edit-name-input" />
       <el-button :icon="Edit" v-if="!edit_plaque_name" @click="edit_plaque_name = true" class="editIcon" circle />
-      <el-button :icon="Select" v-if="edit_plaque_name" :loading="edit_loading" @click="updatePlaqueName"
-        class="editIcon" circle :type="edit_loading ? '' : 'success'" text />
+      <el-button :icon="Select" v-if="edit_plaque_name" :loading="edit_loading" @click="updatePlaqueName" class="editIcon"
+        circle :type="edit_loading ? '' : 'success'" text />
       <div style="flex-grow: 1" />
       <el-tag class="ml-2" type="success">online</el-tag>
     </div>
@@ -23,8 +23,7 @@
           </el-col>
         </el-row>
         <div style="padding:0.3em 1em">{{ `Total artworks: ${plaque.entity.token_meta_id_list.length}` }}</div>
-        <div
-          style="display: flex; justify-content: space-between; align-items: center; margin-right: 1em; padding: 1em;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-right: 1em; padding: 1em;">
           <el-button type="info" @click="show_add_token_dialog = true">Add Artwork</el-button>
           <el-button @click="plaque_view = 'detail'">
             Details<el-icon class="el-icon--right">
@@ -64,8 +63,13 @@
           <el-button @click="previewPlaque">Preview
             Plaque</el-button>
         </div>
-        <div style="padding: 1em 0em;">
-          <el-button type="danger" plain @click="forgetPlaque">Forget Display</el-button>
+        <div style="padding: 1em 0em; display: flex; justify-content: space-between; align-items: center;" >
+          <div v-if="plaque.entity.user_id">
+            <div>Associated User ID:</div>
+            <div>{{ plaque.entity.user_id }}</div>
+          </div>
+          <div v-else>No associated user</div>
+          <el-button v-if="plaque.entity.user_id" type="danger" plain @click="forgetPlaque">Forget Display</el-button>
         </div>
         <div style="display: flex; justify-content: end;">
           <el-button @click="plaque_view = 'detail'">Close<el-icon class="el-icon--right">
