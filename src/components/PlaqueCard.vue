@@ -95,6 +95,7 @@ import { updatePlaque } from "@/api/plaque";
 import { useTokenMetaStore } from "../stores/token-meta";
 import { useRouter } from 'vue-router';
 import { showError } from "@/util/util";
+import { usePlaqueStore } from "@/stores/plaque"
 import {
   Edit,
   Select,
@@ -103,7 +104,7 @@ import {
 interface PlaqueCardProps {
   plaque: FirestoreDocument<Plaque>;
 }
-
+const plaque_store = usePlaqueStore();
 const props = defineProps<PlaqueCardProps>();
 const router = useRouter();
 const plaque_view = ref("simple"); // 3 modes - 'simple', 'detail', 'settings'
@@ -136,15 +137,13 @@ const plaque_tokens = computed(() => {
   return res;
 })
 
-const activeName = ref("0");
-const collapse = ref(true);
-
 const clearTokens = () => {
   ElMessageBox.confirm(`Are you sure you want to clear tokens for plaque '${props.plaque.entity.name}'?`, "Clear tokens", {
     type: 'warning'
   }).then(() => {
     updatePlaque(props.plaque.id, { token_meta_id_list: [] })
       .then(() => {
+        plaque_store.plaque_map[props.plaque.id].entity.token_meta_id_list = [];
         ElMessage({
           type: 'success',
           message: 'Tokens cleared',
@@ -162,6 +161,8 @@ const forgetPlaque = () => {
   }).then(() => {
     updatePlaque(props.plaque.id, { user_id: "", token_meta_id_list: [] })
       .then(() => {
+        plaque_store.plaque_map[props.plaque.id].entity.user_id = "";
+        plaque_store.plaque_map[props.plaque.id].entity.token_meta_id_list = [];
         ElMessage({
           type: 'success',
           message: 'Plaque forgotten',

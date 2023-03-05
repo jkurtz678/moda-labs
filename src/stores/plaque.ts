@@ -22,12 +22,12 @@ export const usePlaqueStore = defineStore({
         all_plaque_list(state): FirestoreDocument<Plaque>[] {
             return Object.values(this.plaque_map)
         },
-        plaque_map(): PlaqueMap {
+        plaque_map(state): PlaqueMap {
             const plaque_map: PlaqueMap = {};
-            this.plaque_list.forEach((p: FirestoreDocument<Plaque>) => {
+            state.plaque_list.forEach((p: FirestoreDocument<Plaque>) => {
                 plaque_map[p.id] = p;
             });
-            this.gallery_plaque_list.forEach((p: FirestoreDocument<Plaque>) => {
+            state.gallery_plaque_list.forEach((p: FirestoreDocument<Plaque>) => {
                 plaque_map[p.id] = p;
             });
             return plaque_map;
