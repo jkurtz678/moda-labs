@@ -32,11 +32,12 @@
                     <div class="title">{{ active_token_meta?.entity?.name }}</div>
                     <div class="grid">
                         <div class="col" style="max-width:650px; text-align: left;">
-                            <div style="margin-bottom: 22px;">{{ active_token_meta?.entity?.artist }}</div>
+                            <div style="margin-bottom: 22px; font-size: 22px;">{{ active_token_meta?.entity?.artist }}</div>
                             <div>{{ active_token_meta?.entity?.description }}</div>
                         </div>
-                        <div class="col" style="display: flex; justify-content: center; padding-top: 25px;">
+                        <div class="col" style="display: flex; justify-content: center; flex-direction: column; align-items: center; padding-top: 25px;">
                             <QrcodeVue :value="active_token_meta?.entity?.public_link" :size="220" level="H" />
+                            <div style="padding-top: 25px; font-size: 22px;">2.88 ETH ($4,948.85)</div>
                         </div>
                     </div>
                 </div>

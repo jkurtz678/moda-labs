@@ -147,3 +147,11 @@ export async function getTokenMetaThumbnailImageURL(token_meta: FirestoreDocumen
     return new URL(`../assets/logo.png`, import.meta.url).href
 }
 
+// Bid represents an individual bid for an art piece, associated with a token meta
+export interface Bid extends BaseDocument{
+    token_meta_id: string; // token_meta the bid is associated with
+    phone_number: string; // phone number for contact
+    email: string; // email for contact
+    bidding_name: string; // public bidding name for display on plaque and form
+    amount: number; // bid amount in usd 
+}

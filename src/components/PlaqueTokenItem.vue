@@ -25,15 +25,7 @@
             <div class="card-flex-right">
               <p class="card-title">Artist name</p>
               <div class="bold bigger-font description">{{ props.token_meta.entity.artist }}</div>
-              <div>{{ token_description }}
-              </div>
-              <div>
-                <a v-if="props.token_meta.entity.description && props.token_meta.entity.description.length > 200"
-                  @click="show_full_description = !show_full_description" class="link">
-                  <span v-if="show_full_description">Less</span>
-                  <span v-else>More</span>
-                </a>
-              </div>
+              <TruncatedDescription :description="token_meta.description"></TruncatedDescription>
               <div>
                 <a v-if="token_meta.public_link" :href="token_meta.public_link" target="_blank">Qr-code link</a>
               </div>
@@ -61,14 +53,15 @@ import { ref, reactive, computed, toRef } from "vue";
 import type { FirestoreDocument, TokenMeta } from "../types/types";
 import { getPlatformDisplay } from "../types/types";
 import { useRouter } from 'vue-router';
+import TruncatedDescription from "@/components/TruncatedDescription.vue";
 import useThumbnail from "@/composables/thumbnail-image";
 
 const router = useRouter();
 
-interface PlaqueTokenItem {
+interface PlaqueTokenItemProps {
   token_meta: FirestoreDocument<TokenMeta>;
 }
-const props = defineProps<PlaqueTokenItem>();
+const props = defineProps<PlaqueTokenItemProps>();
 const expanded = ref(false);
 const show_full_description = ref(false);
 
@@ -106,9 +99,7 @@ const token_meta = computed(() => {
   cursor: pointer;
 }
 
-.link {
-  text-decoration: underline;
-}
+
 
 .link span {
   font-weight: bold;

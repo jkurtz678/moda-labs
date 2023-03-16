@@ -99,6 +99,11 @@ const router = createRouter({
       path: '/preview-plaque/:plaque_id',
       name: 'preview-plaque',
       component: () => import('@/views/PlaquePreview.vue')
+    },
+    {
+      path: "/bid",
+      name: "bid",
+      component: () => import('@/views/BiddingView.vue')
     }
     /*  {
        path: '/login',
