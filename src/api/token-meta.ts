@@ -76,3 +76,11 @@ export const getTokenMetaListByIDList = async (token_meta_id_list: string[]): Pr
     })
     return metas;
 }
+
+// getTokenMetaByIDWithListener returns a token meta that matches the given id, uses firebase listener callback
+export const getTokenMetaByIDWithListener = async (token_meta_id: string, onChange: (meta: FirestoreDocument<TokenMeta>) => void) => {
+    const ref = doc(db, "token-meta", token_meta_id)
+    const unsubscribe = await onSnapshot(ref, (doc_snapshot) => {
+        onChange({ id: doc_snapshot.id, entity: doc_snapshot.data() as TokenMeta })
+    })
+}   

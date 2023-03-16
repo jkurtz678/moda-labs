@@ -26,8 +26,9 @@
               <p class="card-title">Artist name</p>
               <div class="bold bigger-font description">{{ props.token_meta.entity.artist }}</div>
               <TruncatedDescription :description="token_meta.description"></TruncatedDescription>
-              <div>
+              <div style="display: flex; justify-content: space-between;">
                 <a v-if="token_meta.public_link" :href="token_meta.public_link" target="_blank">Qr-code link</a>
+                <a href="#" @click="openBiddingPage">Bid</a>
               </div>
             </div>
           </div>
@@ -86,6 +87,11 @@ const platform = computed(() => {
 const token_meta = computed(() => {
   return props.token_meta.entity
 })
+
+const openBiddingPage = () => {
+  const link = router.resolve({ name: 'bid', params: { token_meta_id: props.token_meta.id } });
+  window.open(link.href);
+}
 
 </script>
 

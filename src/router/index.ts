@@ -101,7 +101,7 @@ const router = createRouter({
       component: () => import('@/views/PlaquePreview.vue')
     },
     {
-      path: "/bid",
+      path: "/bid/:token_meta_id",
       name: "bid",
       component: () => import('@/views/BiddingView.vue')
     }

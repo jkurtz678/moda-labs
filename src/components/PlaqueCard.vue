@@ -60,10 +60,9 @@
       <section v-if="plaque_view == 'settings'" style="padding: 1em;">
         <div style="display: flex; justify-content: space-between;">
           <el-button>Preview Art</el-button>
-          <el-button @click="previewPlaque">Preview
-            Plaque</el-button>
+          <el-button @click="previewPlaque">Preview Plaque</el-button>
         </div>
-        <div style="padding: 1em 0em; display: flex; justify-content: space-between; align-items: center;" >
+        <div style="padding: 1em 0em; display: flex; justify-content: space-between; align-items: center;">
           <div v-if="plaque.entity.user_id">
             <div>Associated User ID:</div>
             <div>{{ plaque.entity.user_id }}</div>
@@ -177,6 +176,7 @@ const previewPlaque = () => {
   const link = router.resolve({ name: 'preview-plaque', params: { plaque_id: props.plaque.id } });
   window.open(link.href);
 }
+
 </script>
 
 <style scoped>

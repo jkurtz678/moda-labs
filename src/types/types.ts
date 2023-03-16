@@ -66,6 +66,7 @@ export interface TokenMeta extends BaseDocument {
     platform: TokenPlatform; // token id for ethereum token
     external_thumbnail_url?: string; // url to thumbnail image from outside moda archives (e.g. from opensea servers)
     external_media_url?: string; // url to media source file from outside moda archives (e.g. opensea servers)
+    starting_bid?: number; // optional starting bid for token in usd, if it is for sale
 }
 
 export enum Blockchain {
