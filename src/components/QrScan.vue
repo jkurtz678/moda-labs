@@ -27,7 +27,7 @@ const onDecode = async (qr_code_link: string) => {
 
     const qparams = new URLSearchParams(split_link[1]);
     const plaque_id = qparams.get("plaque_id");
-    const user_id = account_store.account?.entity.user_id;
+    const user_id = account_store.account?.id;
     if (!plaque_id || !user_id) {
         console.log(`QrScan.onDecode error - invalid plaque_id: ${plaque_id} or wallet addressl: ${user_id}`)
         ElMessage({ message: "Error adding account to plaque - invalid plaque or account", type: 'error', showClose: true, duration: 12000 });
