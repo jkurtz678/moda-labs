@@ -130,10 +130,10 @@ export async function getTokenMetaThumbnailImageURL(token_meta: FirestoreDocumen
     const storage = getStorage();
     const path_ref = ref(storage, `thumb_${token_meta.entity.media_id}.jpg`);
     try {
-       const url = await getDownloadURL(path_ref) 
-       console.log(`getTokenMetaThumbnailImageURL - found url for image ${token_meta.entity.name}`, url)
-       return url
-    } catch (err){
+        const url = await getDownloadURL(path_ref)
+        console.log(`getTokenMetaThumbnailImageURL - found url for image ${token_meta.entity.name}`, url)
+        return url
+    } catch (err) {
         console.log(`getTokenMetaThumbnailImageURL - failed to find archive thumbnail image ${token_meta.entity.name}`, err)
     }
 
@@ -147,3 +147,20 @@ export async function getTokenMetaThumbnailImageURL(token_meta: FirestoreDocumen
     return new URL(`../assets/logo.png`, import.meta.url).href
 }
 
+export async function getSourceFile(token_meta: FirestoreDocument<TokenMeta>): Promise<string> {
+    console.log("token_meta", token_meta);
+    const storage = getStorage();
+    const path = `${token_meta.entity.media_id}${token_meta.entity.media_type}`
+    console.log("path", path);
+    const path_ref = ref(storage, path);
+
+    console;
+    try {
+        const url = await getDownloadURL(path_ref)
+        console.log(`getTokenMetaThumbnailImageURL - found url for image ${token_meta.entity.name}`, url)
+        return url
+    } catch (err) {
+        console.log(`getTokenMetaThumbnailImageURL - failed to find archive thumbnail image ${token_meta.entity.name}`, err)
+    }
+    return ""
+}

@@ -43,6 +43,7 @@
       </el-collapse-transition>
     </div>
     <div style="flex: 1; text-align:right; padding-right:1em; white-space: nowrap;">
+      <el-button icon="Download" text circle @click="openArt"></el-button>
       <el-button icon="Edit" text circle
         @click="router.push({ name: 'edit-token', params: { 'token_meta_id': props.token_meta.id } })"></el-button>
       <el-button :icon="expanded ? 'ArrowDownBold' : 'ArrowRightBold'" @click="expanded = !expanded" text circle>
@@ -58,8 +59,9 @@
 <script setup lang="ts">
 
 import { ref, reactive, computed, toRef } from "vue";
-import type { FirestoreDocument, TokenMeta } from "../types/types";
-import { getPlatformDisplay } from "../types/types";
+import type { FirestoreDocument, TokenMeta} from "../types/types";
+import { getPlatformDisplay, getSourceFile} from "../types/types";
+import { showError } from '@/util/util';
 import { useRouter } from 'vue-router';
 import useThumbnail from "@/composables/thumbnail-image";
 
@@ -93,6 +95,17 @@ const platform = computed(() => {
 const token_meta = computed(() => {
   return props.token_meta.entity
 })
+
+const openArt = async () => {
+  const url = await getSourceFile(props.token_meta);
+
+  if(!url) {
+    showError("Error getting source file")
+    return
+  }
+
+  window.open(url, '_blank');
+}
 
 </script>
 
