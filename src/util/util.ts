@@ -27,5 +27,8 @@ export function getAdminUserIDList(): string[] {
 export function getAdminEmailList(): string[] {
     return [
         "jkurtz678@gmail.com",
+        "natemohler@ucla.edu",
+        "natemohleriv@gmail.com",
+        "ruben@eastsideled.com",
     ];
 }
