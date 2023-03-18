@@ -1,8 +1,7 @@
 import { BaseEntity, type FirestoreDocument, type Plaque } from "@/types/types"
 import firebaseConfig from "../firebaseConfig"
-import { documentId, getDocs, getFirestore } from "firebase/firestore";
+import { documentId, getDocs, getFirestore, Timestamp } from "firebase/firestore";
 import { collection, getDoc, where, query, doc, onSnapshot, updateDoc, addDoc } from "firebase/firestore";
-import { kMaxLength } from "buffer";
 
 const db = getFirestore(firebaseConfig)
 const plaques_ref = collection(db, "plaque")
@@ -64,6 +63,7 @@ export const createPlaque = async (plaque: Plaque): Promise<FirestoreDocument<Pl
 
 // updatePlaque updates a plaque
 export const updatePlaque = async (plaque_id: string, update_data: Partial<Plaque>): Promise<FirestoreDocument<Plaque>> => {
+    update_data.updated_at = Timestamp.now();
     const ref = doc(db, "plaque", plaque_id)
     await updateDoc(ref, update_data)
     const snapshot = await getDoc(ref)
@@ -86,4 +86,12 @@ export const getPlaquesByPlaqueIDList = async (plaque_id_list: string[]): Promis
     
     console.log("retPlaques", plaques) // eslint-disable-line no-console
     return plaques
+}
+
+
+// getPlaqueById returns a plaque for a given plaque id
+export const getPlaqueByID = async (plaque_id: string): Promise<FirestoreDocument<Plaque>> => {
+    const ref = doc(db, "plaque", plaque_id)
+    const snapshot = await getDoc(ref)
+    return { id: snapshot.id, entity: snapshot.data() as Plaque }
 }

@@ -1,5 +1,5 @@
 import firebaseConfig from "../firebaseConfig"
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, Timestamp} from "firebase/firestore";
 import type { TokenMeta, FirestoreDocument } from "@/types/types";
 import { collection, addDoc, getDocs, getDoc, documentId, doc, updateDoc, where, query, onSnapshot } from "firebase/firestore";
 import { BaseEntity } from "@/types/types";
@@ -19,6 +19,7 @@ export const createTokenMeta = async (meta: TokenMeta): Promise<FirestoreDocumen
 
 // updateTokenMeta updates an existing token meta object
 export const updateTokenMeta = async (token_meta_id: string, update_data: Partial<TokenMeta>): Promise<FirestoreDocument<TokenMeta>> => {
+    update_data.updated_at = Timestamp.now();
     const ref = doc(db, "token-meta", token_meta_id)
     await updateDoc(ref, update_data)
     const snapshot = await getDoc(ref)
