@@ -70,6 +70,7 @@
           </div>
           <div v-else>No associated user</div>
           <el-button v-if="plaque.entity.user_id" type="danger" plain @click="forgetPlaque">Forget Display</el-button>
+          <el-button v-if="!plaque.entity.user_id && (!plaque.entity.token_meta_id_list || plaque.entity.token_meta_id_list.length === 0)" type="danger" plain @click="deleteEmptyPlaque">Delete Plaque</el-button>
         </div>
         <div style="display: flex; justify-content: end;">
           <el-button @click="plaque_view = 'detail'">Close<el-icon class="el-icon--right">
@@ -91,7 +92,7 @@ import AddTokenDialog from './AddTokenDialog.vue';
 import PlaqueTokenItem from "./PlaqueTokenItem.vue";
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { ref } from "vue";
-import { updatePlaque } from "@/api/plaque";
+import { updatePlaque, deletePlaqueByID } from "@/api/plaque";
 import { useTokenMetaStore } from "../stores/token-meta";
 import { useRouter } from 'vue-router';
 import { showError } from "@/util/util";
@@ -176,6 +177,23 @@ const forgetPlaque = () => {
 const previewPlaque = () => {
   const link = router.resolve({ name: 'preview-plaque', params: { plaque_id: props.plaque.id } });
   window.open(link.href);
+}
+const deleteEmptyPlaque = () => {
+  ElMessageBox.confirm(`Are you sure you want to delete the plaque named '${props.plaque.entity.name}'?`, "Delete plaque", {
+    type: 'warning'
+  }).then(() => {
+    deletePlaqueByID(props.plaque.id)
+      .then(() => {
+        delete plaque_store.plaque_map[props.plaque.id];
+        ElMessage({
+          type: 'success',
+          message: 'Plaque deleted',
+        })
+      })
+      .catch((err) => {
+        ElMessage({ message: `Error deleting empty plaque - ${err}`, type: 'error', showClose: true, duration: 12000 });
+      })
+  })
 }
 </script>
 

@@ -1,7 +1,7 @@
 import { BaseEntity, type FirestoreDocument, type Plaque } from "@/types/types"
 import firebaseConfig from "../firebaseConfig"
 import { documentId, getDocs, getFirestore, Timestamp } from "firebase/firestore";
-import { collection, getDoc, where, query, doc, onSnapshot, updateDoc, addDoc } from "firebase/firestore";
+import { collection, getDoc, where, query, doc, onSnapshot, updateDoc, addDoc, deleteDoc } from "firebase/firestore";
 
 const db = getFirestore(firebaseConfig)
 const plaques_ref = collection(db, "plaque")
@@ -40,7 +40,6 @@ export const getPlaquesByUserIDListWithListener = async (user_id_list: string[],
         onChange(plaques)
     })
 };
-
 
 // getPlaqueByPlaqueIDWithListener returns listens to changes to plaque and calls on change handler
 export const getPlaqueByPlaqueIDWithListener = async (plaque_id: string, onChange: (plaque: FirestoreDocument<Plaque>) => void) => {
@@ -94,4 +93,10 @@ export const getPlaqueByID = async (plaque_id: string): Promise<FirestoreDocumen
     const ref = doc(db, "plaque", plaque_id)
     const snapshot = await getDoc(ref)
     return { id: snapshot.id, entity: snapshot.data() as Plaque }
+}
+
+// deletePlaqueById deletes a plaque by its id
+export const deletePlaqueByID = async (plaque_id: string): Promise<void> => {
+    const ref = doc(db, "plaque", plaque_id);
+    await deleteDoc(ref);
 }
