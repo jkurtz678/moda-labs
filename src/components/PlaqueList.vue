@@ -74,11 +74,20 @@ const sorted_plaques = computed(() => {
 })
 
 const filtered_plaques = computed(() => {
+
+    let ret_plaques = [...sorted_plaques.value];
+    
+    // filter out plaques that are missing all of the following: name, user_id, no tokens. these would have no purpose to the user, only to a plaque that hasnt been setup yet
+    ret_plaques = ret_plaques.filter(plaque => {
+        return plaque.entity.name || plaque.entity.user_id || plaque.entity.token_meta_id_list.length > 0
+    }) 
+    
+    
     if(!search_filter) {
-        return sorted_plaques.value
+        return ret_plaques.value
     }
 
-    return sorted_plaques.value.filter(p => 
+    return ret_plaques.value.filter(p => 
         p.entity.name.toLowerCase().includes(search_filter.value.toLowerCase())
     ) 
 })
