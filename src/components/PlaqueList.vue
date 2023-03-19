@@ -1,6 +1,7 @@
 <template>
-    <div class='subheader'>
+    <div class='subheader' style="display: flex; align-items: center;">
         <el-input v-model="search_filter" :prefix-icon="Search" placeholder="Search plaques" style="max-width: 350px" clearable></el-input>
+        <el-button icon="Camera" type="info" @click="router.push('qr-scan')" style="margin-left: 10px;" size="small">Scan</el-button>
     </div>
     <div style="padding-bottom: 40px;"></div>
     <PlaqueCard :plaque="plaque" v-for="plaque in filtered_plaques" :key="plaque.id" />
@@ -30,7 +31,7 @@
 <script setup lang="ts">
 import PlaqueCard from '@/components/PlaqueCard.vue'
 import { ref, computed } from "vue";
-import { usePlaqueStore } from "@/stores/plaque"
+import { usePlaqueStore} from "@/stores/plaque"
 import { useRouter } from 'vue-router';
 import { createPlaque } from "@/api/plaque"
 import { Timestamp } from "firebase/firestore"
