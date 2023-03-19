@@ -70,7 +70,7 @@
           </div>
           <div v-else>No associated user</div>
           <el-button v-if="plaque.entity.user_id" type="danger" plain @click="forgetPlaque">Forget Display</el-button>
-          <el-button v-if="!plaque.entity.user_id && (!plaque.entity.token_meta_id_list || plaque.entity.token_meta_id_list.length === 0)" type="danger" plain @click="deleteEmptyPlaque">Delete Plaque</el-button>
+          <!-- <el-button v-if="!plaque.entity.user_id && (!plaque.entity.token_meta_id_list || plaque.entity.token_meta_id_list.length === 0)" type="danger" plain @click="deleteEmptyPlaque">Delete Plaque</el-button> -->
         </div>
         <div style="display: flex; justify-content: end;">
           <el-button @click="plaque_view = 'detail'">Close<el-icon class="el-icon--right">
