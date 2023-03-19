@@ -84,10 +84,10 @@ const filtered_plaques = computed(() => {
     
     
     if(!search_filter) {
-        return ret_plaques.value
+        return ret_plaques;
     }
 
-    return ret_plaques.value.filter(p => 
+    return ret_plaques.filter(p => 
         p.entity.name.toLowerCase().includes(search_filter.value.toLowerCase())
     ) 
 })
