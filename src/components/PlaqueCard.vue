@@ -58,11 +58,11 @@
     </el-collapse-transition>
     <el-collapse-transition>
       <section v-if="plaque_view == 'settings'" style="padding: 1em;">
-        <div style="display: flex; justify-content: space-between;">
+        <!-- <div style="display: flex; justify-content: space-between;">
           <el-button>Preview Art</el-button>
           <el-button @click="previewPlaque">Preview
             Plaque</el-button>
-        </div>
+        </div> -->
         <div style="padding: 1em 0em; display: flex; justify-content: space-between; align-items: center;" >
           <div v-if="plaque.entity.user_id">
             <div>Associated User ID:</div>

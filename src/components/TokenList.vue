@@ -69,12 +69,12 @@ const tokens = computed(() => {
 </script>
 <style scoped>
 .container-card {
-    min-width: 700px;
+    min-width: 750px;
     border-radius: 18px;
     height: 100%;
 }
 
-@media only screen and (max-width: 650px) {
+@media only screen and (max-width: 750px) {
     .container-card {
         display: block;
         width: 100%;

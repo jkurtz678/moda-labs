@@ -49,6 +49,14 @@ export const getTokenMetaListByUserIDWithListener = async (user_id: string, onCh
     })
 };
 
+// getTokenMetaByIDWithListener returns a single token meta by id, uses firebase listener callback
+export const getTokenMetaByIDWithListener = async (token_meta_id: string, onChange: (doc: FirestoreDocument<TokenMeta>) => void) => {
+    const unsubscribe = await onSnapshot(doc(db, "token-meta", token_meta_id), (doc) => {
+        onChange({ id: doc.id, entity: doc.data() as TokenMeta })
+    })
+}
+
+
 /* export const getTokenMetaListByIDListWithListener = async (token_meta_id_list: string[], onChange: (arr: FirestoreDocument<TokenMeta>[]) => void) => {
     // in filters will error if array is empty
     if (token_meta_id_list.length == 0) {

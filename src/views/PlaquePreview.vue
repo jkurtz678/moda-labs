@@ -15,9 +15,9 @@
                     <div id="scan-qrcode" style="display: flex; justify-content: center;"></div>
                     <div style="margin-top: 10px; font-size: 30px;">Scan to cast art</div>
                 </div> -->
-                <div v-show="status == Status.STATUS_NO_VALID_TOKENS">
+                <!-- <div v-show="status == Status.STATUS_NO_VALID_TOKENS">
                     <div style="font-size: 30px;">No art selected</div>
-                </div>
+                </div> -->
                 <div v-show="status == Status.STATUS_ERROR">
                     <div style="font-size: 30px;">Error loading art. Please try a different piece.</div>
                 </div>
@@ -29,14 +29,14 @@
                 </div> -->
 
                 <div v-show="status == Status.STATUS_DISPLAY">
-                    <div class="title">{{ active_token_meta?.entity?.name }}</div>
+                    <div class="title">{{ token_meta?.entity?.name }}</div>
                     <div class="grid">
                         <div class="col" style="max-width:650px; text-align: left;">
-                            <div style="margin-bottom: 22px;">{{ active_token_meta?.entity?.artist }}</div>
-                            <div>{{ active_token_meta?.entity?.description }}</div>
+                            <div style="margin-bottom: 22px;">{{ token_meta?.entity?.artist }}</div>
+                            <div>{{ token_meta?.entity?.description }}</div>
                         </div>
                         <div class="col" style="display: flex; justify-content: center; padding-top: 25px;">
-                            <QrcodeVue :value="active_token_meta?.entity?.public_link" :size="220" level="H" />
+                            <QrcodeVue :value="token_meta?.entity?.public_link" :size="220" level="H" />
                         </div>
                     </div>
                 </div>
@@ -51,7 +51,7 @@
 import { ref, onMounted, computed } from "vue";
 import type { FirestoreDocument, Plaque, TokenMeta } from "@/types/types";
 import { getPlaqueByPlaqueIDWithListener } from "@/api/plaque";
-import { getTokenMetaListByIDList } from "@/api/token-meta";
+import { getTokenMetaByIDWithListener } from "@/api/token-meta";
 import { useRoute } from "vue-router";
 import QrcodeVue from 'qrcode.vue'
 
@@ -69,41 +69,34 @@ enum Status {
 //const status = ref<Status>(Status.STATUS_LOADING);
 const loading = ref(true);
 const show_content = ref(true);
-const plaque = ref<FirestoreDocument<Plaque>>();
-const token_list = ref<FirestoreDocument<TokenMeta>[]>([]);
-const active_token_index = ref(0);
+//const plaque = ref<FirestoreDocument<Plaque>>();
+//const token_list = ref<FirestoreDocument<TokenMeta>[]>([]);
+//const active_token_index = ref(0);
+const token_meta = ref<FirestoreDocument<TokenMeta>>();
 
-const active_token_meta = computed(() => {
+/* const active_token_meta = computed(() => {
     return token_list.value[active_token_index.value]
-})
+}) */
 
 const status = computed(() => {
     if (loading.value) return Status.STATUS_LOADING
 
-    if (!plaque.value || !token_list.value) return Status.STATUS_ERROR
-
-    if (token_list.value.length == 0) return Status.STATUS_NO_VALID_TOKENS
+    if (!token_meta.value || !token_meta.value) return Status.STATUS_ERROR
 
     return Status.STATUS_DISPLAY
 })
 
 onMounted(() => {
-    const plaque_id = route?.params?.plaque_id;
-    if (!plaque_id || typeof plaque_id != "string") return;
+    const token_meta_id = route?.params?.token_meta_id;
+    if (!token_meta_id || typeof token_meta_id != "string") return;
     show_content.value = false
-    getPlaqueByPlaqueIDWithListener(plaque_id, (p) => {
-        loading.value = true
-        show_content.value = false
-        plaque.value = p;
-        getTokenMetaListByIDList(p.entity.token_meta_id_list).then(t_list => {
-            //fade in, update data
-            setTimeout(() => {
-                token_list.value = t_list;
-                //this.updateQrCode()
-                show_content.value = true;
-                loading.value = false;
-            }, 500)
-        })
+    getTokenMetaByIDWithListener(token_meta_id, (t) => {
+        //fade in, update data
+        setTimeout(() => {
+            token_meta.value = t
+            show_content.value = true;
+            loading.value = false;
+        }, 500)
     })
 })
 

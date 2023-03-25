@@ -43,9 +43,17 @@
       </el-collapse-transition>
     </div>
     <div style="flex: 1; text-align:right; padding-right:1em; white-space: nowrap;">
-      <el-button icon="Download" text circle @click="openArt"></el-button>
-      <el-button icon="Edit" text circle
-        @click="router.push({ name: 'edit-token', params: { 'token_meta_id': props.token_meta.id } })"></el-button>
+      <el-tooltip class="box-item" effect="dark" content="Download art" placement="top">
+        <el-button icon="Download" text circle @click="openArt"></el-button>
+      </el-tooltip>
+      <el-tooltip class="box-item" effect="dark" content="Preview plaque" placement="top">
+        <el-button icon="Tickets" text circle @click="previewPlaque"></el-button>
+      </el-tooltip>
+      <el-tooltip class="box-item" effect="dark" content="Edit art data" placement="top">
+        <el-button icon="Edit" text circle
+          @click="router.push({ name: 'edit-token', params: { 'token_meta_id': props.token_meta.id } })">
+        </el-button>
+      </el-tooltip>
       <el-button :icon="expanded ? 'ArrowDownBold' : 'ArrowRightBold'" @click="expanded = !expanded" text circle>
       </el-button>
       <div style="opacity: 0.5;">{{ platform }}</div>
@@ -59,8 +67,8 @@
 <script setup lang="ts">
 
 import { ref, reactive, computed, toRef } from "vue";
-import type { FirestoreDocument, TokenMeta} from "../types/types";
-import { getPlatformDisplay, getSourceFile} from "../types/types";
+import type { FirestoreDocument, TokenMeta } from "../types/types";
+import { getPlatformDisplay, getSourceFile } from "../types/types";
 import { showError } from '@/util/util';
 import { useRouter } from 'vue-router';
 import useThumbnail from "@/composables/thumbnail-image";
@@ -99,12 +107,17 @@ const token_meta = computed(() => {
 const openArt = async () => {
   const url = await getSourceFile(props.token_meta);
 
-  if(!url) {
+  if (!url) {
     showError("Error getting source file")
     return
   }
 
   window.open(url, '_blank');
+}
+
+const previewPlaque = () => {
+  const link = router.resolve({ name: 'preview-plaque', params: { token_meta_id: props.token_meta.id } });
+  window.open(link.href);
 }
 
 </script>
