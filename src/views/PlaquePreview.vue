@@ -9,7 +9,7 @@
                         <div></div>
                         <div></div>
                     </div>
-                    <div style="margin-top: 10px; font-size: 30px;">Preparing art</div>
+                    <div class="status">Preparing art</div>
                 </div>
                 <!-- <div v-show="status == Status.STATUS_QR_SCAN">
                     <div id="scan-qrcode" style="display: flex; justify-content: center;"></div>
@@ -19,7 +19,7 @@
                     <div style="font-size: 30px;">No art selected</div>
                 </div> -->
                 <div v-show="status == Status.STATUS_ERROR">
-                    <div style="font-size: 30px;">Error loading art. Please try a different piece.</div>
+                    <div class="status">Error loading art.</div>
                 </div>
                 <!-- <div v-show="status == Status.STATUS_NO_INTERNET">
                     <div style="font-size: 30px;">No internet connection. Please connect to wifi.</div>
@@ -29,13 +29,13 @@
                 </div> -->
 
                 <div v-show="status == Status.STATUS_DISPLAY">
-                    <div class="title">{{ token_meta?.entity?.name }}</div>
                     <div class="grid">
-                        <div class="col" style="max-width:650px; text-align: left;">
+                        <div class="col" style="flex-basis: 61.8%; text-align: left;">
+                            <div class="title">{{ token_meta?.entity?.name }}</div>
                             <div style="margin-bottom: 22px;">{{ token_meta?.entity?.artist }}</div>
-                            <div>{{ token_meta?.entity?.description }}</div>
+                            <div :class="description_class" style="white-space: pre-line;">{{ token_meta?.entity?.description }}</div>
                         </div>
-                        <div class="col" style="display: flex; justify-content: center; padding-top: 25px;">
+                        <div class="col" style="display: flex; justify-content: center; align-items: center; flex-basis: 38.2%;">
                             <QrcodeVue :value="token_meta?.entity?.public_link" :size="220" level="H" />
                         </div>
                     </div>
@@ -86,6 +86,19 @@ const status = computed(() => {
     return Status.STATUS_DISPLAY
 })
 
+const description_class = computed(() => {
+    if(!token_meta?.value?.entity?.description) {
+        return "description-medium"
+    }
+    if (token_meta.value?.entity?.description?.length > 1200) {
+        return "description-xsmall"
+    } 
+    if (token_meta.value?.entity?.description?.length > 800) {
+        return "description-small"
+    }
+    return "description-medium"
+})
+
 onMounted(() => {
     const token_meta_id = route?.params?.token_meta_id;
     if (!token_meta_id || typeof token_meta_id != "string") return;
@@ -94,6 +107,7 @@ onMounted(() => {
         //fade in, update data
         setTimeout(() => {
             token_meta.value = t
+            console.log("desc", token_meta.value?.entity?.description?.length)
             show_content.value = true;
             loading.value = false;
         }, 500)
@@ -116,7 +130,18 @@ body {
     margin: 0px;
     color: #FFFFFF;
     font-size: 18px;
+}
 
+.description-medium {
+    font-size: 18px;
+}
+
+.description-small {
+    font-size: 16px;
+}
+
+.description-xsmall {
+    font-size: 14px;
 }
 
 .container {
@@ -155,11 +180,6 @@ body {
     margin-top: -0.5rem;
 }
 
-.col {
-    flex-grow: 1;
-    flex-basis: 0;
-    padding: 0.3rem 0.5rem 0.5rem 0.5rem;
-}
 
 #scan-qrcode img {
     border: 1.5px solid rgba(255, 255, 255, 1);
@@ -221,5 +241,9 @@ body {
     100% {
         transform: rotate(360deg);
     }
+}
+
+.status {
+    font-size: 30px;
 }
 </style>
