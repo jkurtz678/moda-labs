@@ -32,8 +32,8 @@
                     <div class="grid">
                         <div class="col" style="flex-basis: 61.8%; text-align: left;">
                             <div class="title">{{ token_meta?.entity?.name }}</div>
-                            <div style="margin-bottom: 22px;">{{ token_meta?.entity?.artist }}</div>
-                            <div :class="description_class" style="white-space: pre-line; text-align: justify;">{{ token_meta?.entity?.description }}</div>
+                            <div class="artist" style="margin-bottom: 22px;">{{ token_meta?.entity?.artist }}</div>
+                            <div :class="description_class" style="white-space: pre-line; text-align: justify">{{ token_meta?.entity?.description }}</div>
                         </div>
                         <div class="col" style="display: flex; justify-content: center; align-items: center; flex-basis: 38.2%;">
                             <QrcodeVue :value="token_meta?.entity?.public_link" :size="220" level="H" />
@@ -170,6 +170,10 @@ body {
 .title {
     text-align: left;
     font-size: 40px;
+    font-weight: bold;
+}
+.artist {
+    font-weight: bold;
 }
 
 .grid {
