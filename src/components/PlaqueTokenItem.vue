@@ -166,7 +166,7 @@ const previewPlaque = () => {
 .card-flex-container {
   display: flex;
   align-items: top;
-  max-width: 658px;
+  max-width: 758px;
 }
 
 .image {
