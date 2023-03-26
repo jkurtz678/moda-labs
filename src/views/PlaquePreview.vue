@@ -33,7 +33,7 @@
                         <div class="col" style="flex-basis: 61.8%; text-align: left;">
                             <div class="title">{{ token_meta?.entity?.name }}</div>
                             <div style="margin-bottom: 22px;">{{ token_meta?.entity?.artist }}</div>
-                            <div :class="description_class" style="white-space: pre-line;">{{ token_meta?.entity?.description }}</div>
+                            <div :class="description_class" style="white-space: pre-line; text-align: justify;">{{ token_meta?.entity?.description }}</div>
                         </div>
                         <div class="col" style="display: flex; justify-content: center; align-items: center; flex-basis: 38.2%;">
                             <QrcodeVue :value="token_meta?.entity?.public_link" :size="220" level="H" />
@@ -102,8 +102,8 @@ const description_class = computed(() => {
 onMounted(() => {
     const token_meta_id = route?.params?.token_meta_id;
     if (!token_meta_id || typeof token_meta_id != "string") return;
-    show_content.value = false
     getTokenMetaByIDWithListener(token_meta_id, (t) => {
+        show_content.value = false
         //fade in, update data
         setTimeout(() => {
             token_meta.value = t
