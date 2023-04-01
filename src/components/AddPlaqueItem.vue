@@ -36,7 +36,13 @@ const in_list = computed({
 </script>
 
 <style>
+.card-flex-container {
+    display: flex;
+    flex-wrap: nowrap;
+}
+
 .card-flex-container:hover {
     background-color: #f5f5f5;
+
 }
 </style>

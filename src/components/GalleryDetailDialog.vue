@@ -1,49 +1,51 @@
 <template>
     <div class="gallery-dialog">
         <el-dialog v-model="show_dialog" title="Edit Gallery" @close="router.push({ name: 'gallery-list' })" top="2vh"
-            :width="screen_type == 'lg' ? '35%' : '60%'" :fullscreen="screen_type == 'xs'">
-            <el-form ref="form_ref" :model="gallery" :rules="rules">
-                <el-form-item prop="name" style="max-width: 280px; margin-bottom: 1em;">
-                    <div>Gallery Name</div>
-                    <el-input v-model="gallery.name" placeholder="Name" />
-                </el-form-item>
-                <el-row style="display: block;">
-                    <div class="header">Users</div>
-                    <el-table :data="account_list" style="width: 100%">
-                        <el-table-column prop="entity.email" label="Email" />
-                        <el-table-column fixed="right" label="" width="50">
-                            <template #default="scope">
-                                <div v-if="scope.$index">
-                                    <el-button link type="primary" size="small" icon="close"
-                                        @click="removeUser(scope.$index)">
-                                    </el-button>
-                                </div>
-                            </template>
-                        </el-table-column>
-                    </el-table>
-                    <div>{{ `Users in gallery: ${gallery.user_id_list.length}` }}</div>
-                    <div style="display: flex; align-items: center; padding: 1em 0em; max-width: 350px;">
-                        <el-input v-model="add_user_email" placeholder="Email"></el-input>
-                        <el-button icon="Plus" color="#000000" size="small" style="margin-left: 1em;" @click="addUser">
-                            Add user
-                        </el-button>
+            width="75%" :fullscreen="screen_type == 'xs'">
+            <div style="max-width: 500px; margin: 0 auto;">
+                <el-form ref="form_ref" :model="gallery" :rules="rules">
+                    <el-form-item prop="name" style="max-width: 280px; margin-bottom: 2em;">
+                        <div class="header">Gallery Name</div>
+                        <el-input v-model="gallery.name" placeholder="Name" />
+                    </el-form-item>
+                    <el-row style="display: block; margin-bottom: 1em">
+                        <div class="header">Users</div>
+                        <el-table :data="account_list" style="width: 100%">
+                            <el-table-column prop="entity.email" label="Email" />
+                            <el-table-column fixed="right" label="" width="50">
+                                <template #default="scope">
+                                    <div v-if="scope.$index">
+                                        <el-button link type="primary" size="small" icon="close"
+                                            @click="removeUser(scope.$index)">
+                                        </el-button>
+                                    </div>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                        <div>{{ `Users in gallery: ${gallery.user_id_list.length}` }}</div>
+                        <div style="display: flex; align-items: center; padding: 1em 0em; max-width: 350px;">
+                            <el-input v-model="add_user_email" placeholder="Email"></el-input>
+                            <el-button icon="Plus" color="#000000" size="small" style="margin-left: 1em;" @click="addUser">
+                                Add user
+                            </el-button>
+                        </div>
+                    </el-row>
+                    <div style="margin-bottom: 2em;">
+                        <div class="header">Plaques</div>
+                        <PlaqueSelectList v-model:selected_plaque_id_list="gallery.plaque_id_list"
+                            :plaque_list="plaque_list">
+                        </PlaqueSelectList>
+                        <div>{{ `Plaques in gallery: ${gallery.plaque_id_list.length}` }}</div>
                     </div>
-                </el-row>
-                <div style="margin-bottom: 1em;">
-                    <div class="header">Plaque</div>
-                    <PlaqueSelectList v-model:selected_plaque_id_list="gallery.plaque_id_list"
-                        :plaque_list="plaque_list">
-                    </PlaqueSelectList>
-                    <div>{{ `Plaques in gallery: ${gallery.plaque_id_list.length}` }}</div>
-                </div>
-                <div >
-                    <div class="header">Artwork</div>
-                    <TokenSelectList v-model:selected_token_meta_id_list="gallery.token_meta_id_list"
-                        :token_meta_list="token_meta_list" :max_height="350">
-                    </TokenSelectList>
-                    <div>{{ `Artwork in gallery: ${gallery.token_meta_id_list.length}` }}</div>
-                </div>
-            </el-form>
+                    <div>
+                        <div class="header">Artwork</div>
+                        <TokenSelectList v-model:selected_token_meta_id_list="gallery.token_meta_id_list"
+                            :token_meta_list="token_meta_list" :max_height="350">
+                        </TokenSelectList>
+                        <div>{{ `Artwork in gallery: ${gallery.token_meta_id_list.length}` }}</div>
+                    </div>
+                </el-form>
+            </div>
             <template #footer>
                 <div class="dialog-footer">
 
@@ -214,6 +216,7 @@ const removeUser = (i: number) => {
 
 .header {
     font-size: var(--el-font-size-large);
+    font-weight: bold;
 }
 
 .gallery-dialog {
