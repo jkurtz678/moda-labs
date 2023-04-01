@@ -1,6 +1,10 @@
 <template>
     <div class='subheader' style="display: flex; align-items: center;">
         <el-input v-model="search_filter" :prefix-icon="Search" placeholder="Search plaques" style="max-width: 350px" clearable></el-input>
+        <el-select v-model="filter_by_gallery" placeholder="Filter by gallery" style="margin-left: 10px; width: 260px;">
+            <el-option :label="'All plaques'" value="" />
+            <el-option v-for="gallery in gallery_store.gallery_list" :key="gallery.id" :label="`Filter by gallery - ${gallery.entity.name}`" :value="gallery.id" />
+        </el-select>
         <el-button icon="Camera" type="info" @click="router.push('qr-scan')" style="margin-left: 10px;" size="small">Scan</el-button>
     </div>
     <div style="padding-bottom: 40px;"></div>
@@ -30,12 +34,13 @@
 
 <script setup lang="ts">
 import PlaqueCard from '@/components/PlaqueCard.vue'
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { usePlaqueStore} from "@/stores/plaque"
 import { useRouter } from 'vue-router';
 import { createPlaque } from "@/api/plaque"
 import { Timestamp } from "firebase/firestore"
-import { useAccountStore } from "@/stores/account"
+import { useAccountStore } from "@/stores/account";
+import { useGalleryStore } from "@/stores/gallery";
 import { ElMessage } from 'element-plus'
 import useBreakpoints from "@/composables/breakpoints"
 import type { FirestoreDocument, Plaque } from "@/types/types"
@@ -46,7 +51,13 @@ const { width, screen_type } = useBreakpoints();
 const show_add_plaque_dialog = ref(false);
 const router = useRouter();
 const account_store = useAccountStore();
+const gallery_store = useGalleryStore();
 const search_filter = ref("")
+const filter_by_gallery = ref<string>(localStorage.getItem('filter_by_gallery') || "")
+
+watch(filter_by_gallery, (newVal) => {
+    localStorage.setItem('filter_by_gallery', newVal)
+})
 
 const plaque_store = usePlaqueStore();
 const createTestPlaque = async () => {
@@ -81,7 +92,10 @@ const filtered_plaques = computed(() => {
     ret_plaques = ret_plaques.filter(plaque => {
         return plaque.entity.name || plaque.entity.user_id || plaque.entity.token_meta_id_list.length > 0
     }) 
-    
+
+    if(filter_by_gallery.value) {
+        ret_plaques = ret_plaques.filter(p => gallery_store.gallery_list.find(g => g.id == filter_by_gallery.value)?.entity.plaque_id_list.includes(p.id))
+    } 
     
     if(!search_filter) {
         return ret_plaques;
