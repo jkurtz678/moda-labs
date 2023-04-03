@@ -1,6 +1,6 @@
 
 import { BaseEntity, type FirestoreDocument, type Gallery } from "@/types/types"
-import { addDoc, doc, getDoc, getFirestore, onSnapshot, setDoc } from "firebase/firestore";
+import { Timestamp, addDoc, doc, getDoc, getFirestore, onSnapshot, setDoc, updateDoc } from "firebase/firestore";
 import firebaseConfig from "../firebaseConfig"
 import { collection, query, getDocs } from "firebase/firestore";
 
@@ -23,14 +23,30 @@ export const saveGallery = async (gallery: Gallery): Promise<FirestoreDocument<G
     const document = await addDoc(gallery_ref, {
         ...BaseEntity.createBaseEntity(),
         ...gallery
-    })    
+    })
     const snapshot = await getDoc(document)
     return { id: snapshot.id, entity: snapshot.data() as Gallery }
 }
 
 // updateGallery updates a gallery in the database
-export const updateGallery = async (gallery_id: string, gallery: Partial<Gallery>): Promise<FirestoreDocument<Gallery>> => {
-    await setDoc(doc(db, "gallery", gallery_id), gallery)
+export const updateGallery = async (gallery_id: string, update_data: Partial<Gallery>): Promise<FirestoreDocument<Gallery>> => {
+    update_data.updated_at = Timestamp.now();
+    const ref = doc(db, "gallery", gallery_id)
+    await updateDoc(ref, update_data)
+    const snapshot = await getDoc(ref);
+    return { id: snapshot.id, entity: snapshot.data() as Gallery }
+}
+
+// getGalleryByID returns a gallery by id
+export const getGalleryByID = async (gallery_id: string): Promise<FirestoreDocument<Gallery>> => {
     const snapshot = await getDoc(doc(db, "gallery", gallery_id))
     return { id: snapshot.id, entity: snapshot.data() as Gallery }
+}
+
+// addTokenToGallery adds a token to a gallery
+export const addTokenToGallery = async (gallery_id: string, token_meta_id: string): Promise<FirestoreDocument<Gallery>> => {
+    const gallery = await getGalleryByID(gallery_id);
+    return await updateGallery(gallery_id,
+        { token_meta_id_list: [...gallery.entity.token_meta_id_list, token_meta_id] }
+    );
 }

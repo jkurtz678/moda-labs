@@ -55,6 +55,7 @@ export interface Plaque extends BaseDocument {
 export interface TokenMeta extends BaseDocument {
     name: string; // name of piece
     artist?: string; // name of artist
+    artist_social_link?: string; // social media url for artist
     description?: string; // description of artwork
     public_link?: string; // link to public site for art, such as opensea listing. Embedded in plaque qr code link
     media_id: string; // uid of media in firebase storage

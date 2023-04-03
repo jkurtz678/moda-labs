@@ -1,13 +1,15 @@
 <template>
-    <el-form ref="formRef" :model="form" :rules="rules" label-position="left" label-width="180px"
-        style="max-width: 750px">
-        <el-form-item label="Artwork title" style="max-width: 550px" prop="name">
+    <el-form ref="formRef" :model="form" :rules="rules" label-position="left" label-width="180px" style="max-width: 750px">
+        <el-form-item label="Artwork Title" style="max-width: 550px" prop="name">
             <el-input v-model="form.name" />
         </el-form-item>
-        <el-form-item label="Artist name" style="max-width: 550px" prop="artist">
+        <el-form-item label="Artist Name" style="max-width: 550px" prop="artist">
             <el-input v-model="form.artist" />
         </el-form-item>
-        <el-form-item label="Blockchain">
+        <el-form-item label="Artist Social Media Link" style="max-width: 550px" prop="artist_social_link">
+            <el-input v-model="form.artist_social_link" />
+        </el-form-item>
+        <el-form-item label="Link to Blockchain">
             <el-radio-group v-model="form.blockchain">
                 <el-radio label="off_chain">Off-chain</el-radio>
                 <el-radio label="ethereum">Ethereum</el-radio>
@@ -20,11 +22,16 @@
         <el-form-item v-if="form.blockchain == 'ethereum'" label="Token ID" style="max-width: 550px;" prop="token_id">
             <el-input v-model="form.token_id" />
         </el-form-item>
-        <el-form-item label="Description" prop="description">
+        <el-form-item label="Plaque Description" prop="description">
             <el-input v-model="form.description" type="textarea" rows="3" />
         </el-form-item>
-        <el-form-item label="Public Link" prop="public_link">
+        <el-form-item label="Plaque QR Code Link" prop="public_link">
             <el-input v-model="form.public_link" />
+        </el-form-item>
+        <el-form-item label="Add to Gallery" prop="galleries">
+            <el-select v-model="selected_galleries" multiple placeholder="N/A" filterable>
+                <el-option v-for="gallery in gallery_store.gallery_list" :key="gallery.id" :label="`${gallery.entity.name}`" :value="gallery.id" />
+            </el-select>
         </el-form-item>
         <el-form-item v-if="!props.token_meta_id">
             <el-upload class="upload-demo" :auto-upload="false" action="" :on-remove="handleRemove"
@@ -55,12 +62,13 @@
 import { reactive, ref, onMounted } from "vue";
 import type { FormInstance, FormRules } from "element-plus";
 import { createTokenMeta, updateTokenMeta } from "@/api/token-meta";
+import { addTokenToGallery } from "@/api/gallery";
 import { uploadFile } from "@/api/storage";
-import { type TokenMeta, Blockchain, TokenPlatform } from "@/types/types";
+import { type TokenMeta, Blockchain, TokenPlatform, type FirestoreDocument, type Gallery } from "@/types/types";
 import { useAccountStore } from "@/stores/account"
 import { useTokenMetaStore } from "@/stores/token-meta"
+import { useGalleryStore } from "@/stores/gallery";
 import { showError } from "@/util/util";
-
 import type { UploadProps, UploadUserFile } from "element-plus";
 import { Timestamp } from "firebase/firestore"
 import { ElMessage, ElMessageBox } from 'element-plus'
@@ -75,6 +83,7 @@ const file_uid = ref<string>();
 const form = ref<TokenMeta>({
     name: "",
     artist: "",
+    artist_social_link: "",
     description: "",
     public_link: "",
     created_at: Timestamp.now(),
@@ -96,7 +105,9 @@ const rules = reactive<FormRules>({
 });
 const loading = ref(false);
 const loading_progress = ref("0%");
+const selected_galleries = ref<string[]>([]);
 const account_store = useAccountStore();
+const gallery_store = useGalleryStore();
 const token_meta_store = useTokenMetaStore();
 
 onMounted(() => {
@@ -170,23 +181,43 @@ const startFileUpload = (formEl: FormInstance) => {
         });
 }
 
-const uploadSuccess = (formEl: FormInstance, file: UploadUserFile) => {
+const uploadSuccess = async (formEl: FormInstance, file: UploadUserFile) => {
     form.value.media_id = `${file.uid}`
     form.value.media_type = `.${file.name.split(".").pop()}`
-    console.log("upload success, sending form: ", form);
-    createTokenMeta(form.value)
-        .then((r) => {
-            formEl.resetFields();
-            file_list.value = [];
-            ElMessage({
-                type: 'success',
-                message: 'Successfully submitted token',
+
+    let new_token_meta: FirestoreDocument<TokenMeta>;
+    try {
+        new_token_meta = await createTokenMeta(form.value)
+    } catch (err) {
+        showError(`Error uploading metadata to moda archive - ${err}`)
+        loading.value = false;
+        return
+    }
+
+    // if the user selected galleries we need to add the token to them
+    if (selected_galleries.value?.length) {
+        try {
+            const gallery_promise_list: Promise<FirestoreDocument<Gallery>>[] = [];
+            selected_galleries.value.forEach(async (gallery_id) => {
+                gallery_promise_list.push(addTokenToGallery(gallery_id, new_token_meta.id))
             })
-        })
-        .catch((err) => {
-            showError(`Error uploading metadata to moda archive - ${err}`);
-        })
-        .finally(() => (loading.value = false))
+            await Promise.all(gallery_promise_list);
+
+        } catch (err) {
+            showError(`Error adding token to gallery - ${err}`)
+            loading.value = false;
+            return
+        }
+    }
+
+    formEl.resetFields();
+    file_list.value = [];
+    selected_galleries.value = [];
+    ElMessage({
+        type: 'success',
+        message: 'Successfully submitted token',
+    })
+    loading.value = false;
 }
 
 const updateToken = (token_meta_id: string) => {
