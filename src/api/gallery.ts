@@ -17,6 +17,14 @@ export const getGalleriesForUserIDWithListener = async (user_id: string, onChang
     })
 }
 
+// getAllGalleries returns a list of all galleries
+export const getAllGalleries = async (): Promise<FirestoreDocument<Gallery>[]> => {
+    const query_snapshot = await getDocs(gallery_ref)
+    return query_snapshot.docs.map(s => ({
+        id: s.id, entity: s.data() as Gallery,
+    }))
+}
+
 
 // saveGallery saves a gallery to the database
 export const saveGallery = async (gallery: Gallery): Promise<FirestoreDocument<Gallery>> => {

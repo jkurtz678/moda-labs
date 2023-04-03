@@ -8,7 +8,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import { Timestamp } from "firebase/firestore"
 import { useAccountStore } from "@/stores/account"
 import { createTokenMeta } from '@/api/token-meta';
-import { addTokenToGallery } from '@/api/gallery';
+import { addTokenToGallery, getAllGalleries } from '@/api/gallery';
 
 vi.mock("@/api/storage", () => ({
     uploadFile: vi.fn(() => {
@@ -18,11 +18,14 @@ vi.mock("@/api/storage", () => ({
 
 vi.mock("@/api/token-meta", () => ({
     createTokenMeta: vi.fn(() => {
-        return Promise.resolve({id: "test-id", entity: {name: "test-name", artist: "test-artist", created_at: Timestamp.now(), updated_at: Timestamp.now()}});
+        return Promise.resolve({ id: "test-id", entity: { name: "test-name", artist: "test-artist", created_at: Timestamp.now(), updated_at: Timestamp.now() } });
     })
 }));
 
 vi.mock("@/api/gallery", () => ({
+    getAllGalleries: vi.fn(() => {
+        return Promise.resolve([{ id: "load-all-test", entity: { name: "test-name", created_at: Timestamp.now(), updated_at: Timestamp.now() } }]);
+    }),
     addTokenToGallery: vi.fn(() => {
         return Promise.resolve();
     })
@@ -33,19 +36,22 @@ const mockRouter = createRouter({ history: createWebHistory(), routes: [] });
 describe("SubmitTokenForm", () => {
     let wrapper: VueWrapper<any>;
     beforeEach(async () => {
-        wrapper = await mount(SubmitTokenForm, {
-            global: {
-                plugins: [
-                    ElementPlus,
-                    createTestingPinia({ createSpy: vi.fn }),
-                    mockRouter
-                ],
-            },
-        });
+        // setup testing pinia
+        const test_pinia = createTestingPinia({ createSpy: vi.fn })
 
         // setup test account
         const account_store = useAccountStore();
         account_store.account = { id: "test-id", entity: { email: "test@test.com", created_at: Timestamp.now(), updated_at: Timestamp.now() } };
+
+        wrapper = await mount(SubmitTokenForm, {
+            global: {
+                plugins: [
+                    ElementPlus,
+                    test_pinia,
+                    mockRouter
+                ],
+            },
+        });
 
         // reset spies
         // @ts-ignore
@@ -55,14 +61,15 @@ describe("SubmitTokenForm", () => {
         // @ts-ignore
         addTokenToGallery.mockClear();
 
-
         await wrapper.vm.$nextTick()
     });
 
-    it("mounts properly", async () => {
+    it("mounts properly and loads all galleries", async () => {
         expect(wrapper).toBeTruthy();
+        expect(getAllGalleries).toHaveBeenCalledTimes(1);
+        expect(wrapper.vm.gallery_list).toHaveLength(1);
+        expect(wrapper.vm.gallery_list[0].id).toBe("load-all-test");
     });
-
     // this is currently not working, validation passes even with invalid data, it exits on file count check so thats why test still passes
     it("errors with invalid data", async () => {
         wrapper.vm.form.name = "";
@@ -89,7 +96,7 @@ describe("SubmitTokenForm", () => {
         wrapper.vm.form.name = "Test Artwork";
         wrapper.vm.form.artist = "Test Artist";
         wrapper.vm.loading = true;
-        await wrapper.vm.uploadSuccess(wrapper.vm.formRef, { name: "test-file.jpg", size: 1000, type: "image/jpeg" } )
+        await wrapper.vm.uploadSuccess(wrapper.vm.formRef, { name: "test-file.jpg", size: 1000, type: "image/jpeg" })
         expect(createTokenMeta).toHaveBeenCalledTimes(1);
 
         //addTokenToGallery is not called because no galleries are selected
@@ -100,7 +107,7 @@ describe("SubmitTokenForm", () => {
         expect(wrapper.vm.form.artist).toBe("");
         expect(wrapper.vm.file_list).toHaveLength(0);
         expect(wrapper.vm.selected_galleries).toHaveLength(0);
-        expect(wrapper.vm.loading).toBe(false); 
+        expect(wrapper.vm.loading).toBe(false);
     });
 
     it("uploadSuccess with galleries", async () => {
@@ -108,7 +115,7 @@ describe("SubmitTokenForm", () => {
         wrapper.vm.form.artist = "Test Artist";
         wrapper.vm.loading = true;
         wrapper.vm.selected_galleries = ["test-gallery", "test-gallery-2"];
-        await wrapper.vm.uploadSuccess(wrapper.vm.formRef, { name: "test-file.jpg", size: 1000, type: "image/jpeg" } )
+        await wrapper.vm.uploadSuccess(wrapper.vm.formRef, { name: "test-file.jpg", size: 1000, type: "image/jpeg" })
         expect(createTokenMeta).toHaveBeenCalledTimes(1);
         expect(addTokenToGallery).toHaveBeenCalledTimes(2);
 
@@ -117,6 +124,6 @@ describe("SubmitTokenForm", () => {
         expect(wrapper.vm.form.artist).toBe("");
         expect(wrapper.vm.file_list).toHaveLength(0);
         expect(wrapper.vm.selected_galleries).toHaveLength(0);
-        expect(wrapper.vm.loading).toBe(false); 
+        expect(wrapper.vm.loading).toBe(false);
     })
 });

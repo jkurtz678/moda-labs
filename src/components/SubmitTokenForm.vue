@@ -28,9 +28,9 @@
         <el-form-item label="Plaque QR Code Link" prop="public_link">
             <el-input v-model="form.public_link" />
         </el-form-item>
-        <el-form-item label="Add to Gallery" prop="galleries">
+        <el-form-item v-if="!props.token_meta_id" label="Add to Gallery" prop="galleries">
             <el-select v-model="selected_galleries" multiple placeholder="N/A" filterable>
-                <el-option v-for="gallery in gallery_store.gallery_list" :key="gallery.id" :label="`${gallery.entity.name}`" :value="gallery.id" />
+                <el-option v-for="gallery in gallery_list" :key="gallery.id" :label="`${gallery.entity.name}`" :value="gallery.id" />
             </el-select>
         </el-form-item>
         <el-form-item v-if="!props.token_meta_id">
@@ -67,11 +67,11 @@ import { uploadFile } from "@/api/storage";
 import { type TokenMeta, Blockchain, TokenPlatform, type FirestoreDocument, type Gallery } from "@/types/types";
 import { useAccountStore } from "@/stores/account"
 import { useTokenMetaStore } from "@/stores/token-meta"
-import { useGalleryStore } from "@/stores/gallery";
 import { showError } from "@/util/util";
 import type { UploadProps, UploadUserFile } from "element-plus";
 import { Timestamp } from "firebase/firestore"
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { getAllGalleries } from "@/api/gallery";
 
 interface SubmitTokenFormProps {
     token_meta_id?: string;
@@ -107,12 +107,17 @@ const loading = ref(false);
 const loading_progress = ref("0%");
 const selected_galleries = ref<string[]>([]);
 const account_store = useAccountStore();
-const gallery_store = useGalleryStore();
 const token_meta_store = useTokenMetaStore();
+const gallery_list = ref<FirestoreDocument<Gallery>[]>([]);
 
 onMounted(() => {
     if (props.token_meta_id) {
         form.value = { ...token_meta_store.all_token_metas[props.token_meta_id].entity }
+    } else {
+        // only show galleries for new tokens for now
+        getAllGalleries().then((galleries) => {
+            gallery_list.value = galleries;
+        })
     }
 })
 
