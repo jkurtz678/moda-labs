@@ -237,4 +237,7 @@ const removeUser = (i: number) => {
     overflow-y: auto;
     margin: 4vh auto;
 }
+:deep(.el-table .cell){
+    padding: 0px 0px;
+}
 </style>
