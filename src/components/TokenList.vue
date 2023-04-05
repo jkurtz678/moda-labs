@@ -24,7 +24,7 @@
     <RouterView></RouterView>
 </template>
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, watch} from "vue";
 import PlaqueTokenItem from "./PlaqueTokenItem.vue";
 import { useTokenMetaStore } from "../stores/token-meta";
 import { Search } from '@element-plus/icons-vue'
@@ -34,7 +34,11 @@ const router = useRouter();
 
 const token_meta_store = useTokenMetaStore()
 const search_filter = ref("")
-const sort_order = ref("name")
+const sort_order = ref(localStorage.getItem('token_list_sort_order') || "name")
+
+watch(sort_order, (newVal) => {
+    localStorage.setItem('token_list_sort_order', newVal)
+})
 
 const tokens = computed(() => {
     const store_tokens = token_meta_store.sorted_all_token_metas;
