@@ -35,7 +35,10 @@
                 </a>
               </div>
               <div>
-                <a v-if="token_meta.public_link" :href="token_meta.public_link" target="_blank">Qr-code link</a>
+                <a v-if="token_meta.public_link" :href="qr_code_link" target="_blank">QR Code Link</a>
+              </div>
+              <div>
+                <a v-if="token_meta.artist_social_link" :href="artist_social_link" target="_blank">Artist Social Media Link</a>
               </div>
             </div>
           </div>
@@ -95,6 +98,27 @@ const token_description = computed(() => {
   }
   return `${props.token_meta.entity.description.substring(0, 200)}...`;
 });
+
+const qr_code_link = computed(() => {
+  const link = props.token_meta.entity.public_link
+  // if link doesnt start with https:// add it
+  if(link && !link.startsWith("https://")) {
+    return `https://${link}`
+  }
+
+  return link
+})
+
+
+const artist_social_link = computed(() => {
+  const link = props.token_meta.entity.artist_social_link
+  // if link doesnt start with https:// add it
+  if(link && !link.startsWith("https://")) {
+    return `https://${link}`
+  }
+
+  return link
+})
 
 const platform = computed(() => {
   return getPlatformDisplay(props.token_meta.entity.platform)
