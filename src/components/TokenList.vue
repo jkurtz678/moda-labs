@@ -16,15 +16,16 @@
                     </el-select>
                 </div>
             </template>
-            <div v-if="tokens.length == 0">No artwork found</div>
-            <PlaqueTokenItem v-for="token in tokens" :token_meta="token">
+            <div v-if="filtered_tokens.length == 0">No artwork found</div>
+            <PlaqueTokenItem v-for="token in paginated_tokens" :token_meta="token">
             </PlaqueTokenItem>
+            <el-pagination v-model:current-page="page" layout="prev, pager, next" hide-on-single-page :page-size="limit" :total="filtered_tokens.length" />
         </el-card>
     </div>
     <RouterView></RouterView>
 </template>
 <script setup lang="ts">
-import { computed, ref, watch} from "vue";
+import { computed, ref, watch } from "vue";
 import PlaqueTokenItem from "./PlaqueTokenItem.vue";
 import { useTokenMetaStore } from "../stores/token-meta";
 import { Search } from '@element-plus/icons-vue'
@@ -36,20 +37,30 @@ const token_meta_store = useTokenMetaStore()
 const search_filter = ref("")
 const sort_order = ref(localStorage.getItem('token_list_sort_order') || "name")
 
+const limit = ref(10);
+const page = ref(1);
+
 watch(sort_order, (newVal) => {
     localStorage.setItem('token_list_sort_order', newVal)
 })
 
-const tokens = computed(() => {
-    const store_tokens = token_meta_store.sorted_all_token_metas;
-    const filtered_tokens = store_tokens.filter((token) =>
+const page_count = computed(() => {
+    return Math.ceil(token_meta_store.sorted_all_token_metas.length / limit.value);
+})
+
+const all_tokens = computed(() => {
+    return token_meta_store.sorted_all_token_metas;
+})
+
+const filtered_tokens = computed(() => {
+    let filtered_tokens = all_tokens.value.filter((token) =>
         token.entity.artist?.toLowerCase().includes(search_filter.value.toLowerCase()) || token.entity.name?.toLowerCase().includes(search_filter.value.toLowerCase())
     );
 
     if (sort_order.value === "name") {
-        return filtered_tokens.sort((a, b) => a.entity.name.localeCompare(b.entity.name));
+        filtered_tokens = filtered_tokens.sort((a, b) => a.entity.name.localeCompare(b.entity.name));
     } else if (sort_order.value === "created_at") {
-        return filtered_tokens.sort((a, b) => {
+        filtered_tokens = filtered_tokens.sort((a, b) => {
             // if both art null return 0
             if (a.entity.created_at == null && b.entity.created_at == null) {
                 return 0;
@@ -66,8 +77,17 @@ const tokens = computed(() => {
             return b.entity.created_at.seconds - a.entity.created_at.seconds
         });
     }
+    return filtered_tokens
+})
 
-    return [];
+const paginated_tokens = computed(() => {
+   const tokens = filtered_tokens.value; 
+
+    const start_index = (page.value-1) * limit.value;
+    const end_index = start_index + limit.value;
+    const subset = tokens.slice(start_index, end_index);
+
+    return subset;
 })
 
 </script>
