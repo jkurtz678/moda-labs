@@ -1,5 +1,5 @@
 <template>
-    <div style="display: flex; justify-content: center">
+    <div style="display: flex; justify-content: center; height: 100%;">
         <el-card class="container-card">
             <template #header>
                 <div class="card-header">
@@ -17,9 +17,14 @@
                 </div>
             </template>
             <div v-if="filtered_tokens.length == 0">No artwork found</div>
-            <PlaqueTokenItem v-for="token in paginated_tokens" :token_meta="token">
-            </PlaqueTokenItem>
-            <el-pagination v-model:current-page="page" layout="prev, pager, next" hide-on-single-page :page-size="limit" :total="filtered_tokens.length" />
+            <div style="overflow-y: auto; height: 100%; padding-bottom: 35px;">
+                <PlaqueTokenItem v-for="token in paginated_tokens" :token_meta="token">
+                </PlaqueTokenItem>
+            </div>
+            <div style="position: absolute; bottom: 0px; left: 0px; right: 0px; background-color: white; padding: 5px; 0px">
+            <el-pagination  v-model:current-page="page" layout="prev, pager, next" hide-on-single-page :page-size="limit"
+                :total="filtered_tokens.length" />
+                </div>
         </el-card>
     </div>
     <RouterView></RouterView>
@@ -81,9 +86,9 @@ const filtered_tokens = computed(() => {
 })
 
 const paginated_tokens = computed(() => {
-   const tokens = filtered_tokens.value; 
+    const tokens = filtered_tokens.value;
 
-    const start_index = (page.value-1) * limit.value;
+    const start_index = (page.value - 1) * limit.value;
     const end_index = start_index + limit.value;
     const subset = tokens.slice(start_index, end_index);
 
@@ -96,6 +101,9 @@ const paginated_tokens = computed(() => {
     min-width: 750px;
     border-radius: 18px;
     height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 @media only screen and (max-width: 750px) {
@@ -110,5 +118,12 @@ const paginated_tokens = computed(() => {
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+:deep(.el-card__body) {
+    padding-top: 0px;
+    padding-bottom: 10px;
+    overflow-y: auto;
+    flex-grow: 1;
 }
 </style>
