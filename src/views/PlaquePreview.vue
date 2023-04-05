@@ -30,12 +30,12 @@
 
                 <div v-show="status == Status.STATUS_DISPLAY">
                     <div class="grid">
-                        <div class="col" style="flex-basis: 61.8%; text-align: left;">
+                        <div style="flex-basis: 61.8%; text-align: left;">
                             <div class="title">{{ token_meta?.entity?.name }}</div>
                             <div class="artist" style="margin-bottom: 22px;">{{ token_meta?.entity?.artist }}</div>
                             <div :class="description_class" style="white-space: pre-line; text-align: justify">{{ token_meta?.entity?.description }}</div>
                         </div>
-                        <div class="col" style="display: flex; justify-content: center; align-items: center; flex-basis: 38.2%;">
+                        <div style="display: flex; justify-content: center; align-items: center; flex-basis: 38.2%;">
                             <QrcodeVue :value="token_meta?.entity?.public_link" :size="220" level="H" />
                         </div>
                     </div>
@@ -132,17 +132,7 @@ body {
     font-size: 18px;
 }
 
-.description-medium {
-    font-size: 18px;
-}
 
-.description-small {
-    font-size: 16px;
-}
-
-.description-xsmall {
-    font-size: 14px;
-}
 
 .container {
     opacity: 0;
@@ -174,6 +164,18 @@ body {
 }
 .artist {
     font-weight: bold;
+}
+
+.description-medium {
+    font-size: 18px;
+}
+
+.description-small {
+    font-size: 16px;
+}
+
+.description-xsmall {
+    font-size: 14px;
 }
 
 .grid {
