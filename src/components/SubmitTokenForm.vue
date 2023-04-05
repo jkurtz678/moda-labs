@@ -28,7 +28,7 @@
         <el-form-item label="Plaque QR Code Link" prop="public_link">
             <el-input v-model="form.public_link" />
         </el-form-item>
-        <el-form-item v-if="!props.token_meta_id" label="Add to Gallery" prop="galleries">
+        <el-form-item v-if="!props.token_meta_id" label="Add to Gallery">
             <el-select v-model="selected_galleries" multiple placeholder="N/A" filterable>
                 <el-option v-for="gallery in gallery_list" :key="gallery.id" :label="`${gallery.entity.name}`" :value="gallery.id" />
             </el-select>
