@@ -1,8 +1,6 @@
 <template>
-  <el-container style="height: 100%">
-    <el-header class="header">
-      <Header></Header>
-    </el-header>
+  <el-container style="height: 100%; flex-direction: column;">
+    <Header></Header>
     <el-main style="background-color: #DAD9D7;">
       <RouterView v-if="initial_load_done"></RouterView>
     </el-main>
@@ -81,7 +79,7 @@ async function loadAppData(user_id: string) {
     .catch(err => (showError(`Error loading opensea minted tokens - ${err}`)))
   const opensea_wallet_token_promise = token_meta_store.loadOpenseaWalletTokenMetas(user_id)
     .catch(err => (showError(`Error loading opensea wallet tokens - ${err}`))) */
-  await Promise.all([plaque_promise, gallery_plaque_promise, archive_token_promise, gallery_token_promise ])
+  await Promise.all([plaque_promise, gallery_plaque_promise, archive_token_promise, gallery_token_promise])
 
   // delay opensea_wallet_load to possibly help with rate limit
   // await opensea_wallet_token_promise;
@@ -99,14 +97,6 @@ async function loadAppData(user_id: string) {
 </script>
 
 <style scoped>
-.header {
-  padding-top: 15px;
-  padding-bottom: 15px;
-  padding-left: 30px;
-  padding-right: 30px;
-  --el-header-height: 75px;
-}
-
 .el-main {
   --el-main-padding: 10px;
 }

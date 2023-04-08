@@ -133,7 +133,7 @@ const filtered_plaques = computed(() => {
 .subheader {
     background-color: white;
     position: fixed;
-    top: 75px;
+    top: 50px;
     left: 0px;
     right: 0px;
     padding: 0px 25px 10px;

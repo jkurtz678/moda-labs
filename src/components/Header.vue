@@ -1,7 +1,7 @@
 <template>
-    <div style="display: flex; align-items: center;">
+    <el-header class="header">
         <el-image v-if="screen_type != 'xs'" :src="getImageUrl('logo.png')"
-            style="width: 43px; height: 43px; margin-right: 2em">
+            style="width: 40px; height: 40px; margin-right: 2em">
         </el-image>
         <template v-if="router.currentRoute.value.name == 'qr-scan'">
             <div style="flex-grow: 1"></div>
@@ -16,7 +16,11 @@
                 <el-tab-pane label="Galleries" name="gallery-list"></el-tab-pane>
             </el-tabs>
             <div style="flex-grow: 1"></div>
-            <div v-if="screen_type != 'xs'" style="margin-right: 10px;">{{ toolbar_address }}<el-button v-if="account_store.is_user_admin" type="info" round size="small" style="margin-left: 8px">Admin</el-button></div>
+            <div v-if="screen_type != 'xs'" style="margin-right: 10px; display: flex; align-items: center;">
+                <div>{{ toolbar_address }}</div>
+                <el-button v-if="account_store.is_user_admin" type="info" round size="small"
+                    style="margin-left: 8px">Admin</el-button>
+            </div>
             <!--- beginning of view-as system -->
             <!-- <el-popover placement="bottom" :width="400" trigger="click">
                 <template #reference>
@@ -27,7 +31,7 @@
             </el-popover> -->
             <el-button @click="logout" style="margin-left: 1em;" :loading="logout_loading">Logout</el-button>
         </template>
-    </div>
+    </el-header>
 </template>
 
 <script setup lang="ts">
@@ -90,4 +94,16 @@ const getImageUrl = (filename: string) => {
 
 </script>
 
-<style scoped></style>
+<style scoped>
+.header {
+    padding: 0px 30px 0px 30px;
+    --el-header-height: 50px;
+    display: flex;
+    align-items: center;
+}
+
+:deep(.el-tabs__header) {
+    margin-bottom: 0px;
+    padding-bottom: 8px;
+}
+</style>
