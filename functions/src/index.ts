@@ -1,5 +1,9 @@
 'use-strict';
 //import { TokenMeta } from "../../src/types/types";
+import * as service_account_backup from "../service-account-backups.json";
+
+const { google } = require("googleapis");
+
 const functions = require('firebase-functions');
 const mkdirp = require('mkdirp');
 const admin = require('firebase-admin');
@@ -11,8 +15,8 @@ const fs = require('fs');
 const express = require('express')
 const cookieParser = require('cookie-parser')();
 const cors = require('cors')({ origin: true });
-const util = require('util');
-const exec = util.promisify(require('child_process').exec);
+//const util = require('util');
+//const exec = util.promisify(require('child_process').exec);
 const ffmpeg = require('fluent-ffmpeg');
 
 const app = express();
@@ -260,3 +264,33 @@ const admin_whitelist = [
     "9jtkHhU6XOVK2TUxYHawnP2yULD3" // jkurtz678@gmail.com live
 ];
 exports.app = functions.runWith({memory: "2GB", timeoutSeconds: 360}).https.onRequest(app);
+
+// backupFirestore
+const auth_client = new google.auth.JWT({
+    email: service_account_backup.client_email,
+    key: service_account_backup.private_key,
+    scopes: ["https://www.googleapis.com/auth/datastore", "https://www.googleapis.com/auth/cloud-platform"]
+});
+
+const firestore_client = google.firestore({
+    version: "v1beta2",
+    auth: auth_client
+});
+
+exports.backupFirestore = functions.pubsub.schedule('every day 00:00').onRun(async () => {
+    const project_id = process.env.GCP_PROJECT
+
+    const timestamp = new Date().toISOString()
+
+    console.log(`Starting to backup project ${project_id}`)
+
+    await auth_client.authorize();
+    return firestore_client.projects.databases.exportDocuments({
+        name: `projects/${project_id}/databases/(default)`,
+        requestBody: {
+            outputUriPrefix: `gs://${project_id}-firestore-backups/backups/${timestamp}`
+        }
+    })
+
+});
+
