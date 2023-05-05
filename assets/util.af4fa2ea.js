@@ -1,0 +1,1 @@
+import{v as r}from"./index.37282573.js";function o(e){r({message:e,type:"error",showClose:!0,duration:8e3})}function t(){return/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)}function a(){return["jkurtz678@gmail.com","natemohler@ucla.edu","natemohleriv@gmail.com","ruben@eastsideled.com"]}export{a as g,t as i,o as s};
