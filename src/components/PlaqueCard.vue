@@ -63,7 +63,7 @@
           <el-button @click="previewPlaque">Preview
             Plaque</el-button>
         </div> -->
-        <div style="padding: 1em 0em; display: flex; justify-content: space-between; align-items: center;" >
+        <div style="padding: 1em 0em; display: flex; justify-content: space-between; align-items: center;">
           <div v-if="plaque.entity.user_id">
             <div>Associated User ID:</div>
             <div>{{ plaque.entity.user_id }}</div>
@@ -71,6 +71,14 @@
           <div v-else>No associated user</div>
           <el-button v-if="plaque.entity.user_id" type="danger" plain @click="forgetPlaque">Forget Display</el-button>
           <!-- <el-button v-if="!plaque.entity.user_id && (!plaque.entity.token_meta_id_list || plaque.entity.token_meta_id_list.length === 0)" type="danger" plain @click="deleteEmptyPlaque">Delete Plaque</el-button> -->
+        </div>
+        <div>
+          <el-radio-group v-model="orientation" class="ml-4" style="display: flex; flex-direction: column; align-items: start;">
+            <el-radio label="landscape" size="small">Landscape</el-radio>
+            <el-radio label="portrait" size="small">Portrait</el-radio>
+            <el-radio label="landscape_reversed" size="small">Landscape Reversed</el-radio>
+            <el-radio label="portrait_reversed" size="small">Portrait Reversed</el-radio>
+          </el-radio-group>
         </div>
         <div style="display: flex; justify-content: end;">
           <el-button @click="plaque_view = 'detail'">Close<el-icon class="el-icon--right">
@@ -137,6 +145,25 @@ const plaque_tokens = computed(() => {
   let res = props.plaque.entity.token_meta_id_list.map(token_id => token_map[token_id])
   return res;
 })
+
+const orientation = computed({
+  get: () => {
+    return props.plaque.entity.orientation || "landscape";
+  },
+  set: (value) => {
+    updatePlaque(props.plaque.id, { orientation: value })
+      .then(() => {
+        plaque_store.plaque_map[props.plaque.id].entity.orientation = value;
+        ElMessage({
+          type: 'success',
+          message: 'Plaque orientation updated',
+        })
+      })
+      .catch((err) => {
+        showError(`Error updating plaque orientation - ${err}`);
+      });
+  },
+});
 
 const clearTokens = () => {
   ElMessageBox.confirm(`Are you sure you want to clear tokens for plaque '${props.plaque.entity.name}'?`, "Clear tokens", {

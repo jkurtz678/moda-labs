@@ -49,7 +49,16 @@ export interface Plaque extends BaseDocument {
     name: string; // name of plaque, given by user in order to remember 
     user_id: string; // user id of user currently paired with display, empty if no user is paired
     token_meta_id_list: string[]; // list of TokenMeta document ids, plaque will attempt to download and play this art in order
+    orientation: OrientationType;
 }
+
+export enum OrientationType {
+    Landscape = "landscape" ,
+    Portrait = "portrait",
+    LandscapeReversed = "landscape_reversed",
+    PortraitReversed = "portrait_reversed"
+}
+
 
 // TokenMeta contains metadata about a token stored in the archive
 export interface TokenMeta extends BaseDocument {
