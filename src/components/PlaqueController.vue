@@ -1,25 +1,17 @@
 <template>
     <div>
         <div class="controller-buttons">
-            <el-button circle text @click="sendCommand('playlist_previous')">
-                <el-icon :size="25">
-                    <DArrowLeft></DArrowLeft>
-                </el-icon>
+            <el-button circle text :loading="previous_loading" icon="DArrowLeft"
+                @click="previous_loading = true; sendCommand('playlist_previous')">
             </el-button>
-            <el-button circle text  @click="sendCommand('play')">
-                <el-icon :size="25">
-                    <VideoPlay></VideoPlay>
-                </el-icon>
+            <el-button circle text :loading="play_loading" icon="VideoPlay"
+                @click="play_loading = true; sendCommand('play')">
             </el-button>
-            <el-button circle text  @click="sendCommand('pause')">
-                <el-icon :size="25">
-                    <VideoPause></VideoPause>
-                </el-icon>
+            <el-button circle text icon="VideoPause" :loading="pause_loading"
+                @click="pause_loading = true; sendCommand('pause')">
             </el-button>
-            <el-button circle text @click="sendCommand('playlist_next')">
-                <el-icon :size="25">
-                    <DArrowRight></DArrowRight>
-                </el-icon>
+            <el-button circle text icon="DArrowRight" :loading="next_loading"
+                @click="next_loading = true; sendCommand('playlist_next')">
             </el-button>
         </div>
         <!-- <div class="controller-buttons"> 
@@ -55,10 +47,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { usePlaqueStore } from "@/stores/plaque"
 import type { FirestoreDocument, Plaque, Command } from "@/types/types";
-import { updatePlaque} from "@/api/plaque";
+import { updatePlaque } from "@/api/plaque";
 import { ElMessage } from 'element-plus'
 import { showError } from "@/util/util";
 import { Timestamp } from "@firebase/firestore";
@@ -66,51 +58,69 @@ import { Timestamp } from "@firebase/firestore";
 const plaque_store = usePlaqueStore();
 
 interface PlaqueControllerProps {
-  plaque: FirestoreDocument<Plaque>;
+    plaque: FirestoreDocument<Plaque>;
 }
 const props = defineProps<PlaqueControllerProps>();
 
+const previous_loading = ref<boolean>(false);
+const play_loading = ref<boolean>(false);
+const pause_loading = ref<boolean>(false);
+const next_loading = ref<boolean>(false);
+
 const orientation = computed({
-  get: () => {
-    return props.plaque.entity.orientation || "landscape";
-  },
-  set: (value) => {
-    updatePlaque(props.plaque.id, { orientation: value })
-      .then(() => {
-        plaque_store.plaque_map[props.plaque.id].entity.orientation = value;
-        ElMessage({
-          type: 'success',
-          message: 'Plaque orientation updated',
-        })
-      })
-      .catch((err) => {
-        showError(`Error updating plaque orientation - ${err}`);
-      });
-  },
+    get: () => {
+        return props.plaque.entity.orientation || "landscape";
+    },
+    set: (value) => {
+        updatePlaque(props.plaque.id, { orientation: value })
+            .then(() => {
+                plaque_store.plaque_map[props.plaque.id].entity.orientation = value;
+                ElMessage({
+                    type: 'success',
+                    message: 'Plaque orientation updated',
+                })
+            })
+            .catch((err) => {
+                showError(`Error updating plaque orientation - ${err}`);
+            });
+    },
 });
 
 const sendCommand = (command_type: string) => {
-    const command: Command = {type: command_type, time_sent: Timestamp.now()};
+    const command: Command = { type: command_type, time_sent: Timestamp.now() };
 
-    updatePlaque(props.plaque.id, { command: command})
-      .then(() => {
-        plaque_store.plaque_map[props.plaque.id].entity.command = command;
-        ElMessage({
-          type: 'success',
-          message: 'Command sent to plaque',
+    updatePlaque(props.plaque.id, { command: command })
+        .then(() => {
+            plaque_store.plaque_map[props.plaque.id].entity.command = command;
+            ElMessage({
+                type: 'success',
+                message: 'Command sent to plaque',
+            })
         })
-      })
-      .catch((err) => {
-        showError(`Error sending command to plaque - ${err}`);
-      });
+        .catch((err) => {
+            showError(`Error sending command to plaque - ${err}`);
+        }).finally(() => {
+            previous_loading.value = false;
+            play_loading.value = false;
+            pause_loading.value = false;
+            next_loading.value = false;
+        })
 }
 </script>
 
-<style>
+<style scoped>
 .controller-buttons {
     display: flex;
     align-items: center;
     justify-content: space-around;
-    padding: 10px 0px; 
+    padding: 10px 0px;
+}
+
+::v-deep(.el-icon) {
+    font-size: 25px;
+}
+
+::v-deep(.el-radio.el-radio--small .el-radio__label){
+    font-size: 15px;
 }
 </style>
