@@ -77,10 +77,10 @@
         </div>
         <div>
           <div style="font-size: var(--el-font-size-extra-small)">Machine Info</div>
-          <div>Machine name: {{plaque.entity.machine_data?.machine_name ?? "N/A"}}</div>
-          <div>Local IP: {{plaque.entity.machine_data?.local_ip ?? "N/A"}}</div>
-          <div>Public IP: {{plaque.entity.machine_data?.public_ip ?? "N/A"}}</div>
-          <div>Updated At: {{plaque.entity.machine_data?.updated_at ?? "N/A"}}</div>
+          <div>Machine name: {{ plaque.entity.machine_data?.machine_name ?? "N/A" }}</div>
+          <div>Local IP: {{ plaque.entity.machine_data?.local_ip ?? "N/A" }}</div>
+          <div>Public IP: {{ plaque.entity.machine_data?.public_ip ?? "N/A" }}</div>
+          <div>Updated At: {{ machine_data_updated_at }}</div>
         </div>
         <div style="display: flex; justify-content: end;">
           <el-button @click="plaque_view = 'detail'">Close<el-icon class="el-icon--right">
@@ -220,6 +220,17 @@ watch(plaque_view, (v) => {
       })
   }
 })
+
+const machine_data_updated_at = computed(() => {
+  const timestamp = props?.plaque?.entity?.machine_data?.updated_at
+  if (!timestamp) {
+    return "N/A"
+  }
+  const date = new Date(timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000);
+
+  return date.toLocaleString();
+})
+
 </script>
 
 <style scoped>
