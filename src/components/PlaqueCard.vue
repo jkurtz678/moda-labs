@@ -63,16 +63,25 @@
           <el-button @click="previewPlaque">Preview
             Plaque</el-button>
         </div> -->
+        <PlaqueController :plaque="props.plaque"></PlaqueController>
         <div style="padding: 1em 0em; display: flex; justify-content: space-between; align-items: center;">
           <div v-if="plaque.entity.user_id">
-            <div>Associated User ID:</div>
-            <div>{{ plaque.entity.user_id }}</div>
+            <div style="font-size: var(--el-font-size-extra-small)">Associated User</div>
+            <div v-if="user_email">{{ user_email }}</div>
+            <div v-else>Loading...</div>
+            <div style="font-size: var(--el-font-size-extra-small)">{{ plaque.entity.user_id }}</div>
           </div>
           <div v-else>No associated user</div>
           <el-button v-if="plaque.entity.user_id" type="danger" plain @click="forgetPlaque">Forget Display</el-button>
           <!-- <el-button v-if="!plaque.entity.user_id && (!plaque.entity.token_meta_id_list || plaque.entity.token_meta_id_list.length === 0)" type="danger" plain @click="deleteEmptyPlaque">Delete Plaque</el-button> -->
         </div>
-        <PlaqueController :plaque="props.plaque"></PlaqueController>
+        <div>
+          <div style="font-size: var(--el-font-size-extra-small)">Machine Info</div>
+          <div>Machine name: {{plaque.entity.machine_data?.machine_name ?? "N/A"}}</div>
+          <div>Local IP: {{plaque.entity.machine_data?.local_ip ?? "N/A"}}</div>
+          <div>Public IP: {{plaque.entity.machine_data?.public_ip ?? "N/A"}}</div>
+          <div>Updated At: {{plaque.entity.machine_data?.updated_at ?? "N/A"}}</div>
+        </div>
         <div style="display: flex; justify-content: end;">
           <el-button @click="plaque_view = 'detail'">Close<el-icon class="el-icon--right">
               <Close />
@@ -87,7 +96,7 @@
   </el-card>
 </template>
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, watch } from "vue";
 import type { FirestoreDocument, Plaque, TokenMeta } from "@/types/types";
 import AddTokenDialog from './AddTokenDialog.vue';
 import PlaqueController from './PlaqueController.vue';
@@ -104,6 +113,7 @@ import {
   Select,
   Loading
 } from '@element-plus/icons-vue'
+import { getAccountByID } from "@/api/account";
 
 interface PlaqueCardProps {
   plaque: FirestoreDocument<Plaque>;
@@ -114,6 +124,7 @@ const router = useRouter();
 const plaque_view = ref("simple"); // 3 modes - 'simple', 'detail', 'settings'
 const show_add_token_dialog = ref(false);
 const edit_plaque_name = ref(false);
+const user_email = ref("");
 const edit_loading = ref(false);
 const updatePlaqueName = async () => {
   edit_loading.value = true;
@@ -198,6 +209,17 @@ const deleteEmptyPlaque = () => {
       })
   })
 }
+
+watch(plaque_view, (v) => {
+  if (v == "settings" && props.plaque.entity.user_id && !user_email.value) {
+    getAccountByID(props.plaque.entity.user_id).then((account) => {
+      user_email.value = account.entity.email
+    })
+      .catch((err) => {
+        ElMessage({ message: `Error loading user account - ${err}`, type: 'error', showClose: true, duration: 12000 });
+      })
+  }
+})
 </script>
 
 <style scoped>

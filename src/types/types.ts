@@ -51,6 +51,7 @@ export interface Plaque extends BaseDocument {
     token_meta_id_list: string[]; // list of TokenMeta document ids, plaque will attempt to download and play this art in order
     orientation: OrientationType;
     command: Command;
+    machine_data: MachineData;
 }
 
 export interface Command {
@@ -58,6 +59,12 @@ export interface Command {
     time_sent: Timestamp;
 }
 
+export interface MachineData {
+    machine_name: string;
+    local_ip: string;
+    public_ip: string;
+    updated_at: Timestamp;
+}
 
 export enum OrientationType {
     Landscape = "landscape" ,
