@@ -22,6 +22,8 @@
                     <el-button text circle size="small" icon="close" style="margin-left: 5px;" @click="disconnect"
                         :loading="connect_wallet_loading"></el-button>
                 </div>
+                <div>Loaded {{ token_meta_store.opensea_wallet_token_meta_list.length }} wallet token{{token_meta_store.opensea_wallet_token_meta_list.length == 1 ? '' : 's'}} from Opensea</div>
+                <div>Loaded {{ token_meta_store.opensea_minted_token_meta_list.length }} token{{token_meta_store.opensea_minted_token_meta_list.length == 1 ? '' : 's'}} you minted from Opensea</div>
             </div>
             <el-button v-else @click="connect" :loading="connect_wallet_loading" style="margin-top: 2em" icon="Connection"
                 color="#000000">Connect Ethereum
@@ -32,13 +34,16 @@
 
 <script setup lang="ts">
 import { useAccountStore } from "@/stores/account"
+import { useTokenMetaStore } from "@/stores/token-meta"
 import { computed, ref } from "vue";
 import { connectWallet } from "@/web3Interface"
 import { updateAccount } from "@/api/account"
 import { ElMessage, ElMessageBox } from "element-plus";
 import type { Account } from "@/types/types";
+import { showError } from "@/util/util";
 
 const account_store = useAccountStore();
+const token_meta_store = useTokenMetaStore();
 const connect_wallet_loading = ref(false);
 
 
@@ -54,8 +59,15 @@ const connect = async () => {
     if (ens_name) {
         update_data.ens_name = ens_name;
     }
-    await updateAccount(account.value.id, update_data).then(() => {
+    updateAccount(account.value.id, update_data).then(() => {
         return account_store.loadAccount(account.value.id);
+    }).then(() => {
+        const opensea_minted_token_promise = token_meta_store.loadOpenseaMintedTokenMetas(address)
+            .catch(err => (showError(`Error loading opensea minted tokens - ${err}`)))
+        const opensea_wallet_token_promise = token_meta_store.loadOpenseaWalletTokenMetas(address)
+            .catch(err => (showError(`Error loading opensea wallet tokens - ${err}`)))
+
+        return Promise.all([opensea_minted_token_promise,opensea_wallet_token_promise]);
     }).then(() => {
         ElMessage({
             type: 'success',
@@ -76,6 +88,8 @@ const disconnect = async () => {
     }).then(() => {
         return account_store.loadAccount(account.value.id);
     }).then(() => {
+        token_meta_store.opensea_minted_token_meta_list = [];
+        token_meta_store.opensea_wallet_token_meta_list = [];
         ElMessage({
             type: 'success',
             message: 'Ethereum wallet disconnected',
