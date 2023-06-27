@@ -3,8 +3,8 @@ import type { OpenseaToken, FirestoreDocument, TokenMeta } from "@/types/types";
 const OPENSEA_API_KEY = import.meta.env.VITE_OPENSEA_API_KEY;
 
 // loadTokensByAccountID returns all associated opensea tokens for a given account id
-export async function loadTokensByAccountID(user_id: string): Promise<Array<OpenseaToken>> {
-    const res = await fetch(`https://api.opensea.io/api/v1/assets/?owner=${user_id}`, {
+export async function loadTokensByAccountID(wallet_address: string): Promise<Array<OpenseaToken>> {
+    const res = await fetch(`https://api.opensea.io/api/v1/assets/?owner=${wallet_address}`, {
         headers: {
             'X-API-KEY': OPENSEA_API_KEY
         }
@@ -36,11 +36,11 @@ export const loadTokensByTokenIDAndAssetContract = async (tokens: Array<Firestor
 }
 
 // loadTokensCreatedByAddress returns opensea tokens that are created by a wallet address
-export const loadTokensCreatedByAddress = async (user_id: string): Promise<Array<OpenseaToken>> => {
+export const loadTokensCreatedByAddress = async (wallet_address: string): Promise<Array<OpenseaToken>> => {
     const token_list = [];
     let cursor = "";
     while (true) {
-        const res = await fetch(`https://api.opensea.io/api/v1/events?account_address=${user_id}&event_type=created&limit=50${cursor ? '&cursor=' + cursor : ""}`,
+        const res = await fetch(`https://api.opensea.io/api/v1/events?account_address=${wallet_address}&event_type=created&limit=50${cursor ? '&cursor=' + cursor : ""}`,
             {
                 headers: {
                     'X-API-KEY': OPENSEA_API_KEY

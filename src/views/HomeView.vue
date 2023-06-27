@@ -60,7 +60,7 @@ onMounted(async () => {
 async function loadAppData(user_id: string) {
   await account_store.loadAccount(user_id)
 
-  // must load gallery data before loading plaque data
+  // must load gallery data before loading plaque data because we need to know which plaques to load
   await gallery_store.loadGalleryList(user_id)
     .catch(err => (showError(`Error loading galleries - ${err}`)));
 
@@ -69,17 +69,27 @@ async function loadAppData(user_id: string) {
     .catch(err => (showError(`Error loading plaques - ${err}`)));
   const gallery_plaque_promise = plaque_store.loadGalleryPlaques(gallery_store.gallery_list)
     .catch(err => (showError(`Error loading gallery plaques - ${err}`)));
-  /* const gallery_plaque_promise = plaque_store.loadGalleryPlaques(gallery_store.gallery_list)
-    .catch(err => (showError(`Error loading gallery plaques - ${err}`))); */
   const archive_token_promise = token_meta_store.loadArchiveTokenMetas(user_id)
     .catch(err => (showError(`Error loading archive token metas - ${err}`)));
   const gallery_token_promise = token_meta_store.loadGalleryTokenMetas(gallery_store.gallery_list)
     .catch(err => (showError(`Error loading token metas - ${err}`)));
-  /* const opensea_minted_token_promise = token_meta_store.loadOpenseaMintedTokenMetas(user_id)
-    .catch(err => (showError(`Error loading opensea minted tokens - ${err}`)))
-  const opensea_wallet_token_promise = token_meta_store.loadOpenseaWalletTokenMetas(user_id)
-    .catch(err => (showError(`Error loading opensea wallet tokens - ${err}`))) */
-  await Promise.all([plaque_promise, gallery_plaque_promise, archive_token_promise, gallery_token_promise])
+
+
+  const promise_list = [plaque_promise, gallery_plaque_promise, archive_token_promise, gallery_plaque_promise];
+
+  // if user has a wallet connected then we load opensea tokens also
+  const wallet_address = account_store.get_account.entity.wallet_address;
+  if (wallet_address) {
+    const opensea_minted_token_promise = token_meta_store.loadOpenseaMintedTokenMetas(wallet_address)
+      .catch(err => (showError(`Error loading opensea minted tokens - ${err}`)))
+    const opensea_wallet_token_promise = token_meta_store.loadOpenseaWalletTokenMetas(wallet_address)
+      .catch(err => (showError(`Error loading opensea wallet tokens - ${err}`)))
+
+    promise_list.push(opensea_minted_token_promise);
+    promise_list.push(opensea_wallet_token_promise);
+  }
+
+  await Promise.all(promise_list);
 
   // delay opensea_wallet_load to possibly help with rate limit
   // await opensea_wallet_token_promise;

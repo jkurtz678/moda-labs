@@ -83,13 +83,13 @@ export const useTokenMetaStore = defineStore({
                 this.archive_token_meta_list = token_metas;
             })
         },
-        async loadOpenseaMintedTokenMetas(user_id: string) {
-            await loadTokensCreatedByAddress(user_id).then(tokens => {
+        async loadOpenseaMintedTokenMetas(wallet_address: string) {
+            await loadTokensCreatedByAddress(wallet_address).then(tokens => {
                 this.opensea_minted_token_meta_list = tokens;
             })
         },
-        async loadOpenseaWalletTokenMetas(user_id: string) {
-            await loadTokensByAccountID(user_id).then(tokens => {
+        async loadOpenseaWalletTokenMetas(wallet_address: string) {
+            await loadTokensByAccountID(wallet_address).then(tokens => {
                 this.opensea_wallet_token_meta_list = tokens;
             })
         },

@@ -14,6 +14,7 @@
                 <el-tab-pane label="Plaques" name="plaque-list"></el-tab-pane>
                 <el-tab-pane label="Artwork" name="token-list"></el-tab-pane>
                 <el-tab-pane label="Galleries" name="gallery-list"></el-tab-pane>
+                <el-tab-pane label="Account" name="account-settings"></el-tab-pane>
             </el-tabs>
             <div style="flex-grow: 1"></div>
             <div v-if="screen_type != 'xs'" style="margin-right: 10px; display: flex; align-items: center;">
@@ -107,3 +108,5 @@ const getImageUrl = (filename: string) => {
     padding-bottom: 8px;
 }
 </style>
+
+

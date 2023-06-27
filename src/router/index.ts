@@ -64,6 +64,11 @@ const router = createRouter({
             }]
         },
         {
+          path: "account-settings",
+          name: "account-settings",
+          component: () => import('@/components/AccountSettings.vue'),
+        },
+        {
           path: "qr-scan",
           name: "qr-scan",
           component: () => import('@/components/QrScan.vue')

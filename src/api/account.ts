@@ -1,6 +1,6 @@
 import type { FirestoreDocument, Account } from "@/types/types"
 import { BaseEntity } from "@/types/types";
-import { documentId, getFirestore, setDoc } from "firebase/firestore";
+import { documentId, getFirestore, setDoc, Timestamp, updateDoc } from "firebase/firestore";
 import firebaseConfig from "../firebaseConfig"
 import { collection, addDoc, getDoc, where, query, getDocs, doc } from "firebase/firestore";
 
@@ -40,8 +40,10 @@ export const createAccount = async (user_id: string, account: Partial<Account>):
     return { id: snapshot.id, entity: snapshot.data() as Account }
 }
 
-/* export const updateAccount = async (account: FirestoreDocument<Account>): Promise<FirestoreDocument<Account>> => {
-    await db.collection("account").doc(account.id).update(account.entity)
-    const snapshot = await db.collection("account").doc(account.id).get()
+export const updateAccount = async (account_id: string, update_data: Partial<Account>): Promise<FirestoreDocument<Account>> => {
+    update_data.updated_at = Timestamp.now();
+    const ref = doc(db, "account", account_id)
+    await updateDoc(ref, update_data)
+    const snapshot = await getDoc(ref)
     return { id: snapshot.id, entity: snapshot.data() as Account }
-} */
+}
