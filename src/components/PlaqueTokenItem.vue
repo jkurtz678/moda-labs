@@ -78,10 +78,10 @@ import useThumbnail from "@/composables/thumbnail-image";
 
 const router = useRouter();
 
-interface PlaqueTokenItem {
+interface PlaqueTokenItemProps {
   token_meta: FirestoreDocument<TokenMeta>;
 }
-const props = defineProps<PlaqueTokenItem>();
+const props = defineProps<PlaqueTokenItemProps>();
 const expanded = ref(false);
 const show_full_description = ref(false);
 

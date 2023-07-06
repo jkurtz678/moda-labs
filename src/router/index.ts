@@ -44,6 +44,11 @@ const router = createRouter({
           ]
         },
         {
+          path: "artwork-tile-grid",
+          name: "artwork-tile-grid",
+          component: () => import('@/components/ArtworkTileGrid.vue'),
+        },
+        {
           path: "gallery-list",
           name: "gallery-list",
           component: () => import('@/components/GalleryList.vue'),
