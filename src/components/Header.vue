@@ -1,6 +1,6 @@
 <template>
     <el-header class="header">
-        <el-image v-if="screen_type != 'xs'" :src="getImageUrl('logo.png')"
+        <el-image v-if="screen_type != 'sm' && screen_type != 'xs'" :src="getImageUrl('logo.png')"
             style="width: 40px; height: 40px; margin-right: 2em">
         </el-image>
         <template v-if="router.currentRoute.value.name == 'qr-scan'">
@@ -10,14 +10,14 @@
             </el-button>
         </template>
         <template v-else>
-            <el-tabs v-model="route.name" @tab-click="handleClick">
+            <el-tabs v-model="route.name" @tab-click="handleClick" :class="screen_type == 'lg' || screen_type == 'md' ? '' : 'small-tabs'">
                 <el-tab-pane label="Plaques" name="plaque-list"></el-tab-pane>
                 <el-tab-pane label="Artwork" name="token-list"></el-tab-pane>
                 <el-tab-pane label="Galleries" name="gallery-list"></el-tab-pane>
                 <el-tab-pane label="Account" name="account-settings"></el-tab-pane>
             </el-tabs>
             <div style="flex-grow: 1"></div>
-            <div v-if="screen_type != 'xs'" style="margin-right: 10px; display: flex; align-items: center;">
+            <div v-if="screen_type != 'sm' && screen_type != 'xs'" style="margin-right: 10px; display: flex; align-items: center;">
                 <div>{{ toolbar_address }}</div>
                 <el-button v-if="account_store.is_user_admin" type="info" round size="small"
                     style="margin-left: 8px">Admin</el-button>
@@ -107,6 +107,10 @@ const getImageUrl = (filename: string) => {
     margin-bottom: 0px;
     padding-bottom: 8px;
 }
+
+.small-tabs :deep(.el-tabs__item) {
+    padding: 0px 8px;
+} 
 </style>
 
 

@@ -10,7 +10,8 @@ export default function useBreakpoints() {
 
     const screen_type = computed(() => {
         if (windowWidth.value < 650) return 'xs'
-        if (windowWidth.value >= 650 && windowWidth.value < 1200) return 'md'
+        if (windowWidth.value >= 650 && windowWidth.value < 960 ) return 'sm'
+        if (windowWidth.value >= 960 && windowWidth.value < 1200) return 'md'
         if (windowWidth.value >= 1200) return 'lg'
         return null; // This is an unreachable line, simply to keep eslint happy.
     })
