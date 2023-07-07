@@ -1,5 +1,5 @@
 <template>
-    <vue-masonry-wall :items="paginated_tokens" :column-width="250" :gap="16">
+    <vue-masonry-wall :items="paginated_tokens" :column-width="220" :gap="16">
         <template v-slot:default="{ item }">
             <ArtworkTile :token_meta="item">
             </ArtworkTile>
@@ -19,7 +19,7 @@ import { computed, ref } from 'vue';
 const token_meta_store = useTokenMetaStore()
 const search_filter = ref("")
 const sort_order = ref(localStorage.getItem('token_list_sort_order') || "name")
-const limit = ref(10);
+const limit = ref(1000);
 
 
 const all_tokens = computed(() => {
