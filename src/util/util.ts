@@ -30,5 +30,6 @@ export function getAdminEmailList(): string[] {
         "natemohler@ucla.edu",
         "natemohleriv@gmail.com",
         "ruben@eastsideled.com",
+        "juliaschell@ucla.edu",
     ];
 }
