@@ -78,6 +78,7 @@
         <div>
           <div style="font-size: var(--el-font-size-extra-small)">Machine Info</div>
           <div>Machine name: {{ plaque.entity.machine_data?.machine_name ?? "N/A" }}</div>
+          <div>Version: {{ plaque.entity.machine_data?.version ?? "N/A" }}</div>
           <div>Local IP: {{ plaque.entity.machine_data?.local_ip ?? "N/A" }}</div>
           <div>Public IP: {{ plaque.entity.machine_data?.public_ip ?? "N/A" }}</div>
           <div>Updated At: {{ machine_data_updated_at }}</div>

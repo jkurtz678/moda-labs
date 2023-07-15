@@ -61,6 +61,7 @@ export interface Command {
 
 export interface MachineData {
     machine_name: string;
+    version: string;
     local_ip: string;
     public_ip: string;
     updated_at: Timestamp;
