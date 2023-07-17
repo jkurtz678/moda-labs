@@ -108,7 +108,7 @@ import { ref } from "vue";
 import { updatePlaque, deletePlaqueByID } from "@/api/plaque";
 import { useTokenMetaStore } from "../stores/token-meta";
 import { useRouter } from 'vue-router';
-import { showError } from "@/util/util";
+import { isPlaqueOnline, showError } from "@/util/util";
 import { usePlaqueStore } from "@/stores/plaque"
 import {
   Edit,
@@ -156,16 +156,7 @@ const plaque_tokens = computed(() => {
 
 // plaque is considered online if it has last_check_in_time that is newer than 2 hours
 const is_online = computed(() => {
-  if(!props.plaque.entity.last_check_in_time) {
-    return false;
-  }
-
-
-  const now = new Date();
-  const last_check_in = props.plaque.entity.last_check_in_time.seconds
-  const time_diff = (now.getTime()/1000) - last_check_in
-  const hours_diff = time_diff / (60 * 60);
-  return hours_diff < 2
+  return isPlaqueOnline(props.plaque)
 })
 
 const clearTokens = () => {

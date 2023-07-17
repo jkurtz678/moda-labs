@@ -1,4 +1,5 @@
 
+import type { FirestoreDocument, Plaque } from '@/types/types';
 import { ElMessage } from 'element-plus'
 
 export function showError(message: string) {
@@ -32,4 +33,17 @@ export function getAdminEmailList(): string[] {
         "ruben@eastsideled.com",
         "juliaschell@ucla.edu",
     ];
+}
+
+export function isPlaqueOnline(plaque: FirestoreDocument<Plaque>) {
+    if(!plaque.entity.last_check_in_time) {
+        return false;
+      }
+    
+    
+      const now = new Date();
+      const last_check_in = plaque.entity.last_check_in_time.seconds
+      const time_diff = (now.getTime()/1000) - last_check_in
+      const hours_diff = time_diff / (60 * 60);
+      return hours_diff < 2
 }
