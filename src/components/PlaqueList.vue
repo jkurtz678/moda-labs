@@ -2,15 +2,20 @@
     <div class='subheader' style="display: flex; align-items: center;">
         <el-input v-model="search_filter" :prefix-icon="Search" placeholder="Search plaques" style="max-width: 350px"
             clearable></el-input>
-        <el-select v-model="filter_by_gallery" placeholder="Filter by gallery" style="margin-left: 10px; width: 260px;">
-            <el-option :label="'All plaques'" value="" />
-            <el-option v-for="gallery in gallery_store.gallery_list" :key="gallery.id"
-                :label="`Filter by gallery - ${gallery.entity.name}`" :value="gallery.id" />
-        </el-select>
-        <el-select v-model="active_filter" style="margin-left: 10px; width: 260px;">
-            <el-option :label="'Offline and online'" :value="false" />
-            <el-option :label="`Online only`" :value="true" />
-        </el-select>
+
+        <el-popover placement="bottom" title="Plaque Filters" :width="300" trigger="click">
+            <template #reference>
+                <el-button icon="Filter" style="margin-left: 10px;" type="info" size="small">Filters</el-button>
+            </template>
+            <div style="font-size: var(--el-font-size-extra-small)">Filter by gallery</div>
+            <el-select v-model="filter_by_gallery" placeholder="Filter by gallery" style="width: 260px; margin-bottom: 12px;">
+                <el-option :label="'All plaques'" value="" />
+                <el-option v-for="gallery in gallery_store.gallery_list" :key="gallery.id"
+                    :label="`${gallery.entity.name}`" :value="gallery.id" />
+            </el-select>
+            <div style="font-size: var(--el-font-size-extra-small);">Online only</div>
+            <el-switch v-model="online_filter" />
+        </el-popover>
         <el-button icon="Camera" type="info" @click="router.push('qr-scan')" style="margin-left: 10px;"
             size="small">Scan</el-button>
     </div>
@@ -62,10 +67,18 @@ const account_store = useAccountStore();
 const gallery_store = useGalleryStore();
 const search_filter = ref("")
 const filter_by_gallery = ref<string>(localStorage.getItem('filter_by_gallery') || "")
-const active_filter = ref(false);
+const online_filter = ref<boolean>(localStorage.getItem('online_filter') === 'true' || false);
 
 watch(filter_by_gallery, (newVal) => {
     localStorage.setItem('filter_by_gallery', newVal)
+})
+
+watch(online_filter, (newVal) => {
+    if(newVal) {
+        localStorage.setItem('online_filter', 'true')
+        return
+    }
+    localStorage.setItem('online_filter', 'false')
 })
 
 const plaque_store = usePlaqueStore();
@@ -106,13 +119,13 @@ const filtered_plaques = computed(() => {
         ret_plaques = ret_plaques.filter(p => gallery_store.gallery_list.find(g => g.id == filter_by_gallery.value)?.entity.plaque_id_list.includes(p.id))
     }
 
-    if (active_filter.value) {
+    if (online_filter.value) {
         ret_plaques = ret_plaques.filter(p => isPlaqueOnline(p));
     }
 
     if (!search_filter.value) {
         return ret_plaques;
-    } 
+    }
 
     return ret_plaques.filter(p =>
         p.entity.name.toLowerCase().includes(search_filter.value.toLowerCase())
