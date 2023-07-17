@@ -7,7 +7,8 @@
       <el-button :icon="Select" v-if="edit_plaque_name" :loading="edit_loading" @click="updatePlaqueName" class="editIcon"
         circle :type="edit_loading ? '' : 'success'" text />
       <div style="flex-grow: 1" />
-      <el-tag class="ml-2" type="success">online</el-tag>
+      <el-tag v-if="is_online" class="ml-2" type="success">online</el-tag>
+      <el-tag v-else class="ml-2" type="danger">offline</el-tag>
     </div>
     <el-collapse-transition>
       <section v-show="plaque_view == 'simple'" class="card-simple">
@@ -151,6 +152,20 @@ const plaque_tokens = computed(() => {
   const token_map = token_meta_store.archive_token_meta_map;
   let res = props.plaque.entity.token_meta_id_list.map(token_id => token_map[token_id])
   return res;
+})
+
+// plaque is considered online if it has last_check_in_time that is newer than 2 hours
+const is_online = computed(() => {
+  if(!props.plaque.entity.last_check_in_time) {
+    return false;
+  }
+
+
+  const now = new Date();
+  const last_check_in = props.plaque.entity.last_check_in_time.seconds
+  const time_diff = (now.getTime()/1000) - last_check_in
+  const hours_diff = time_diff / (60 * 60);
+  return hours_diff < 2
 })
 
 const clearTokens = () => {

@@ -52,6 +52,7 @@ export interface Plaque extends BaseDocument {
     orientation: OrientationType;
     command: Command;
     machine_data: MachineData;
+    last_check_in_time: Timestamp;
 }
 
 export interface Command {
