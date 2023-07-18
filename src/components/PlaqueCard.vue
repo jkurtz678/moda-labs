@@ -7,8 +7,12 @@
       <el-button :icon="Select" v-if="edit_plaque_name" :loading="edit_loading" @click="updatePlaqueName" class="editIcon"
         circle :type="edit_loading ? '' : 'success'" text />
       <div style="flex-grow: 1" />
-      <el-tag v-if="is_online" class="ml-2" type="success">online</el-tag>
-      <el-tag v-else class="ml-2" type="danger">offline</el-tag>
+      <el-tooltip class="box-item" effect="dark" :content="`Last activity ${last_check_in_time_formatted}`"
+        placement="top">
+        <el-tag v-if="is_online" class="ml-2" type="success">online</el-tag>
+        <el-tag v-else class="ml-2" type="danger">offline</el-tag>
+      </el-tooltip>
+
     </div>
     <el-collapse-transition>
       <section v-show="plaque_view == 'simple'" class="card-simple">
@@ -45,6 +49,7 @@
         <template v-if="plaque_tokens.length == 0">
           <div style="padding: 1em;">No artwork added</div>
           <hr />
+
         </template>
         <PlaqueTokenItem :token_meta="meta" v-for="meta in plaque_tokens" />
         <div style="display: flex; padding: 1em;">
@@ -157,6 +162,23 @@ const plaque_tokens = computed(() => {
 // plaque is considered online if it has last_check_in_time that is newer than 2 hours
 const is_online = computed(() => {
   return isPlaqueOnline(props.plaque)
+})
+
+const last_check_in_time_formatted = computed(() => {
+  const last_check_in_time = props.plaque.entity.last_check_in_time
+  if (!last_check_in_time) {
+    return "N/A"
+  }
+  const date = new Date(last_check_in_time.seconds * 1000)
+  return date.toLocaleString('en-US', {
+    year: '2-digit',
+    month: '2-digit',
+    day: '2-digit',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+    hour12: true
+  });
 })
 
 const clearTokens = () => {

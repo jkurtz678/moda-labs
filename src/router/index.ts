@@ -47,6 +47,22 @@ const router = createRouter({
           path: "artwork-tile-grid",
           name: "artwork-tile-grid",
           component: () => import('@/components/ArtworkTileGrid.vue'),
+          children: [
+            {
+              path: "new",
+              name: "new-artwork",
+              components: {
+                default: () => import('@/components/SubmitTokenDialog.vue')
+              }
+            },
+            {
+              path: ":token_meta_id",
+              name: "edit-artwork",
+              components: {
+                default: () => import('@/components/SubmitTokenDialog.vue')
+              }
+            },
+          ]
         },
         {
           path: "gallery-list",
