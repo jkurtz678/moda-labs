@@ -23,7 +23,7 @@
     <div id="masonry-container" ref="masonryContainer"
         style="overflow-y: auto; height: 100%; padding: 10px; margin: -10px;">
         <vue-masonry-wall id="masonary-wall" :scroll-container="masonryContainer" :items="paginated_tokens"
-            :column-width="220" :gap="16">
+            :column-width="250" :gap="14">
             <template v-slot:default="{ item }">
                 <ArtworkTile :token_meta="item">
                 </ArtworkTile>
