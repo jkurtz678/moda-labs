@@ -11,19 +11,26 @@
 
     <div class='detail-container transition' :class="show_detail ? 'show-blur' : 'hide-blur absolute'">
       <div style="font-size: 1.6em; font-weight: bold;">{{ token_meta.entity.name }}</div>
-      <div style="font-weight: bold;">{{ token_meta.entity.artist }}</div>
+      <div v-if="token_meta.entity.artist_social_link">
+        <el-button link style="font-weight: bold; display: block;" @click="openArtistSocial">{{ token_meta.entity.artist }}</el-button>
+      </div>
+      <div v-else style="font-weight: bold;">{{ token_meta.entity.artist }}</div>
       <template v-if="show_detail">
-      <el-tooltip class="box-item" effect="dark" content="Download art" placement="top">
-        <el-button icon="Download" text circle @click="openArt"></el-button>
-      </el-tooltip>
-      <el-tooltip class="box-item" effect="dark" content="Preview plaque" placement="top">
-        <el-button icon="Tickets" text circle @click="previewPlaque"></el-button>
-      </el-tooltip>
-      <el-tooltip class="box-item" effect="dark" content="Edit art data" placement="top">
-        <el-button icon="Edit" text circle
-          @click="router.push({ name: 'edit-artwork', params: { 'token_meta_id': props.token_meta.id } })">
-        </el-button>
-      </el-tooltip>
+        <el-tooltip class="box-item" effect="dark" content="Download art" placement="top">
+          <el-button icon="Download" text circle @click="openArt"></el-button>
+        </el-tooltip>
+        <el-tooltip class="box-item" effect="dark" content="Preview plaque" placement="top">
+          <el-button icon="Tickets" text circle @click="previewPlaque"></el-button>
+        </el-tooltip>
+        <el-tooltip v-if="token_meta.entity.public_link" class="box-item" effect="dark" content="QR Code Link"
+          placement="top">
+          <el-button icon="Link" text circle @click="qrCodeLink"></el-button>
+        </el-tooltip>
+        <el-tooltip class="box-item" effect="dark" content="Edit art data" placement="top">
+          <el-button icon="Edit" text circle
+            @click="router.push({ name: 'edit-artwork', params: { 'token_meta_id': props.token_meta.id } })">
+          </el-button>
+        </el-tooltip>
       </template>
       <div style="font-size: 0.9em; line-height: 1.3em">{{ token_meta.entity.description }}</div>
     </div>
@@ -68,6 +75,13 @@ const previewPlaque = () => {
   window.open(link.href);
 }
 
+const qrCodeLink = () => {
+  window.open(props.token_meta.entity.public_link, '_blank');
+}
+
+const openArtistSocial = () => {
+  window.open(props.token_meta.entity.artist_social_link, '_blank');
+}
 
 </script>
   
@@ -78,7 +92,7 @@ const previewPlaque = () => {
   width: 100%;
   background: #F5F5F5;
   box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.5);
-  transition: box-shadow 0.6s;
+  transition: box-shadow 0.5s;
 }
 
 .custom-card:hover {
@@ -94,7 +108,7 @@ const previewPlaque = () => {
   z-index: 10;
   background-color: white;
   opacity: 0;
-  transition: opacity 0.6s;
+  transition: opacity 0.5s;
 }
 
 .platform {
@@ -106,17 +120,17 @@ const previewPlaque = () => {
   opacity: 0;
   z-index: 10;
   background-color: white;
-  transition: opacity 0.6s;
+  transition: opacity 0.5s;
   font-size: .7em;
 }
 
 .custom-card:hover .platform {
-  opacity: 85%;
+  opacity: 88%;
 }
 
 
 .custom-card:hover .header {
-  opacity: 85%;
+  opacity: 88%;
 }
 
 img {
@@ -128,7 +142,7 @@ img {
 }
 
 .show-blur {
-  opacity: 0.85 !important;
+  opacity: 0.88 !important;
 }
 
 .hide-blur {
@@ -153,5 +167,8 @@ img {
   right: 0px;
   left: 0px;
   bottom: 0px;
+}
+:deep(.el-button>span) {
+  font-weight: bold;
 }
 </style>
