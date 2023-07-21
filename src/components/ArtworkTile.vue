@@ -1,6 +1,7 @@
 <template>
   <div ref="tile_container" class="custom-card" @click="() => { show_detail = !show_detail; animateTileHeight(show_detail); }">
     <img :class="show_detail ? 'absolute' : ''" :src="thumbnail_url" />
+    <div :class="show_detail ? 'show-blur' : 'hide-blur'" class="absolute overlay transition" ></div>
     <div class="transition absolute" :class="!show_detail ? 'show-blur' : 'hide-blur'">
       <div class="header">
         {{ `${token_meta.entity.name} | ${token_meta.entity.artist}` }}
@@ -96,7 +97,6 @@ function animateTileHeight(detail: boolean) {
   }
 
   if (detail && starting_height.value == 0) {
-    console.log("offset height", tile_container.value.offsetHeight)
     starting_height.value = tile_container.value.offsetHeight
   }
 
@@ -105,12 +105,10 @@ function animateTileHeight(detail: boolean) {
     return
   }
 
-  console.log("tile container before:", tile_container.value.offsetHeight)
-  console.log("detail container before:", detail_container.value.offsetHeight)
 
   let targetHeight: number;
   if (detail) {
-    targetHeight = detail_container.value.offsetHeight - 8; // The final height you want to animate to (in pixels)
+    targetHeight = detail_container.value.offsetHeight; // The final height you want to animate to (in pixels)
   } else {
     targetHeight = starting_height.value
   }
@@ -118,21 +116,17 @@ function animateTileHeight(detail: boolean) {
   const frameRate = 10; // The interval between each animation frame in milliseconds
 
   const startHeight = tile_container.value.offsetHeight;
-  const distance = targetHeight - startHeight;
+  const distance = Math.ceil(targetHeight - startHeight);
   const increments = Math.ceil(duration / frameRate);
   const incrementSize = distance / increments;
-
-  console.log("target height", targetHeight)
 
   let currentIncrement = 0;
 
   const interval = setInterval(() => {
     if (currentIncrement >= increments) {
       tile_container.value.style.height = targetHeight + "px"
-      console.log("tile container after:", tile_container.value.offsetHeight)
-      console.log("detail container after:", detail_container.value.offsetHeight)
-      console.log("detail container after:", detail_container.value.offsetHeight)
       clearInterval(interval);
+      return
     }
 
     currentIncrement++;
@@ -213,9 +207,14 @@ img {
   transition: opacity 0.5s !important;
 }
 
+.overlay {
+  background-color: white;
+  opacity: 0;
+}
+
 
 .detail-container {
-  background-color: white;
+  background-color: transparent;
   opacity: 0;
   padding: 1em;
   min-height: 279px;
