@@ -1,18 +1,18 @@
 <template>
-  <div class="custom-card" @click="show_detail = !show_detail">
+  <div ref="tile_container" class="custom-card" @click="() => { show_detail = !show_detail; animateTileHeight(show_detail); }">
     <img :class="show_detail ? 'absolute' : ''" :src="thumbnail_url" />
-
     <div class="transition absolute" :class="!show_detail ? 'show-blur' : 'hide-blur'">
       <div class="header">
         {{ `${token_meta.entity.name} | ${token_meta.entity.artist}` }}
       </div>
       <div class="platform">{{ platform }}</div>
     </div>
-
-    <div class='detail-container transition' :class="show_detail ? 'show-blur' : 'hide-blur absolute'">
+    <div ref="detail_container" class='detail-container transition'
+      :class="show_detail ? 'show-blur' : 'hide-blur absolute-no-b'">
       <div style="font-size: 1.6em; font-weight: bold;">{{ token_meta.entity.name }}</div>
       <div v-if="token_meta.entity.artist_social_link">
-        <el-button link style="font-weight: bold; display: block;" @click.stop="openArtistSocial">{{ token_meta.entity.artist }}</el-button>
+        <el-button link style="font-weight: bold; display: block;" @click.stop="openArtistSocial">{{
+          token_meta.entity.artist }}</el-button>
       </div>
       <div v-else style="font-weight: bold;">{{ token_meta.entity.artist }}</div>
       <template v-if="show_detail">
@@ -32,6 +32,7 @@
           </el-button>
         </el-tooltip>
       </template>
+      <div v-else style="height: 32px;"></div>
       <div style="font-size: 0.9em; line-height: 1.3em">{{ token_meta.entity.description }}</div>
     </div>
   </div>
@@ -53,6 +54,9 @@ interface ArtworkTileProps {
 const props = defineProps<ArtworkTileProps>();
 const thumbnail_url = useThumbnail(toRef(props, "token_meta"));
 const show_detail = ref(false);
+const starting_height = ref<number>(0);
+const tile_container = ref();
+const detail_container = ref();
 
 const platform = computed(() => {
   return getPlatformDisplay(props.token_meta.entity.platform)
@@ -83,6 +87,60 @@ const openArtistSocial = () => {
   window.open(props.token_meta.entity.artist_social_link, '_blank');
 }
 
+function animateTileHeight(detail: boolean) {
+
+
+  if (!tile_container.value) {
+    console.log("animateDivHeight - error finding tile container")
+    return
+  }
+
+  if (detail && starting_height.value == 0) {
+    console.log("offset height", tile_container.value.offsetHeight)
+    starting_height.value = tile_container.value.offsetHeight
+  }
+
+  if (!detail_container.value) {
+    console.log("animateDivHeight - error finding detail container")
+    return
+  }
+
+  console.log("tile container before:", tile_container.value.offsetHeight)
+  console.log("detail container before:", detail_container.value.offsetHeight)
+
+  let targetHeight: number;
+  if (detail) {
+    targetHeight = detail_container.value.offsetHeight - 8; // The final height you want to animate to (in pixels)
+  } else {
+    targetHeight = starting_height.value
+  }
+  const duration = 300; // The duration of the animation in milliseconds
+  const frameRate = 10; // The interval between each animation frame in milliseconds
+
+  const startHeight = tile_container.value.offsetHeight;
+  const distance = targetHeight - startHeight;
+  const increments = Math.ceil(duration / frameRate);
+  const incrementSize = distance / increments;
+
+  console.log("target height", targetHeight)
+
+  let currentIncrement = 0;
+
+  const interval = setInterval(() => {
+    if (currentIncrement >= increments) {
+      tile_container.value.style.height = targetHeight + "px"
+      console.log("tile container after:", tile_container.value.offsetHeight)
+      console.log("detail container after:", detail_container.value.offsetHeight)
+      console.log("detail container after:", detail_container.value.offsetHeight)
+      clearInterval(interval);
+    }
+
+    currentIncrement++;
+    const newHeight = startHeight + incrementSize * currentIncrement;
+    tile_container.value.style.height = newHeight + "px";
+  }, frameRate);
+}
+
 </script>
   
 <style scoped>
@@ -92,7 +150,9 @@ const openArtistSocial = () => {
   width: 100%;
   background: #F5F5F5;
   box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.5);
-  transition: box-shadow 0.5s;
+  transition-property: box-shadow, height;
+  transition-duration: 0.5s, 0.3s;
+  transition-timing-function: ease-out ease-out;
 }
 
 .custom-card:hover {
@@ -168,6 +228,14 @@ img {
   left: 0px;
   bottom: 0px;
 }
+
+.absolute-no-b {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  left: 0px;
+}
+
 :deep(.el-button>span) {
   font-weight: bold;
 }
