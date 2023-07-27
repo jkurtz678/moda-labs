@@ -81,13 +81,17 @@
           <el-button v-if="plaque.entity.user_id" type="danger" plain @click="forgetPlaque">Forget Display</el-button>
           <!-- <el-button v-if="!plaque.entity.user_id && (!plaque.entity.token_meta_id_list || plaque.entity.token_meta_id_list.length === 0)" type="danger" plain @click="deleteEmptyPlaque">Delete Plaque</el-button> -->
         </div>
-        <div>
+        <div style="margin-bottom: 1em;">
           <div style="font-size: var(--el-font-size-extra-small)">Machine Info</div>
           <div>Machine name: {{ plaque.entity.machine_data?.machine_name ?? "N/A" }}</div>
           <div>Version: {{ plaque.entity.machine_data?.version ?? "N/A" }}</div>
           <div>Local IP: {{ plaque.entity.machine_data?.local_ip ?? "N/A" }}</div>
           <div>Public IP: {{ plaque.entity.machine_data?.public_ip ?? "N/A" }}</div>
           <div>Updated At: {{ machine_data_updated_at }}</div>
+        </div>
+        <div>
+          <div class="caption">Enable Support VPN</div>
+          <el-switch v-model="vpn_active" active-text="Enabled" inactive-text="Off" />
         </div>
         <div style="display: flex; justify-content: end;">
           <el-button @click="plaque_view = 'detail'">Close<el-icon class="el-icon--right">
@@ -250,6 +254,25 @@ watch(plaque_view, (v) => {
   }
 })
 
+const vpn_active = computed({
+  get: () => {
+    return Boolean(props.plaque.entity.vpn_active);
+  },
+  set: (value) => {
+    updatePlaque(props.plaque.id, { vpn_active: value })
+      .then(() => {
+        plaque_store.plaque_map[props.plaque.id].entity.vpn_active = value;
+        ElMessage({
+          type: 'success',
+          message: 'VPN setting updated',
+        })
+      })
+      .catch((err) => {
+        showError(`Error updating VPN setting- ${err}`);
+      });
+  }
+})
+
 const machine_data_updated_at = computed(() => {
   const timestamp = props?.plaque?.entity?.machine_data?.updated_at
   if (!timestamp) {
@@ -324,5 +347,9 @@ span {
     margin: 12px 0px 12px 0px;
     min-width: 250px !important;
   }
+}
+
+.caption {
+  font-size: var(--el-font-size-extra-small)
 }
 </style>

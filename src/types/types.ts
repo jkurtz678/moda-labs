@@ -53,6 +53,7 @@ export interface Plaque extends BaseDocument {
     command: Command;
     machine_data: MachineData;
     last_check_in_time: Timestamp;
+    vpn_active: boolean;
 }
 
 export interface Command {
