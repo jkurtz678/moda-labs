@@ -109,9 +109,27 @@ export enum TokenPlatform {
 // Gallery is a group of users and token metas
 export interface Gallery extends BaseDocument {
     name: string;
-    user_id_list: string[];
-    plaque_id_list: string[];
-    token_meta_id_list: string[];
+    //user_id_list: string[];
+    //plaque_id_list: string[];
+    //token_meta_id_list: string[];
+}
+
+// GalleryTokenUser is a mapping between a gallery and a user
+export interface GalleryUser extends BaseDocument {
+    gallery_id: string;
+    user_id: string;
+}
+
+// GalleryPlaque is a mapping between a gallery and a plaque
+export interface GalleryPlaque extends BaseDocument {
+    gallery_id: string;
+    plaque_id: string;
+}
+
+// GalleryTokenMeta is a mapping between a gallery and a token meta
+export interface GalleryTokenMeta extends BaseDocument {
+    gallery_id: string;
+    token_meta_id: string;
 }
 
 // OpenseaToken is the structure of tokens returned from the opensea API

@@ -30,7 +30,8 @@
         </el-form-item>
         <el-form-item v-if="!props.token_meta_id" label="Add to Gallery">
             <el-select v-model="selected_galleries" multiple placeholder="N/A" filterable>
-                <el-option v-for="gallery in gallery_list" :key="gallery.id" :label="`${gallery.entity.name}`" :value="gallery.id" />
+                <el-option v-for="gallery in gallery_list" :key="gallery.id" :label="`${gallery.entity.name}`"
+                    :value="gallery.id" />
             </el-select>
         </el-form-item>
         <el-form-item v-if="!props.token_meta_id">
@@ -62,9 +63,9 @@
 import { reactive, ref, onMounted } from "vue";
 import type { FormInstance, FormRules } from "element-plus";
 import { createTokenMeta, updateTokenMeta } from "@/api/token-meta";
-import { addTokenToGallery } from "@/api/gallery";
+import { createGalleryTokenMetaList } from "@/api/gallery-token";
 import { uploadFile } from "@/api/storage";
-import { type TokenMeta, Blockchain, TokenPlatform, type FirestoreDocument, type Gallery } from "@/types/types";
+import { type TokenMeta, Blockchain, TokenPlatform, type FirestoreDocument, type Gallery, type GalleryTokenMeta } from "@/types/types";
 import { useAccountStore } from "@/stores/account"
 import { useTokenMetaStore } from "@/stores/token-meta"
 import { showError } from "@/util/util";
@@ -201,18 +202,18 @@ const uploadSuccess = async (formEl: FormInstance, file: UploadUserFile) => {
 
     // if the user selected galleries we need to add the token to them
     if (selected_galleries.value?.length) {
-        try {
-            const gallery_promise_list: Promise<FirestoreDocument<Gallery>>[] = [];
-            selected_galleries.value.forEach(async (gallery_id) => {
-                gallery_promise_list.push(addTokenToGallery(gallery_id, new_token_meta.id))
-            })
-            await Promise.all(gallery_promise_list);
+        const gallery_token_meta_list = selected_galleries.value.map((gallery_id) => {
+            return {
+                gallery_id,
+                token_meta_id: new_token_meta.id
+            } as GalleryTokenMeta
+        })
 
-        } catch (err) {
-            showError(`Error adding token to gallery - ${err}`)
-            loading.value = false;
-            return
-        }
+        await createGalleryTokenMetaList(gallery_token_meta_list)
+            .catch((err) => {
+                showError(`Error adding token to gallery - ${err}`)
+                loading.value = false;
+            })
     }
 
     formEl.resetFields();
