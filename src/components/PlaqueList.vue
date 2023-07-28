@@ -66,11 +66,11 @@ const router = useRouter();
 const account_store = useAccountStore();
 const gallery_store = useGalleryStore();
 const search_filter = ref("")
-const filter_by_gallery = ref<string>(localStorage.getItem('filter_by_gallery') || "")
+const filter_by_gallery = ref<string>(localStorage.getItem('plaque_list_filter_by_gallery') || "")
 const online_filter = ref<boolean>(localStorage.getItem('online_filter') === 'true' || false);
 
 watch(filter_by_gallery, (newVal) => {
-    localStorage.setItem('filter_by_gallery', newVal)
+    localStorage.setItem('plaque_list_filter_by_gallery', newVal)
 })
 
 watch(online_filter, (newVal) => {

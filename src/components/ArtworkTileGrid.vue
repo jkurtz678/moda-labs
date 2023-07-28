@@ -3,20 +3,23 @@
         <el-input v-model="search_filter" :prefix-icon="Search" placeholder="Search artwork or artist" style="max-width: 350px"
             clearable>
         </el-input>
-        <el-select v-model="sort_order" placeholder="Sort by" style="margin-left: 10px;">
-                <el-option label="Sort by name" value="name"></el-option>
-                <el-option label="Sort by newest" value="created_at"></el-option>
-            </el-select>
-            <el-button icon="Plus" @click="router.push({ name: 'new-artwork' })" color="#000000" style="margin-left: 10px" size="small">Artwork</el-button>
-        <!-- <el-popover placement="bottom" title="Plaque Filters" :width="300" trigger="click">
+        <el-popover placement="bottom" title="Artwork Filters" :width="300" trigger="click">
             <template #reference>
                 <el-button icon="Filter" style="margin-left: 10px;" type="info" size="small">Filters</el-button>
             </template>
-            <el-select v-model="sort_order" placeholder="Sort by" style="">
+            <div class="caption">Filter by gallery</div>
+            <el-select v-model="filter_by_gallery" placeholder="Filter by gallery" style="width: 260px; margin-bottom: 12px;">
+                <el-option :label="'All plaques'" value="" />
+                <el-option v-for="gallery in gallery_store.gallery_list" :key="gallery.id"
+                    :label="`${gallery.entity.name}`" :value="gallery.id" />
+            </el-select>
+            <div class="caption">Sort order</div>
+            <el-select v-model="sort_order" placeholder="Sort by" >
                 <el-option label="Sort by name" value="name"></el-option>
                 <el-option label="Sort by newest" value="created_at"></el-option>
             </el-select>
-        </el-popover> -->
+        </el-popover>
+        <el-button icon="Plus" type="info" @click="router.push({ name: 'new-artwork' })" style="margin-left: 10px" size="small">Artwork</el-button>
     </div>
 
     <div style="padding-bottom: 40px;"></div>
@@ -42,14 +45,21 @@ import { watch } from "vue";
 import type { FirestoreDocument, TokenMeta } from "@/types/types";
 import { Search } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router';
+import { useGalleryStore } from "@/stores/gallery";
 
 const router = useRouter();
 
 const token_meta_store = useTokenMetaStore()
+const gallery_store = useGalleryStore();
 const search_filter = ref("")
 const masonryContainer = ref(null);
 const sort_order = ref(localStorage.getItem('token_list_sort_order') || "name")
 const limit = ref(1000);
+
+const filter_by_gallery = ref<string>(localStorage.getItem('artwork_grid_filter_by_gallery') || "")
+watch(filter_by_gallery, (newVal) => {
+    localStorage.setItem('artwork_grid_filter_by_gallery', newVal)
+})
 
 const all_tokens = computed(() => {
     return token_meta_store.sorted_all_token_metas;
@@ -59,6 +69,10 @@ const filtered_tokens = computed(() => {
     let filtered_tokens = all_tokens.value.filter((token) =>
         token.entity.artist?.toLowerCase().includes(search_filter.value.toLowerCase()) || token.entity.name?.toLowerCase().includes(search_filter.value.toLowerCase())
     );
+
+    if(filter_by_gallery.value) {
+        filtered_tokens = filtered_tokens.filter(t => gallery_store.gallery_list.find(g => g.id == filter_by_gallery.value)?.entity.token_meta_id_list.includes(t.id))
+    }
 
     if (sort_order.value === "name") {
         filtered_tokens = filtered_tokens.sort((a, b) => a.entity.name.localeCompare(b.entity.name));
@@ -134,5 +148,9 @@ onMounted(() => {
     right: 0px;
     padding: 0px 25px 10px;
     z-index: 5;
+}
+
+.caption {
+    font-size: var(--el-font-size-extra-small) 
 }
 </style>
