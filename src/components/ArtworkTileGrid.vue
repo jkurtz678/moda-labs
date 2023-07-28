@@ -69,11 +69,11 @@ watch(search_filter, (newVal) => {
 
 const all_tokens = computed(() => {
     //create array of all token metas, duplicated 20 times
-    const all_token_metas = token_meta_store.sorted_all_token_metas.flatMap((token_meta) => {
-         return Array(1000).fill(token_meta)
-    })
-    return all_token_metas
-    //return token_meta_store.sorted_all_token_metas;
+    // const all_token_metas = token_meta_store.sorted_all_token_metas.flatMap((token_meta) => {
+    //      return Array(1000).fill(token_meta)
+    // })
+    // return all_token_metas
+    return token_meta_store.sorted_all_token_metas;
 })
 
 const filtered_tokens = computed(() => {
