@@ -1,7 +1,7 @@
 <template>
   <el-container style="height: 100%; flex-direction: column;">
     <Header></Header>
-    <el-main style="background-color: #DAD9D7;">
+    <el-main style="background-color: #DAD9D7;" :class="route.name == 'artwork-tile-grid' ? 'remove-padding' : ''">
       <RouterView v-if="initial_load_done"></RouterView>
     </el-main>
   </el-container>
@@ -115,5 +115,10 @@ async function loadAppData(user_id: string) {
   .el-main {
     text-align: center;
   }
+}
+
+.remove-padding {
+  padding: 0px !important;
+  overflow-y: hidden;
 }
 </style>

@@ -12,7 +12,7 @@
         <template v-else>
             <el-tabs v-model="route.name" @tab-click="handleClick" :class="screen_type == 'lg' || screen_type == 'md' ? '' : 'small-tabs'">
                 <el-tab-pane label="Plaques" name="plaque-list"></el-tab-pane>
-                <el-tab-pane label="Artwork" name="token-list"></el-tab-pane>
+                <el-tab-pane label="Artwork" name="artwork-tile-grid"></el-tab-pane>
                 <el-tab-pane label="Galleries" name="gallery-list"></el-tab-pane>
                 <el-tab-pane label="Account" name="account-settings"></el-tab-pane>
             </el-tabs>

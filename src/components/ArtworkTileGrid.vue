@@ -24,14 +24,15 @@
 
     <div style="padding-bottom: 40px;"></div>
     <div id="masonry-container" ref="masonryContainer"
-        style="overflow-y: auto; height: 100%; padding: 10px; margin: -10px;">
-        <vue-masonry-wall id="masonary-wall" :scroll-container="masonryContainer" :items="paginated_tokens"
+        style="overflow-y: auto; height: 100%; padding: 10px;">
+        <vue-masonry-wall v-if="paginated_tokens.length > 0" id="masonary-wall" :scroll-container="masonryContainer" :items="paginated_tokens"
             :column-width="250" :gap="14">
             <template v-slot:default="{ item }">
                 <ArtworkTile :token_meta="item">
                 </ArtworkTile>
             </template>
         </vue-masonry-wall>
+        <div v-else style="padding: 1em;">No artwork found</div>
     </div>
     <RouterView></RouterView>
 </template>
@@ -54,15 +55,25 @@ const gallery_store = useGalleryStore();
 const search_filter = ref("")
 const masonryContainer = ref(null);
 const sort_order = ref(localStorage.getItem('token_list_sort_order') || "name")
-const limit = ref(1000);
+const starting_limit = 40;
+const limit = ref(starting_limit);
 
 const filter_by_gallery = ref<string>(localStorage.getItem('artwork_grid_filter_by_gallery') || "")
 watch(filter_by_gallery, (newVal) => {
     localStorage.setItem('artwork_grid_filter_by_gallery', newVal)
 })
 
+watch(search_filter, (newVal) => {
+    limit.value = starting_limit;
+})
+
 const all_tokens = computed(() => {
-    return token_meta_store.sorted_all_token_metas;
+    //create array of all token metas, duplicated 20 times
+    const all_token_metas = token_meta_store.sorted_all_token_metas.flatMap((token_meta) => {
+         return Array(1000).fill(token_meta)
+    })
+    return all_token_metas
+    //return token_meta_store.sorted_all_token_metas;
 })
 
 const filtered_tokens = computed(() => {
@@ -116,19 +127,16 @@ onMounted(() => {
         console.log("ArtworkTileGrid error, masonary_wall element not found")
         return
     }
-    // masonry_container_el.addEventListener('scroll', () => {
-    //     const scroll_top = masonry_container_el.scrollTop;
-    //     const scroll_height = masonry_container_el.scrollHeight;
-    //     const client_height = masonry_container_el.clientHeight;
-    //     const scroll_percentage = (scroll_top / (scroll_height - client_height)) * 100;
-    //     if (scroll_percentage > 85 && limit.value < all_tokens.value.length) {
-    //         limit.value = limit.value + 4;
-    //         // if (paginated_tokens.value) {
-    //         //     paginated_tokens.value = [...paginated_tokens.value, ...filtered_tokens.value.slice(paginated_tokens.value.length, 4)]
-    //         // }
-    //     }
+    masonry_container_el.addEventListener('scroll', () => {
+        const scroll_top = masonry_container_el.scrollTop;
+        const scroll_height = masonry_container_el.scrollHeight;
+        const client_height = masonry_container_el.clientHeight;
+        const scroll_percentage = (scroll_top / (scroll_height - client_height)) * 100;
+        if (scroll_percentage > 85 && limit.value < all_tokens.value.length) {
+            limit.value = limit.value + 40;
+        }
 
-    // });
+    });
 })
 
 </script>
