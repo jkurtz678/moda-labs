@@ -63,6 +63,7 @@ watch(filter_by_gallery, (newVal) => {
     localStorage.setItem('artwork_grid_filter_by_gallery', newVal)
 })
 
+// if search filter changes we want to reset the limit
 watch(search_filter, (newVal) => {
     limit.value = starting_limit;
 })
@@ -132,7 +133,7 @@ onMounted(() => {
         const scroll_height = masonry_container_el.scrollHeight;
         const client_height = masonry_container_el.clientHeight;
         const scroll_percentage = (scroll_top / (scroll_height - client_height)) * 100;
-        if (scroll_percentage > 85 && limit.value < all_tokens.value.length) {
+        if (scroll_percentage > 85 && limit.value < filtered_tokens.value.length) {
             limit.value = limit.value + 40;
         }
 
