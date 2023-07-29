@@ -152,9 +152,6 @@ const paginated_tokens = computed(() => {
 
     return subset;
 })
-// watch(filtered_tokens, (v) => {
-//     paginated_tokens.value = v.slice(0, limit.value)
-// })
 
 onMounted(() => {
     const masonry_container_el = document.getElementById("masonry-container")

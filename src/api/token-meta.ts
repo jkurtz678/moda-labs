@@ -1,5 +1,5 @@
 import firebaseConfig from "../firebaseConfig"
-import { getFirestore, Timestamp} from "firebase/firestore";
+import { DocumentReference, getFirestore, setDoc, Timestamp} from "firebase/firestore";
 import type { TokenMeta, FirestoreDocument } from "@/types/types";
 import { collection, addDoc, getDocs, getDoc, documentId, doc, updateDoc, where, query, onSnapshot } from "firebase/firestore";
 import { BaseEntity } from "@/types/types";
@@ -15,6 +15,21 @@ export const createTokenMeta = async (meta: TokenMeta): Promise<FirestoreDocumen
     })
     const snapshot = await getDoc(document)
     return { id: document.id, entity: snapshot.data() as TokenMeta }
+}
+
+// getTokenMetaByID returns a single token meta ref by id
+export const getTokenMetaDocumentRef = async (): Promise<DocumentReference> => {
+    return doc(token_meta_ref);
+}
+
+// createTokenMetaWithReference will add a new firestore record for the given token meta ref
+export const createTokenMetaWithReference = async (ref: DocumentReference, meta: TokenMeta): Promise<FirestoreDocument<TokenMeta>> => {
+    await setDoc(ref, {
+        ...BaseEntity.createBaseEntity(),
+        ...meta
+    })
+    const snapshot = await getDoc(ref)
+    return { id: ref.id, entity: snapshot.data() as TokenMeta }
 }
 
 // updateTokenMeta updates an existing token meta object

@@ -14,6 +14,7 @@ const cors = require('cors')({ origin: true });
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 const ffmpeg = require('fluent-ffmpeg');
+const sharp = require('sharp');
 
 const app = express();
 
@@ -30,7 +31,7 @@ const generateThumbnail = async (object: any) => {
     //const content_type = object.contentType;
     const file_dir = path.dirname(file_path);
     const file_name = path.basename(file_path);
-    const file_name_no_ext = path.parse(file_name).name;
+    const file_name_no_ext = path.parse(file_name).name; // this is also the document id of the firestore record
     const thumbnail_file_path = path.normalize(path.join(file_dir, `${THUMB_PREFIX}${file_name_no_ext}.jpg`));
     const temp_local_file = path.join(os.tmpdir(), file_path);
     const temp_local_dir = path.dirname(temp_local_file);
@@ -133,6 +134,23 @@ const generateThumbnail = async (object: any) => {
     // Uploading the Thumbnail.
     await bucket.upload(temp_local_thumb_file, { destination: thumbnail_file_path, metadata: metadata });
     functions.logger.log('Thumbnail uploaded to Storage at', thumbnail_file_path);
+
+    // get aspect ratio of thumbnail
+    const thumbnail_metadata = await sharp(temp_local_thumb_file).metadata()
+    const width = thumbnail_metadata.width;
+    const height = thumbnail_metadata.height;
+
+    // calculate aspect ratio
+    const aspect_ratio = width / height;
+    functions.logger.log("Calculated aspect ratio of thumbnail: ", aspect_ratio)
+
+    functions.logger.log("Updating aspect ratio of token-meta document: ", file_name_no_ext)
+    // save aspect ratio to firestore
+    const token_meta_ref = admin.firestore().collection('token-meta').doc(file_name_no_ext);
+    await token_meta_ref.set({aspect_ratio: aspect_ratio}, {merge: true});
+    
+    functions.logger.log("Successfully update firestore document with aspect ratio: ", aspect_ratio)
+
     // Once the image has been uploaded delete the local files to free up disk space.
     fs.unlinkSync(temp_local_thumb_file);
     return true;

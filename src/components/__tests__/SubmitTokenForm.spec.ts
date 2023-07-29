@@ -7,7 +7,7 @@ import { createTestingPinia } from '@pinia/testing'
 import { createRouter, createWebHistory } from 'vue-router';
 import { Timestamp } from "firebase/firestore"
 import { useAccountStore } from "@/stores/account"
-import { createTokenMeta } from '@/api/token-meta';
+import { createTokenMetaWithReference, getTokenMetaDocumentRef } from '@/api/token-meta';
 import { addTokenToGallery, getAllGalleries } from '@/api/gallery';
 
 vi.mock("@/api/storage", () => ({
@@ -17,7 +17,10 @@ vi.mock("@/api/storage", () => ({
 }));
 
 vi.mock("@/api/token-meta", () => ({
-    createTokenMeta: vi.fn(() => {
+    getTokenMetaDocumentRef: vi.fn(() => {
+        return Promise.resolve({id: "test-id"})
+    }),
+    createTokenMetaWithReference: vi.fn(() => {
         return Promise.resolve({ id: "test-id", entity: { name: "test-name", artist: "test-artist", created_at: Timestamp.now(), updated_at: Timestamp.now() } });
     })
 }));
@@ -57,7 +60,9 @@ describe("SubmitTokenForm", () => {
         // @ts-ignore
         uploadFile.mockClear();
         // @ts-ignore
-        createTokenMeta.mockClear();
+        getTokenMetaDocumentRef.mockClear();
+        // @ts-ignore
+        createTokenMetaWithReference.mockClear();
         // @ts-ignore
         addTokenToGallery.mockClear();
 
@@ -88,6 +93,7 @@ describe("SubmitTokenForm", () => {
         wrapper.vm.form.artist = "Test Artist";
         wrapper.vm.file_list = [{ name: "test-file.jpg", size: 1000, type: "image/jpeg" }];
         await wrapper.vm.submit(wrapper.vm.formRef);
+        expect(getTokenMetaDocumentRef).toHaveBeenCalledTimes(1);
         expect(uploadFile).toHaveBeenCalledTimes(1);
         // loading indicator shown
         expect(wrapper.vm.loading).toBe(true);
@@ -96,8 +102,9 @@ describe("SubmitTokenForm", () => {
         wrapper.vm.form.name = "Test Artwork";
         wrapper.vm.form.artist = "Test Artist";
         wrapper.vm.loading = true;
-        await wrapper.vm.uploadSuccess(wrapper.vm.formRef, { name: "test-file.jpg", size: 1000, type: "image/jpeg" })
-        expect(createTokenMeta).toHaveBeenCalledTimes(1);
+        await wrapper.vm.uploadSuccess(wrapper.vm.formRef, { name: "test-file.jpg", size: 1000, type: "image/jpeg" }, { id: "test-id"})
+        expect(createTokenMetaWithReference).toHaveBeenCalledTimes(1);
+        expect(createTokenMetaWithReference).toHaveBeenCalledWith({ id: "test-id" }, wrapper.vm.form);
 
         //addTokenToGallery is not called because no galleries are selected
         expect(addTokenToGallery).toHaveBeenCalledTimes(0);
@@ -115,8 +122,8 @@ describe("SubmitTokenForm", () => {
         wrapper.vm.form.artist = "Test Artist";
         wrapper.vm.loading = true;
         wrapper.vm.selected_galleries = ["test-gallery", "test-gallery-2"];
-        await wrapper.vm.uploadSuccess(wrapper.vm.formRef, { name: "test-file.jpg", size: 1000, type: "image/jpeg" })
-        expect(createTokenMeta).toHaveBeenCalledTimes(1);
+        await wrapper.vm.uploadSuccess(wrapper.vm.formRef, { name: "test-file.jpg", size: 1000, type: "image/jpeg" }, { id: "test-id"})
+        expect(createTokenMetaWithReference).toHaveBeenCalledTimes(1);
         expect(addTokenToGallery).toHaveBeenCalledTimes(2);
 
         // ensure data gets reset
