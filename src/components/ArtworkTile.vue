@@ -227,7 +227,6 @@ img {
   background-color: transparent;
   opacity: 0;
   padding: 1em;
-  min-height: 279px;
 }
 
 .absolute {

@@ -91,10 +91,13 @@ const grid_width = computed(() => {
 })
 const tile_width = computed(() => {
     // determine how many columns can fit in the grid width with minimum column width and gap between columns
-    const num_columns = Math.floor(grid_width.value / (min_column_width + gap_width));
+    let num_columns = Math.floor(grid_width.value / (min_column_width + gap_width));
+    if (num_columns > 5 ) {
+        num_columns = 5;
+    }
 
     // calculate the width of each tile
-    return (grid_width.value - ((num_columns + 1) * gap_width)) / num_columns;
+    return (grid_width.value - ((num_columns - 1) * gap_width)) / num_columns;
 })
 
 const all_tokens = computed(() => {
