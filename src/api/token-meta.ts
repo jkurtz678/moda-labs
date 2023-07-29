@@ -41,6 +41,13 @@ export const updateTokenMeta = async (token_meta_id: string, update_data: Partia
     return { id: snapshot.id, entity: snapshot.data() as TokenMeta }
 }
 
+// deleteTokenMeta deletes an existing token meta object using a soft delete flag
+export const deleteTokenMeta = async (token_meta_id: string): Promise<void> => {
+    const update_data: Partial<TokenMeta> = { deleted: true, updated_at: Timestamp.now()}
+    const ref = doc(db, "token-meta", token_meta_id)
+    await updateDoc(ref, update_data)
+}
+
 // getAllTokenMetasWithListener returns a list of all archive token metas with a firebase listener callback
 export const getAllTokenMetasWithListener = async (onChange: (arr: FirestoreDocument<TokenMeta>[]) => void) => {
     const unsubscribe = await onSnapshot(query(token_meta_ref), (query_snapshot) => {
@@ -48,7 +55,8 @@ export const getAllTokenMetasWithListener = async (onChange: (arr: FirestoreDocu
         query_snapshot.forEach((doc) => {
             token_metas.push({ id: doc.id, entity: doc.data() as TokenMeta })
         })
-        onChange(token_metas)
+        const filtered_tokens = token_metas.filter((token_meta) => !token_meta.entity.deleted);
+        onChange(filtered_tokens)
     })
 }
 
@@ -60,7 +68,8 @@ export const getTokenMetaListByUserIDWithListener = async (user_id: string, onCh
         query_snapshot.forEach((doc) => {
             token_metas.push({ id: doc.id, entity: doc.data() as TokenMeta })
         })
-        onChange(token_metas)
+        const filtered_tokens = token_metas.filter((token_meta) => !token_meta.entity.deleted);
+        onChange(filtered_tokens)
     })
 };
 
@@ -98,5 +107,6 @@ export const getTokenMetaListByIDList = async (token_meta_id_list: string[]): Pr
     query_snapshot.forEach((doc) => {
         metas.push({ id: doc.id, entity: doc.data() as TokenMeta })
     })
-    return metas;
+    const filtered_metas = metas.filter((token_meta) => !token_meta.entity.deleted);
+    return filtered_metas;
 }

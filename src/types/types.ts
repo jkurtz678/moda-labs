@@ -94,6 +94,7 @@ export interface TokenMeta extends BaseDocument {
     external_thumbnail_url?: string; // url to thumbnail image from outside moda archives (e.g. from opensea servers)
     external_media_url?: string; // url to media source file from outside moda archives (e.g. opensea servers)
     aspect_ratio?: number
+    deleted?: boolean; // if true this token meta has been soft deleted and wont be displayed in the UI
 }
 
 export enum Blockchain {

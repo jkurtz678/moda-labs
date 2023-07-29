@@ -75,7 +75,7 @@ async function loadAppData(user_id: string) {
     .catch(err => (showError(`Error loading token metas - ${err}`)));
 
 
-  const promise_list = [plaque_promise, gallery_plaque_promise, archive_token_promise, gallery_plaque_promise];
+  const promise_list = [plaque_promise, gallery_plaque_promise, archive_token_promise, gallery_plaque_promise, gallery_token_promise];
 
   // if user has a wallet connected then we load opensea tokens also
   const wallet_address = account_store.get_account.entity.wallet_address;

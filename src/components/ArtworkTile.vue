@@ -1,7 +1,9 @@
 <template>
-  <div ref="tile_container" class="custom-card" @click="() => { show_detail = !show_detail; animateTileHeight(show_detail); }" :style="show_detail ? '' : `height: ${tile_height}px !important`">
-    <img :class="show_detail ? 'absolute' : ''" :src="thumbnail_url"  />
-    <div :class="show_detail ? 'show-blur' : 'hide-blur'" class="absolute overlay transition" ></div>
+  <div ref="tile_container" class="custom-card"
+    @click="() => { show_detail = !show_detail; animateTileHeight(show_detail); }"
+    :style="show_detail ? '' : `height: ${tile_height}px !important`">
+    <img :class="show_detail ? 'absolute' : ''" :src="thumbnail_url" />
+    <div :class="show_detail ? 'show-blur' : 'hide-blur'" class="absolute overlay transition"></div>
     <div class="transition absolute" :class="!show_detail ? 'show-blur' : 'hide-blur'">
       <div class="header">
         {{ `${token_meta.entity.name} | ${token_meta.entity.artist}` }}
@@ -31,7 +33,11 @@
         <el-tooltip v-if="token_meta.entity.public_link" class="box-item" effect="dark" content="QR Code Link"
           placement="top">
           <el-button icon="Link" text circle @click.stop="qrCodeLink"></el-button>
-        </el-tooltip> 
+        </el-tooltip>
+        <el-tooltip v-if="account_store.is_user_admin" class="box-item" effect="dark" content="Delete Artwork"
+          placement="top">
+          <el-button icon="Delete" text circle @click.stop="deleteConfirm"></el-button>
+        </el-tooltip>
       </template>
       <div v-else style="height: 32px;"></div>
       <div style="font-size: 0.9em; line-height: 1.3em">{{ token_meta.entity.description }}</div>
@@ -47,6 +53,9 @@ import { ref } from 'vue';
 import { computed } from 'vue';
 import { toRef } from 'vue';
 import { useRouter } from 'vue-router';
+import { useAccountStore } from "@/stores/account";
+import { deleteTokenMeta } from "@/api/token-meta";
+import { ElMessage, ElMessageBox } from 'element-plus';
 
 const router = useRouter();
 interface ArtworkTileProps {
@@ -59,6 +68,7 @@ const show_detail = ref(false);
 const starting_height = ref<number>(0);
 const tile_container = ref();
 const detail_container = ref();
+const account_store = useAccountStore();
 
 const platform = computed(() => {
   return getPlatformDisplay(props.token_meta.entity.platform)
@@ -78,7 +88,7 @@ const openArt = async () => {
 const tile_height = computed(() => {
 
   if (!props.token_meta.entity.aspect_ratio) {
-    return props.column_width 
+    return props.column_width
   }
 
   return props.column_width / props.token_meta.entity.aspect_ratio
@@ -143,6 +153,26 @@ function animateTileHeight(detail: boolean) {
     const newHeight = startHeight + incrementSize * currentIncrement;
     tile_container.value.style.height = newHeight + "px";
   }, frameRate);
+}
+
+const deleteConfirm = () => {
+  ElMessageBox.prompt(`Are you sure you want to delete ${props.token_meta.entity.name}? Please type the word 'DELETE' to proceed.`, 'Delete Artwork', {
+    confirmButtonText: 'Delete',
+    cancelButtonText: 'Cancel',
+    inputPattern: /^DELETE$/i,
+    inputErrorMessage: 'Please enter the word DELETE to confirm.'
+  })
+    .then(({ value }) => {
+      if (value) {
+        return deleteTokenMeta(props.token_meta.id)
+      }
+    })
+    .then(() => {
+      ElMessage({ message: 'Artwork deleted', type: 'success', showClose: true, duration: 12000 });
+    })
+    .catch((err) => {
+      ElMessage({ message: `Error deleting artwork - ${err}`, type: 'error', showClose: true, duration: 12000 });
+    });
 }
 
 </script>
