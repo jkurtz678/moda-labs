@@ -26,9 +26,9 @@
     <div id="masonry-container" ref="masonryContainer"
         style="overflow-y: auto; height: 100%; padding: 10px;">
         <vue-masonry-wall v-if="paginated_tokens.length > 0" id="masonary-wall" :scroll-container="masonryContainer" :items="paginated_tokens"
-            :column-width="250" :gap="14">
+            :column-width="min_column_width" :gap="gap_width" :style="`width: ${grid_width}px; margin: auto`" :max-columns="5">
             <template v-slot:default="{ item }">
-                <ArtworkTile :token_meta="item">
+                <ArtworkTile :token_meta="item" :column_width="tile_width">
                 </ArtworkTile>
             </template>
         </vue-masonry-wall>
@@ -47,6 +47,7 @@ import type { FirestoreDocument, TokenMeta } from "@/types/types";
 import { Search } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router';
 import { useGalleryStore } from "@/stores/gallery";
+import useBreakpoints from "@/composables/breakpoints";
 
 const router = useRouter();
 
@@ -68,13 +69,43 @@ watch(search_filter, (newVal) => {
     limit.value = starting_limit;
 })
 
+/* width calculation logic */
+const min_column_width = 250;
+const gap_width = 10;
+const { screen_type } = useBreakpoints();
+const grid_width = computed(() => {
+    switch (screen_type.value) {
+        case "xs":
+            return 340 - (gap_width*2);
+        case "sm":
+            return 650 - (gap_width*2);
+        case "md":
+            return 960 - (gap_width*2);
+        case "lg":
+            return 1200 - (gap_width*2); 
+        case "xl": 
+            return 1700 - (gap_width*2)
+    }
+    // wont get here but typescript complains
+    return 0;
+})
+const tile_width = computed(() => {
+    // determine how many columns can fit in the grid width with minimum column width and gap between columns
+    const num_columns = Math.floor(grid_width.value / (min_column_width + gap_width));
+
+    // calculate the width of each tile
+    return (grid_width.value - ((num_columns + 1) * gap_width)) / num_columns;
+})
+
 const all_tokens = computed(() => {
     //create array of all token metas, duplicated 20 times
     // const all_token_metas = token_meta_store.sorted_all_token_metas.flatMap((token_meta) => {
     //      return Array(1000).fill(token_meta)
     // })
     // return all_token_metas
-    return token_meta_store.sorted_all_token_metas;
+    return token_meta_store.sorted_all_token_metas.filter((token_meta) => {
+        return Boolean(token_meta.entity.aspect_ratio)
+    });
 })
 
 const filtered_tokens = computed(() => {

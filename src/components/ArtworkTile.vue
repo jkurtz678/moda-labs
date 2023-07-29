@@ -1,6 +1,6 @@
 <template>
-  <div ref="tile_container" class="custom-card" @click="() => { show_detail = !show_detail; animateTileHeight(show_detail); }">
-    <img :class="show_detail ? 'absolute' : ''" :src="thumbnail_url" />
+  <div ref="tile_container" class="custom-card" @click="() => { show_detail = !show_detail; animateTileHeight(show_detail); }" :style="show_detail ? '' : `height: ${tile_height}px !important`">
+    <img :class="show_detail ? 'absolute' : ''" :src="thumbnail_url"  />
     <div :class="show_detail ? 'show-blur' : 'hide-blur'" class="absolute overlay transition" ></div>
     <div class="transition absolute" :class="!show_detail ? 'show-blur' : 'hide-blur'">
       <div class="header">
@@ -17,6 +17,11 @@
       </div>
       <div v-else style="font-weight: bold;">{{ token_meta.entity.artist }}</div>
       <template v-if="show_detail">
+        <el-tooltip class="box-item" effect="dark" content="Edit art data" placement="top">
+          <el-button icon="Edit" text circle
+            @click.stop="router.push({ name: 'edit-artwork', params: { 'token_meta_id': props.token_meta.id } })">
+          </el-button>
+        </el-tooltip>
         <el-tooltip class="box-item" effect="dark" content="Download art" placement="top">
           <el-button icon="Download" text circle @click.stop="openArt"></el-button>
         </el-tooltip>
@@ -26,12 +31,7 @@
         <el-tooltip v-if="token_meta.entity.public_link" class="box-item" effect="dark" content="QR Code Link"
           placement="top">
           <el-button icon="Link" text circle @click.stop="qrCodeLink"></el-button>
-        </el-tooltip>
-        <el-tooltip class="box-item" effect="dark" content="Edit art data" placement="top">
-          <el-button icon="Edit" text circle
-            @click.stop="router.push({ name: 'edit-artwork', params: { 'token_meta_id': props.token_meta.id } })">
-          </el-button>
-        </el-tooltip>
+        </el-tooltip> 
       </template>
       <div v-else style="height: 32px;"></div>
       <div style="font-size: 0.9em; line-height: 1.3em">{{ token_meta.entity.description }}</div>
@@ -51,6 +51,7 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 interface ArtworkTileProps {
   token_meta: FirestoreDocument<TokenMeta>;
+  column_width: number;
 }
 const props = defineProps<ArtworkTileProps>();
 const thumbnail_url = useThumbnail(toRef(props, "token_meta"));
@@ -73,6 +74,15 @@ const openArt = async () => {
 
   window.open(url, '_blank');
 }
+
+const tile_height = computed(() => {
+
+  if (!props.token_meta.entity.aspect_ratio) {
+    return props.column_width 
+  }
+
+  return props.column_width / props.token_meta.entity.aspect_ratio
+})
 
 
 const previewPlaque = () => {
