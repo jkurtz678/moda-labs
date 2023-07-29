@@ -56,7 +56,7 @@ const gallery_store = useGalleryStore();
 const search_filter = ref("")
 const masonryContainer = ref(null);
 const sort_order = ref(localStorage.getItem('token_list_sort_order') || "name")
-const starting_limit = 40;
+const starting_limit = 30;
 const limit = ref(starting_limit);
 
 const filter_by_gallery = ref<string>(localStorage.getItem('artwork_grid_filter_by_gallery') || "")
@@ -164,8 +164,8 @@ onMounted(() => {
         const scroll_height = masonry_container_el.scrollHeight;
         const client_height = masonry_container_el.clientHeight;
         const scroll_percentage = (scroll_top / (scroll_height - client_height)) * 100;
-        if (scroll_percentage > 85 && limit.value < filtered_tokens.value.length) {
-            limit.value = limit.value + 40;
+        if (scroll_percentage > 90 && limit.value < filtered_tokens.value.length) {
+            limit.value = limit.value + 20;
         }
 
     });

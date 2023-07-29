@@ -117,7 +117,7 @@ function animateTileHeight(detail: boolean) {
 
 
   let targetHeight: number;
-  if (detail) {
+  if (detail && detail_container.value.offsetHeight > starting_height.value) {
     targetHeight = detail_container.value.offsetHeight; // The final height you want to animate to (in pixels)
   } else {
     targetHeight = starting_height.value
