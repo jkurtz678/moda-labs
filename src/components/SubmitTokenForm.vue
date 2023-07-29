@@ -176,7 +176,6 @@ const startFileUpload = async (formEl: FormInstance) => {
         loading.value = false;
         showError(`Error getting moda archive token meta document - ${err}`);
     });
-    console.log("REF", ref)
     if(!ref) {
         return
     }
@@ -189,7 +188,6 @@ const startFileUpload = async (formEl: FormInstance) => {
     }
 
     const file_uri = `${ref.id}.${file.name.split(".").pop()}`;
-    console.log("before upload, file_uri", file_uri)
     return uploadFile(file_uri, file.raw as File, progressCallback, successCallback)
         .catch(err => {
             console.error(err)
