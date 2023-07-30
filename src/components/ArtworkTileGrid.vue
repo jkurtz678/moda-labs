@@ -1,32 +1,40 @@
 <template>
     <div class='subheader' style="display: flex; align-items: center;">
-        <el-input v-model="search_filter" :prefix-icon="Search" placeholder="Search artwork or artist" style="max-width: 350px"
-            clearable>
+        <el-input v-model="search_filter" :prefix-icon="Search" placeholder="Search artwork or artist"
+            style="max-width: 350px" clearable>
         </el-input>
         <el-popover placement="bottom" title="Artwork Filters" :width="300" trigger="click">
             <template #reference>
                 <el-button icon="Filter" style="margin-left: 10px;" type="info" size="small">Filters</el-button>
             </template>
             <div class="caption">Filter by gallery</div>
-            <el-select v-model="filter_by_gallery" placeholder="Filter by gallery" style="width: 260px; margin-bottom: 12px;">
+            <el-select v-model="filter_by_gallery" placeholder="Filter by gallery" class="filter-select">
                 <el-option :label="'All plaques'" value="" />
-                <el-option v-for="gallery in gallery_store.gallery_list" :key="gallery.id"
-                    :label="`${gallery.entity.name}`" :value="gallery.id" />
+                <el-option v-for="gallery in gallery_store.gallery_list" :key="gallery.id" :label="`${gallery.entity.name}`"
+                    :value="gallery.id" />
+            </el-select>
+            <div class="caption">Filter by aspect ratio</div>
+            <el-select v-model="filter_by_aspect_ratio" class="filter-select">
+                <el-option label="All" value=""></el-option>
+                <el-option label="Landscape" value="landscape"></el-option>
+                <el-option label="Portrait" value="portrait"></el-option>
+                <el-option label="Square" value="square"></el-option>
             </el-select>
             <div class="caption">Sort order</div>
-            <el-select v-model="sort_order" placeholder="Sort by" >
+            <el-select v-model="sort_order" placeholder="Sort by" class="filter-select">
                 <el-option label="Sort by name" value="name"></el-option>
                 <el-option label="Sort by newest" value="created_at"></el-option>
             </el-select>
         </el-popover>
-        <el-button icon="Plus" type="info" @click="router.push({ name: 'new-artwork' })" style="margin-left: 10px" size="small">Artwork</el-button>
+        <el-button icon="Plus" type="info" @click="router.push({ name: 'new-artwork' })" style="margin-left: 10px"
+            size="small">Artwork</el-button>
     </div>
 
     <div style="padding-bottom: 40px;"></div>
-    <div id="masonry-container" ref="masonryContainer"
-        style="overflow-y: auto; height: 100%; padding: 10px;">
-        <vue-masonry-wall v-if="paginated_tokens.length > 0" id="masonary-wall" :scroll-container="masonryContainer" :items="paginated_tokens"
-            :column-width="min_column_width" :gap="gap_width" :style="`width: ${grid_width}px; margin: auto`" :max-columns="5">
+    <div id="masonry-container" ref="masonryContainer" style="overflow-y: auto; height: 100%; padding: 10px;">
+        <vue-masonry-wall v-if="paginated_tokens.length > 0" id="masonary-wall" :scroll-container="masonryContainer"
+            :items="paginated_tokens" :column-width="min_column_width" :gap="gap_width"
+            :style="`width: ${grid_width}px; margin: auto`" :max-columns="5">
             <template v-slot:default="{ item }">
                 <ArtworkTile :token_meta="item" :column_width="tile_width">
                 </ArtworkTile>
@@ -55,13 +63,22 @@ const token_meta_store = useTokenMetaStore()
 const gallery_store = useGalleryStore();
 const search_filter = ref("")
 const masonryContainer = ref(null);
-const sort_order = ref(localStorage.getItem('token_list_sort_order') || "name")
 const starting_limit = 30;
 const limit = ref(starting_limit);
 
+
+/* token filters */
+const filter_by_aspect_ratio = ref<string>(localStorage.getItem('artwork_grid_aspect_ratio_filter') || "")
+watch(filter_by_aspect_ratio, (newVal) => {
+    localStorage.setItem('artwork_grid_aspect_ratio_filter', newVal)
+})
 const filter_by_gallery = ref<string>(localStorage.getItem('artwork_grid_filter_by_gallery') || "")
 watch(filter_by_gallery, (newVal) => {
     localStorage.setItem('artwork_grid_filter_by_gallery', newVal)
+})
+const sort_order = ref(localStorage.getItem('artwork_grid_sort_order') || "name")
+watch(sort_order, (newVal) => {
+    localStorage.setItem('artwork_grid_sort_order', newVal)
 })
 
 // if search filter changes we want to reset the limit
@@ -76,15 +93,15 @@ const { screen_type } = useBreakpoints();
 const grid_width = computed(() => {
     switch (screen_type.value) {
         case "xs":
-            return 340 - (gap_width*2);
+            return 340 - (gap_width * 2);
         case "sm":
-            return 650 - (gap_width*2);
+            return 650 - (gap_width * 2);
         case "md":
-            return 960 - (gap_width*2);
+            return 960 - (gap_width * 2);
         case "lg":
-            return 1200 - (gap_width*2); 
-        case "xl": 
-            return 1700 - (gap_width*2)
+            return 1200 - (gap_width * 2);
+        case "xl":
+            return 1700 - (gap_width * 2)
     }
     // wont get here but typescript complains
     return 0;
@@ -92,7 +109,7 @@ const grid_width = computed(() => {
 const tile_width = computed(() => {
     // determine how many columns can fit in the grid width with minimum column width and gap between columns
     let num_columns = Math.floor(grid_width.value / (min_column_width + gap_width));
-    if (num_columns > 5 ) {
+    if (num_columns > 5) {
         num_columns = 5;
     }
 
@@ -112,13 +129,38 @@ const all_tokens = computed(() => {
 })
 
 const filtered_tokens = computed(() => {
-    let filtered_tokens = all_tokens.value.filter((token) =>
-        token.entity.artist?.toLowerCase().includes(search_filter.value.toLowerCase()) || token.entity.name?.toLowerCase().includes(search_filter.value.toLowerCase())
-    );
+    let filtered_tokens = all_tokens.value.filter((token) => {
 
-    if(filter_by_gallery.value) {
-        filtered_tokens = filtered_tokens.filter(t => gallery_store.gallery_list.find(g => g.id == filter_by_gallery.value)?.entity.token_meta_id_list.includes(t.id))
-    }
+        if (search_filter.value && !token.entity.artist?.toLowerCase().includes(search_filter.value.toLowerCase()) && !token.entity.name?.toLowerCase().includes(search_filter.value.toLowerCase())) {
+            return false
+        }
+        if (filter_by_gallery.value && !gallery_store.gallery_list.find(g => g.id == filter_by_gallery.value)?.entity.token_meta_id_list.includes(token.id)) {
+            return false
+        }
+
+
+        switch (filter_by_aspect_ratio.value) {
+            case "portrait":
+                if (!token.entity.aspect_ratio || token.entity.aspect_ratio > 0.9) {
+                    return false
+                }
+                break; 
+            case "landscape":
+                if (!token.entity.aspect_ratio || token.entity.aspect_ratio < 1.1) {
+                    return false
+                }
+                break
+            case "square":
+                if (!token.entity.aspect_ratio || token.entity.aspect_ratio < 0.9 || token.entity.aspect_ratio > 1.1) {
+                    return false
+                }
+                break;
+        }
+        return true
+    });
+
+
+
 
     if (sort_order.value === "name") {
         filtered_tokens = filtered_tokens.sort((a, b) => a.entity.name.localeCompare(b.entity.name));
@@ -191,6 +233,11 @@ onMounted(() => {
 }
 
 .caption {
-    font-size: var(--el-font-size-extra-small) 
+    font-size: var(--el-font-size-extra-small)
+}
+
+.filter-select {
+    margin-bottom: 1em;
+    width: 260px;
 }
 </style>
