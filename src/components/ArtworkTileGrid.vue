@@ -9,7 +9,7 @@
             </template>
             <div class="caption">Filter by gallery</div>
             <el-select v-model="filter_by_gallery" placeholder="Filter by gallery" class="filter-select">
-                <el-option :label="'All plaques'" value="" />
+                <el-option :label="'All artwork'" value="" />
                 <el-option v-for="gallery in gallery_store.gallery_list" :key="gallery.id" :label="`${gallery.entity.name}`"
                     :value="gallery.id" />
             </el-select>
