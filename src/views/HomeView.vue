@@ -90,6 +90,7 @@ async function loadAppData(user_id: string) {
   }
 
   await Promise.all(promise_list);
+  await token_meta_store.loadOpenseaConvertedTokens();
 
   // delay opensea_wallet_load to possibly help with rate limit
   // await opensea_wallet_token_promise;

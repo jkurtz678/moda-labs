@@ -12,6 +12,7 @@ export type RootTokenMetaState = {
     archive_token_meta_list: FirestoreDocument<TokenMeta>[];
     opensea_minted_token_meta_list: OpenseaToken[];
     opensea_wallet_token_meta_list: OpenseaToken[];
+    opensea_converted_tokens: FirestoreDocument<TokenMeta>[];
     gallery_token_meta_list: FirestoreDocument<TokenMeta>[];
 }
 interface TokenMetaMap {
@@ -23,6 +24,7 @@ export const useTokenMetaStore = defineStore({
         archive_token_meta_list: [],
         opensea_minted_token_meta_list: [],
         opensea_wallet_token_meta_list: [],
+        opensea_converted_tokens: [],
         gallery_token_meta_list: [],
     } as RootTokenMetaState),
     getters: {
@@ -37,10 +39,13 @@ export const useTokenMetaStore = defineStore({
             const token_meta_map: TokenMetaMap = {};
 
             // add wallet and minted tokens together in one map, which will remove duplicates
-            const opensea_tokens = [...state.opensea_minted_token_meta_list, ...state.opensea_wallet_token_meta_list]
-            opensea_tokens.forEach((o) => {
-                const meta = convertOpenseaToTokenMeta(o)
-                token_meta_map[meta.id] = meta
+            // const opensea_tokens = [...state.opensea_minted_token_meta_list, ...state.opensea_wallet_token_meta_list]
+            // opensea_tokens.forEach((o) => {
+            //     const meta = convertOpenseaToTokenMeta(o)
+            //     token_meta_map[meta.id] = meta
+            // })
+            state.opensea_converted_tokens.forEach((t) => {
+                token_meta_map[t.id] = t
             })
 
             // add archive tokens
@@ -93,6 +98,33 @@ export const useTokenMetaStore = defineStore({
                 this.opensea_wallet_token_meta_list = tokens;
             })
         },
+        async loadOpenseaConvertedTokens() {
+            const token_meta_list: FirestoreDocument<TokenMeta>[] = [];
+            const opensea_tokens = [...this.opensea_minted_token_meta_list, ...this.opensea_wallet_token_meta_list];
+            const promise_list: Promise<void>[] = [];
+            opensea_tokens.forEach((o) => {
+                const meta = convertOpenseaToTokenMeta(o)
+                token_meta_list.push(meta)
+                promise_list.push((async () => {
+                    if(!meta.entity.external_media_url) {
+                        return
+                    }
+
+                    const ratio = await getAspectRatio(meta.entity.external_thumbnail_url || "").catch(err => {
+                        console.log(err)
+                    })
+                    if (!ratio) {
+                        return
+                    }
+                    meta.entity.aspect_ratio = ratio
+                })());
+            });
+
+            await Promise.all(promise_list);
+        
+            console.log("TOKEN META LIST", token_meta_list)
+            this.opensea_converted_tokens = token_meta_list;
+        },
         async loadGalleryTokenMetas(gallery_list: FirestoreDocument<Gallery>[]) {
             const token_meta_id_list: string[] = [];
             gallery_list.forEach(g => {
@@ -125,4 +157,29 @@ const convertOpenseaToTokenMeta = (o: OpenseaToken): FirestoreDocument<TokenMeta
             external_media_url: o.animation_url ? o.animation_url : o.image_url,
         }
     } as FirestoreDocument<TokenMeta>
+}
+
+const getAspectRatio = (url: string): Promise<number> => {
+    const local_storage_key = `${url}_aspect_ratio`
+    return new Promise((resolve, reject) => {
+        const local_storage_ratio = localStorage.getItem(local_storage_key)
+        if (local_storage_ratio) {
+            resolve(Number(local_storage_ratio));
+            return
+        }
+
+        const img = new Image();
+        img.onload = () => {
+            const aspect_ratio = img.naturalWidth / img.naturalHeight;
+            console.log("aspect_ratio for opensea", aspect_ratio, url)
+            // save to local storage
+            localStorage.setItem(local_storage_key, String(aspect_ratio))
+
+            resolve(aspect_ratio);
+        }
+        img.onerror = () => {
+            reject("Error loading image");
+        }
+        img.src = url;
+    })
 }
