@@ -20,6 +20,12 @@
                 <el-option label="Portrait" value="portrait"></el-option>
                 <el-option label="Square" value="square"></el-option>
             </el-select>
+            <div class="caption">Filter by platform</div>
+            <el-select v-model="filter_by_platform" class="filter-select">
+                <el-option label="All" value=""></el-option>
+                <el-option label="Moda Archive" value="moda_archive"></el-option>
+                <el-option label="Opensea" value="opensea"></el-option>
+            </el-select>
             <div class="caption">Sort order</div>
             <el-select v-model="sort_order" placeholder="Sort by" class="filter-select">
                 <el-option label="Sort by name" value="name"></el-option>
@@ -75,6 +81,10 @@ watch(filter_by_aspect_ratio, (newVal) => {
 const filter_by_gallery = ref<string>(localStorage.getItem('artwork_grid_filter_by_gallery') || "")
 watch(filter_by_gallery, (newVal) => {
     localStorage.setItem('artwork_grid_filter_by_gallery', newVal)
+})
+const filter_by_platform = ref<string>(localStorage.getItem('artwork_grid_filter_by_platform') || "")
+watch(filter_by_platform, (newVal) => {
+    localStorage.setItem('artwork_grid_filter_by_platform', newVal)
 })
 const sort_order = ref(localStorage.getItem('artwork_grid_sort_order') || "name")
 watch(sort_order, (newVal) => {
@@ -138,13 +148,26 @@ const filtered_tokens = computed(() => {
             return false
         }
 
+        switch (filter_by_platform.value) {
+            case "moda_archive":
+                if (token.entity.platform != 'archive') {
+                    return false
+                }
+                break;
+            case "opensea":
+                if (token.entity.platform != 'opensea' && token.entity.platform != 'opensea_archive') {
+                    return false
+                }
+                break
+        }
+
 
         switch (filter_by_aspect_ratio.value) {
             case "portrait":
                 if (!token.entity.aspect_ratio || token.entity.aspect_ratio > 0.9) {
                     return false
                 }
-                break; 
+                break;
             case "landscape":
                 if (!token.entity.aspect_ratio || token.entity.aspect_ratio < 1.1) {
                     return false
