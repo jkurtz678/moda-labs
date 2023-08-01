@@ -57,7 +57,7 @@ import ArtworkTile from "./ArtworkTile.vue"
 import { useTokenMetaStore } from '@/stores/token-meta';
 import { computed, onMounted, ref } from 'vue';
 import { watch } from "vue";
-import type { FirestoreDocument, TokenMeta } from "@/types/types";
+import { TokenPlatform, type FirestoreDocument, type TokenMeta } from "@/types/types";
 import { Search } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router';
 import { useGalleryStore } from "@/stores/gallery";
@@ -150,12 +150,12 @@ const filtered_tokens = computed(() => {
 
         switch (filter_by_platform.value) {
             case "moda_archive":
-                if (token.entity.platform != 'archive') {
+                if (token.entity.platform != TokenPlatform.Archive) {
                     return false
                 }
                 break;
             case "opensea":
-                if (token.entity.platform != 'opensea' && token.entity.platform != 'opensea_archive') {
+                if (token.entity.platform != TokenPlatform.Opensea && token.entity.platform != TokenPlatform.OpenseaArchive) {
                     return false
                 }
                 break
