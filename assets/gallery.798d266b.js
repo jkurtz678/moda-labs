@@ -1,0 +1,1 @@
+import{v as l}from"./index.459f1e60.js";import{g as s}from"./gallery.82c2a091.js";const o=l({id:"gallery",state:()=>({gallery_list:[]}),getters:{get_user_id_list_for_galleries:r=>Array().concat.apply(Array(),r.gallery_list.map(e=>e.entity.user_id_list))},actions:{async loadGalleryList(r){return new Promise(e=>s(r,t=>{this.gallery_list=t,e(null)}))}}});export{o as u};
