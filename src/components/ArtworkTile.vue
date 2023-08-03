@@ -1,7 +1,6 @@
 <template>
-  <div ref="tile_container" class="custom-card"
-    @click="() => { show_detail = !show_detail; animateTileHeight(show_detail); }"
-    :style="show_detail ? '' : `height: ${tile_height}px !important`">
+  <div ref="tile_container" class="custom-card" @click="toggleTileDetail"
+    :style="`height: ${tile_height}px !important`">
     <img :class="show_detail ? 'absolute' : ''" :src="thumbnail_url" />
     <div :class="show_detail ? 'show-blur' : 'hide-blur'" class="absolute overlay transition"></div>
     <div class="transition absolute" :class="!show_detail ? 'show-blur' : 'hide-blur'">
@@ -11,7 +10,7 @@
       <div class="platform">{{ platform }}</div>
     </div>
     <div ref="detail_container" class='detail-container transition'
-      :class="show_detail ? 'show-blur' : 'hide-blur absolute-no-b'">
+      :class="show_detail ? 'show-blur' : 'hide-blur'">
       <div style="font-size: 1.6em; font-weight: bold;">{{ token_meta.entity.name }}</div>
       <div v-if="token_meta.entity.artist_social_link">
         <el-button link style="font-weight: bold; display: block;" @click.stop="openArtistSocial">{{
@@ -108,26 +107,25 @@ const openArtistSocial = () => {
   window.open(props.token_meta.entity.artist_social_link, '_blank');
 }
 
-function animateTileHeight(detail: boolean) {
-
-
+function toggleTileDetail() {
   if (!tile_container.value) {
     console.log("animateDivHeight - error finding tile container")
     return
   }
 
-  if (detail && starting_height.value == 0) {
+  if (!show_detail.value && starting_height.value == 0) {
     starting_height.value = tile_container.value.offsetHeight
   }
+
+  show_detail.value = !show_detail.value;
 
   if (!detail_container.value) {
     console.log("animateDivHeight - error finding detail container")
     return
   }
 
-
   let targetHeight: number;
-  if (detail && detail_container.value.offsetHeight > starting_height.value) {
+  if (show_detail.value && detail_container.value.offsetHeight > starting_height.value) {
     targetHeight = detail_container.value.offsetHeight; // The final height you want to animate to (in pixels)
   } else {
     targetHeight = starting_height.value
