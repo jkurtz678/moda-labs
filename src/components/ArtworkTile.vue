@@ -13,7 +13,7 @@
       :class="show_detail ? 'show-blur' : 'hide-blur'">
       <div style="font-size: 1.6em; font-weight: bold;">{{ token_meta.entity.name }}</div>
       <div v-if="token_meta.entity.artist_social_link">
-        <el-button link style="font-weight: bold; display: block;" @click.stop="openArtistSocial">{{
+        <el-button link style="font-weight: bold; display: block;" :disabled="!show_detail" @click.stop="openArtistSocial">{{
           token_meta.entity.artist }}</el-button>
       </div>
       <div v-else style="font-weight: bold;">{{ token_meta.entity.artist }}</div>
@@ -40,6 +40,9 @@
       </template>
       <div v-else style="height: 32px;"></div>
       <div style="font-size: 0.9em; line-height: 1.3em">{{ token_meta.entity.description }}</div>
+      <div style="margin: 10px 0px">
+      <el-button v-for="g in gallery_store.token_id_to_gallery_map.get(props.token_meta.id)" size="small" round plain type="primary" style="margin: 3px 10px 3px 0px;">{{g.entity.name}}</el-button>
+      </div>
     </div>
   </div>
 </template>
@@ -55,6 +58,7 @@ import { useRouter } from 'vue-router';
 import { useAccountStore } from "@/stores/account";
 import { deleteTokenMeta } from "@/api/token-meta";
 import { ElMessage, ElMessageBox } from 'element-plus';
+import {useGalleryStore} from "@/stores/gallery";
 
 const router = useRouter();
 interface ArtworkTileProps {
@@ -68,6 +72,7 @@ const starting_height = ref<number>(0);
 const tile_container = ref();
 const detail_container = ref();
 const account_store = useAccountStore();
+const gallery_store = useGalleryStore();
 
 const platform = computed(() => {
   return getPlatformDisplay(props.token_meta.entity.platform)
