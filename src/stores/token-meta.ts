@@ -53,7 +53,10 @@ export const useTokenMetaStore = defineStore({
                 // if archive tokens contain matching token_id/asset_contract_address pair to opensea tokens, remove
                 if (token_meta_map[getTokenMetaUniqueChainID(t)]) {
                     delete token_meta_map[getTokenMetaUniqueChainID(t)]
-                    t.entity.platform = TokenPlatform.OpenseaArchive
+                    const opensea_archive_token = {id: t.id, entity: {...t.entity}};
+                    opensea_archive_token.entity.platform = TokenPlatform.OpenseaArchive
+                    token_meta_map[opensea_archive_token.id] = opensea_archive_token;
+                    return
                 }
                 token_meta_map[t.id] = t
             })  
