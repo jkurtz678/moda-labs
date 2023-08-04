@@ -36,7 +36,7 @@
                             <div :class="description_class" style="white-space: pre-line; text-align: justify">{{ token_meta?.entity?.description }}</div>
                         </div>
                         <div style="display: flex; justify-content: center; align-items: center; flex-basis: 38.2%;">
-                            <QrcodeVue :value="token_meta?.entity?.public_link" :size="220" level="H" />
+                            <QrcodeVue v-if="token_meta?.entity?.public_link" :value="token_meta?.entity?.public_link" :size="220" level="H" />
                         </div>
                     </div>
                 </div>
