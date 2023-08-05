@@ -105,6 +105,7 @@ const generateResizedFile = async (bucket: any, file_path: string, new_file_pref
     const new_file_path = path.normalize(path.join(file_dir, `${new_file_prefix}${file_name_no_ext}.jpg`));
     const temp_local_new_file = path.join(os.tmpdir(), new_file_path);
 
+    // if the file already exists we return null
     const new_file_exists_arr = await bucket.file(new_file_path).exists()
     if (new_file_exists_arr && new_file_exists_arr[0]) {
         return null;

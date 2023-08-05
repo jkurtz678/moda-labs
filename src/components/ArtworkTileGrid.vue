@@ -67,13 +67,14 @@ const router = useRouter();
 
 const token_meta_store = useTokenMetaStore()
 const gallery_store = useGalleryStore();
-const search_filter = ref("")
 const masonryContainer = ref(null);
 const starting_limit = 30;
 const limit = ref(starting_limit);
 
 
 /* token filters */
+const search_filter = ref("")
+
 const filter_by_aspect_ratio = ref<string>(localStorage.getItem('artwork_grid_aspect_ratio_filter') || "")
 watch(filter_by_aspect_ratio, (newVal) => {
     localStorage.setItem('artwork_grid_aspect_ratio_filter', newVal)
