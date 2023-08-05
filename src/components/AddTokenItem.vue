@@ -18,7 +18,7 @@
 import { computed, toRef } from "vue";
 import { getPlatformDisplay } from "@/types/types";
 import type { FirestoreDocument, TokenMeta } from "@/types/types";
-import useThumbnail from "@/composables/thumbnail-image";
+import {useThumbnail} from "@/composables/thumbnail-image";
 
 interface AddTokenItemProps {
     in_list: boolean;

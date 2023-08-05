@@ -176,6 +176,39 @@ export async function getTokenMetaThumbnailImageURL(token_meta: FirestoreDocumen
     return new URL(`../assets/logo.png`, import.meta.url).href
 }
 
+// getTokenMetaThumbnailImageURL returns the url to the thumbnail image for a token meta
+export async function getTokenMetaMediumImageURL(token_meta: FirestoreDocument<TokenMeta>): Promise<string> {
+    // first check if archive medium image exist in firebase storage
+    const storage = getStorage();
+    const medium_path_ref = ref(storage, `medium_${token_meta.entity.media_id}.jpg`);
+    try {
+        const url = await getDownloadURL(medium_path_ref)
+        console.log(`getTokenMetaThumbnailImageURL - found url for image ${token_meta.entity.name}`, url)
+        return url
+    } catch (err) {
+        console.log(`getTokenMetaThumbnailImageURL - failed to find archive medium image ${token_meta.entity.name}`, err)
+    }
+
+    // then fallback to thumbnail if it exists
+    const thumbnail_path_ref = ref(storage, `thumb_${token_meta.entity.media_id}.jpg`);
+    try {
+        const url = await getDownloadURL(thumbnail_path_ref)
+        console.log(`getTokenMetaThumbnailImageURL - found url for image ${token_meta.entity.name}`, url)
+        return url
+    } catch (err) {
+        console.log(`getTokenMetaThumbnailImageURL - failed to find archive thumbnail image ${token_meta.entity.name}`, err)
+    } 
+
+
+    // then we check external thumbnail url
+    if (token_meta.entity.external_thumbnail_url) {
+        return token_meta.entity.external_thumbnail_url
+    }
+
+    // if none found return moda logo as placeholder image
+    return new URL(`../assets/logo.png`, import.meta.url).href
+}
+
 export async function getSourceFile(token_meta: FirestoreDocument<TokenMeta>): Promise<string> {
     console.log("token_meta", token_meta);
     const storage = getStorage();

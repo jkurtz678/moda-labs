@@ -38,7 +38,8 @@
                 <a v-if="token_meta.public_link" :href="qr_code_link" target="_blank">QR Code Link</a>
               </div>
               <div>
-                <a v-if="token_meta.artist_social_link" :href="artist_social_link" target="_blank">Artist Social Media Link</a>
+                <a v-if="token_meta.artist_social_link" :href="artist_social_link" target="_blank">Artist Social Media
+                  Link</a>
               </div>
             </div>
           </div>
@@ -74,7 +75,7 @@ import type { FirestoreDocument, TokenMeta } from "../types/types";
 import { getPlatformDisplay, getSourceFile } from "../types/types";
 import { showError } from '@/util/util';
 import { useRouter } from 'vue-router';
-import useThumbnail from "@/composables/thumbnail-image";
+import { useThumbnail } from "@/composables/thumbnail-image";
 
 const router = useRouter();
 
@@ -102,7 +103,7 @@ const token_description = computed(() => {
 const qr_code_link = computed(() => {
   const link = props.token_meta.entity.public_link
   // if link doesnt start with https:// add it
-  if(link && !link.startsWith("https://")) {
+  if (link && !link.startsWith("https://")) {
     return `https://${link}`
   }
 
@@ -113,7 +114,7 @@ const qr_code_link = computed(() => {
 const artist_social_link = computed(() => {
   const link = props.token_meta.entity.artist_social_link
   // if link doesnt start with https:// add it
-  if(link && !link.startsWith("https://")) {
+  if (link && !link.startsWith("https://")) {
     return `https://${link}`
   }
 
