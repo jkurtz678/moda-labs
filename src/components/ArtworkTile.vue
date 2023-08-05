@@ -1,6 +1,5 @@
 <template>
-  <div ref="tile_container" class="custom-card" @click="toggleTileDetail"
-    :style="`height: ${tile_height}px !important`">
+  <div ref="tile_container" class="custom-card" @click="toggleTileDetail" :style="`height: ${tile_height}px !important`">
     <img :class="show_detail ? 'absolute' : ''" :src="thumbnail_url" />
     <div :class="show_detail ? 'show-blur' : 'hide-blur'" class="absolute overlay transition"></div>
     <div class="transition absolute" :class="!show_detail ? 'show-blur' : 'hide-blur'">
@@ -9,12 +8,12 @@
       </div>
       <div class="platform">{{ platform }}</div>
     </div>
-    <div ref="detail_container" class='detail-container transition'
-      :class="show_detail ? 'show-blur' : 'hide-blur'">
+    <div ref="detail_container" class='detail-container transition' :class="show_detail ? 'show-blur' : 'hide-blur'">
       <div style="font-size: 1.6em; font-weight: bold;">{{ token_meta.entity.name }}</div>
       <div v-if="token_meta.entity.artist_social_link">
-        <el-button link style="font-weight: bold; display: block;" :disabled="!show_detail" @click.stop="openArtistSocial">{{
-          token_meta.entity.artist }}</el-button>
+        <el-button link style="font-weight: bold; display: block;" :disabled="!show_detail"
+          @click.stop="openArtistSocial">{{
+            token_meta.entity.artist }}</el-button>
       </div>
       <div v-else style="font-weight: bold;">{{ token_meta.entity.artist }}</div>
       <template v-if="show_detail">
@@ -41,14 +40,15 @@
       <div v-else style="height: 32px;"></div>
       <div style="font-size: 0.9em; line-height: 1.3em">{{ token_meta.entity.description }}</div>
       <div style="margin: 10px 0px">
-      <el-button v-for="g in gallery_store.token_id_to_gallery_map.get(props.token_meta.id)" size="small" round plain type="primary" style="margin: 3px 10px 3px 0px;">{{g.entity.name}}</el-button>
+        <el-button v-for="g in gallery_store.token_id_to_gallery_map.get(props.token_meta.id)" size="small" round plain
+          type="primary" style="margin: 3px 10px 3px 0px;">{{ g.entity.name }}</el-button>
       </div>
     </div>
   </div>
 </template>
   
 <script setup lang="ts">
-import useThumbnail from '@/composables/thumbnail-image';
+import { useMediumThumbnail } from "@/composables/thumbnail-image";
 import { getPlatformDisplay, type FirestoreDocument, type TokenMeta, getSourceFile } from '@/types/types';
 import { showError } from '@/util/util';
 import { ref } from 'vue';
@@ -58,7 +58,7 @@ import { useRouter } from 'vue-router';
 import { useAccountStore } from "@/stores/account";
 import { deleteTokenMeta } from "@/api/token-meta";
 import { ElMessage, ElMessageBox } from 'element-plus';
-import {useGalleryStore} from "@/stores/gallery";
+import { useGalleryStore } from "@/stores/gallery";
 
 const router = useRouter();
 interface ArtworkTileProps {
@@ -66,7 +66,7 @@ interface ArtworkTileProps {
   column_width: number;
 }
 const props = defineProps<ArtworkTileProps>();
-const thumbnail_url = useThumbnail(toRef(props, "token_meta"));
+const thumbnail_url = useMediumThumbnail(toRef(props, "token_meta"));
 const show_detail = ref(false);
 const starting_height = ref<number>(0);
 const tile_container = ref();

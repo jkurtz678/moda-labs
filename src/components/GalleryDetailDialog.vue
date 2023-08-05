@@ -61,7 +61,7 @@ import { useAccountStore } from '@/stores/account';
 import { useTokenMetaStore } from '@/stores/token-meta';
 import { getAccountByAccountIDList, getAccountByEmail } from "@/api/account";
 import { saveGallery, updateGallery } from "@/api/gallery";
-import type { Gallery, FirestoreDocument, TokenMeta, Account, Plaque } from '@/types/types';
+import { type Gallery, type FirestoreDocument, type TokenMeta, type Account, type Plaque, TokenPlatform } from '@/types/types';
 import { Timestamp } from '@firebase/firestore';
 import { ElMessage, ElTable, type FormInstance, type FormRules } from 'element-plus';
 import { computed, onMounted, reactive, ref, toRaw } from 'vue';
@@ -72,6 +72,7 @@ import useBreakpoints from '@/composables/breakpoints';
 import { usePlaqueStore } from '@/stores/plaque';
 import TokenSelectList from "./TokenSelectList.vue";
 import PlaqueSelectList from './PlaqueSelectList.vue';
+import { types } from 'util';
 
 const show_dialog = ref(true);
 const gallery = ref<Gallery>({
@@ -110,7 +111,7 @@ const plaque_list = computed(() => {
     return Object.values(plaque_store.plaque_map);
 })
 const token_meta_list = computed(() => {
-    return Object.values(token_meta_store.all_token_metas);
+    return Object.values(token_meta_store.all_token_metas).filter(t => t.entity.platform != TokenPlatform.Opensea)
 })
 
 onMounted(async () => {

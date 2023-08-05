@@ -178,16 +178,26 @@ export async function getTokenMetaThumbnailImageURL(token_meta: FirestoreDocumen
 
 // getTokenMetaThumbnailImageURL returns the url to the thumbnail image for a token meta
 export async function getTokenMetaMediumImageURL(token_meta: FirestoreDocument<TokenMeta>): Promise<string> {
-    // first check if archive thumbnail image exist in firebase storage
+    // first check if archive medium image exist in firebase storage
     const storage = getStorage();
-    const path_ref = ref(storage, `medium_${token_meta.entity.media_id}.jpg`);
+    const medium_path_ref = ref(storage, `medium_${token_meta.entity.media_id}.jpg`);
     try {
-        const url = await getDownloadURL(path_ref)
+        const url = await getDownloadURL(medium_path_ref)
+        console.log(`getTokenMetaThumbnailImageURL - found url for image ${token_meta.entity.name}`, url)
+        return url
+    } catch (err) {
+        console.log(`getTokenMetaThumbnailImageURL - failed to find archive medium image ${token_meta.entity.name}`, err)
+    }
+
+    // then fallback to thumbnail if it exists
+    const thumbnail_path_ref = ref(storage, `thumb_${token_meta.entity.media_id}.jpg`);
+    try {
+        const url = await getDownloadURL(thumbnail_path_ref)
         console.log(`getTokenMetaThumbnailImageURL - found url for image ${token_meta.entity.name}`, url)
         return url
     } catch (err) {
         console.log(`getTokenMetaThumbnailImageURL - failed to find archive thumbnail image ${token_meta.entity.name}`, err)
-    }
+    } 
 
 
     // then we check external thumbnail url

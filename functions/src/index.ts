@@ -24,8 +24,8 @@ const THUMB_MAX_WIDTH = 200;
 const THUMB_PREFIX = 'thumb_';
 
 // medium is the middle sized image, used for the image gallery
-const MEDIUM_MAX_HEIGHT = 640;
-const MEDIUM_MAX_WIDTH = 640;
+const MEDIUM_MAX_HEIGHT = 960;
+const MEDIUM_MAX_WIDTH = 960;
 const MEDIUM_PREFIX = 'medium_';
 
 const generateThumbnail = async (object: any) => {
@@ -59,11 +59,13 @@ const generateThumbnail = async (object: any) => {
     if(temp_local_thumb_file) {
         // get aspect ratio of thumbnail
         await calculateImageAspectRatio(file_id, temp_local_thumb_file);
+        fs.unlinkSync(temp_local_thumb_file);
     }
-    fs.unlinkSync(temp_local_thumb_file);
 
     const temp_local_medium_file = await generateResizedFile(bucket, file_path, MEDIUM_PREFIX, MEDIUM_MAX_WIDTH, MEDIUM_MAX_HEIGHT);
-    fs.unlinkSync(temp_local_medium_file);
+    if (temp_local_medium_file ){
+        fs.unlinkSync(temp_local_medium_file);
+    }
 
     return true;
 }
