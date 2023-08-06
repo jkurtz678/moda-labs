@@ -147,7 +147,7 @@ const previewPlaque = () => {
 
 </script>
 
-<style>
+<style scoped>
 .card-title {
   line-height: 0.5em;
 }
