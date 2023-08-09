@@ -1,7 +1,7 @@
 <template>
     <el-popover placement="bottom" title="Artwork Filters" :width="300" trigger="click">
         <template #reference>
-            <el-badge is-dot :hidden="!show_filter_dot">   
+            <el-badge is-dot :hidden="!show_filter_dot">
                 <el-button icon="Filter" style="margin-left: 10px;" type="info" size="small">Filters</el-button>
             </el-badge>
         </template>
@@ -33,13 +33,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed, defineProps, defineEmits } from 'vue';
+import { ref, watch, computed, defineProps, defineEmits, onMounted } from 'vue';
 import { useGalleryStore } from "@/stores/gallery";
 import { TokenPlatform, type FirestoreDocument, type TokenMeta } from '@/types/types';
 
 interface ArtworkFilterProps {
     all_tokens: FirestoreDocument<TokenMeta>[];
     search_filter: string;
+    use_local_storage: boolean;
 }
 const props = defineProps<ArtworkFilterProps>();
 const gallery_store = useGalleryStore();
@@ -51,24 +52,40 @@ const emits = defineEmits(['update-filtered-tokens']);
 
 /* token filters */
 
-const filter_by_aspect_ratio = ref<string>(localStorage.getItem('artwork_grid_aspect_ratio_filter') || "")
+const filter_by_aspect_ratio = ref<string>("")
 watch(filter_by_aspect_ratio, (newVal) => {
-    localStorage.setItem('artwork_grid_aspect_ratio_filter', newVal)
+    if (props.use_local_storage) {
+        localStorage.setItem('artwork_grid_aspect_ratio_filter', newVal)
+    }
 })
-const filter_by_gallery = ref<string>(localStorage.getItem('artwork_grid_filter_by_gallery') || "")
+const filter_by_gallery = ref<string>("")
 watch(filter_by_gallery, (newVal) => {
-    localStorage.setItem('artwork_grid_filter_by_gallery', newVal)
+    if (props.use_local_storage) {
+        localStorage.setItem('artwork_grid_filter_by_gallery', newVal)
+    }
 })
-const filter_by_platform = ref<string>(localStorage.getItem('artwork_grid_filter_by_platform') || "")
+const filter_by_platform = ref<string>("")
 watch(filter_by_platform, (newVal) => {
-    localStorage.setItem('artwork_grid_filter_by_platform', newVal)
+    if (props.use_local_storage) {
+        localStorage.setItem('artwork_grid_filter_by_platform', newVal)
+    }
 })
-const sort_order = ref(localStorage.getItem('artwork_grid_sort_order') || "name")
+const sort_order = ref("created_at")
 watch(sort_order, (newVal) => {
-    localStorage.setItem('artwork_grid_sort_order', newVal)
+    if (props.use_local_storage) {
+        localStorage.setItem('artwork_grid_sort_order', newVal)
+    }
 })
 
-const show_filter_dot = computed(() => { 
+onMounted(() => {
+    if (props.use_local_storage) {
+        filter_by_aspect_ratio.value = localStorage.getItem('artwork_grid_aspect_ratio_filter') || ""
+        filter_by_gallery.value = localStorage.getItem('artwork_grid_filter_by_gallery') || ""
+        filter_by_platform.value = localStorage.getItem('artwork_grid_filter_by_platform') || ""
+        sort_order.value = localStorage.getItem('artwork_grid_sort_order') || "name"
+    }
+})
+const show_filter_dot = computed(() => {
     return filter_by_aspect_ratio.value || filter_by_gallery.value || filter_by_platform.value;
 })
 

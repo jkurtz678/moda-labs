@@ -3,7 +3,7 @@
         <el-input v-model="search_filter" :prefix-icon="Search" placeholder="Search artwork or artist"
             style="max-width: 350px" clearable>
         </el-input>
-        <ArtworkFilters :all_tokens="all_tokens" :search_filter="search_filter" @update-filtered-tokens="filtered_tokens = $event"></ArtworkFilters> 
+        <ArtworkFilters :all_tokens="all_tokens" :search_filter="search_filter" :use_local_storage="true" @update-filtered-tokens="filtered_tokens = $event"></ArtworkFilters> 
         <el-button icon="Plus" type="info" @click="router.push({ name: 'new-artwork' })" style="margin-left: 10px"
             size="small">Artwork</el-button>
     </div>

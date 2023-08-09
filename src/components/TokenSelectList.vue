@@ -2,7 +2,7 @@
     <div style="display: flex; align-items:center;">
         <el-input type="text" v-model="search_filter" :prefix-icon="Search"
             placeholder="Search by artwork title or artist name" />
-        <ArtworkFilters :all_tokens="props.token_meta_list" :search_filter="search_filter"
+        <ArtworkFilters :all_tokens="props.token_meta_list" :search_filter="search_filter" :use_local_storage="false"
             @update-filtered-tokens="updateFilteredTokenMetaList"></ArtworkFilters>
     </div>
     <div :style="{ marginTop: '10px', overflowY: 'auto', maxHeight: props.max_height ? `${props.max_height}px` : '' }">
@@ -26,15 +26,11 @@ interface TokenSelectListProps {
     selected_token_meta_id_list: string[];
     token_meta_list: FirestoreDocument<TokenMeta>[];
     max_height?: number;
-    show_dialog?: boolean;
 }
 
 const props = defineProps<TokenSelectListProps>();
 const emit = defineEmits(['update:selected_token_meta_id_list'])
 const initial_sort_done = ref(false);
-const show_dialog = computed(() => {
-    return props.show_dialog;
-})
 
 const search_filter = ref("");
 const filtered_token_meta_list = ref<FirestoreDocument<TokenMeta>[]>([]);
@@ -58,13 +54,6 @@ const updateFilteredTokenMetaList = (new_list: FirestoreDocument<TokenMeta>[]) =
 
     filtered_token_meta_list.value = filtered_tokens;
 }
-
-watch(show_dialog, (new_val) => {
-    if (!new_val) {
-        initial_sort_done.value = false;
-        updateFilteredTokenMetaList(filtered_token_meta_list.value);
-    }
-})
 
 const selected_token_meta_set = computed((): Set<string> => {
     return new Set(props.selected_token_meta_id_list);
