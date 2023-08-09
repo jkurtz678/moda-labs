@@ -1,7 +1,9 @@
 <template>
     <el-popover placement="bottom" title="Artwork Filters" :width="300" trigger="click">
         <template #reference>
-            <el-button icon="Filter" style="margin-left: 10px;" type="info" size="small">Filters</el-button>
+            <el-badge is-dot :hidden="!show_filter_dot">   
+                <el-button icon="Filter" style="margin-left: 10px;" type="info" size="small">Filters</el-button>
+            </el-badge>
         </template>
         <div class="caption">Filter by gallery</div>
         <el-select v-model="filter_by_gallery" placeholder="Filter by gallery" class="filter-select">
@@ -64,6 +66,10 @@ watch(filter_by_platform, (newVal) => {
 const sort_order = ref(localStorage.getItem('artwork_grid_sort_order') || "name")
 watch(sort_order, (newVal) => {
     localStorage.setItem('artwork_grid_sort_order', newVal)
+})
+
+const show_filter_dot = computed(() => { 
+    return filter_by_aspect_ratio.value || filter_by_gallery.value || filter_by_platform.value;
 })
 
 const filtered_tokens = computed(() => {
