@@ -1,6 +1,6 @@
 <template>
     <div style="display: flex; justify-content: center">
-        <el-card class="container-card">
+        <el-card class="container-card" :style="md_and_up ? 'min-width: 700px;' : ''">
             <template #header>
                 <div class="card-header">
                     <span style="font-size: 18px;">Galleries</span>
@@ -20,7 +20,9 @@ import { useGalleryStore } from '@/stores/gallery';
 import GalleryItem from "./GalleryItem.vue";
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
+import useBreakpoints from '@/composables/breakpoints';
 
+const { md_and_up } = useBreakpoints();
 const router = useRouter();
 const gallery_store = useGalleryStore()
 const galleries = computed(() => {
@@ -30,7 +32,6 @@ const galleries = computed(() => {
 
 <style scoped>
 .container-card {
-    min-width: 700px;
     border-radius: 18px;
     height: 100%;
 }
