@@ -10,7 +10,7 @@
     </div>
     <div ref="detail_container" class='detail-container transition' :class="show_detail ? 'show-blur' : 'hide-blur'">
       <div style="font-size: 1.6em; font-weight: bold;">{{ token_meta.entity.name }}</div>
-      <div v-if="token_meta.entity.artist_social_link">
+      <div v-if="token_meta.entity.artist_social_link" :style="screen_type == 'xs' ? 'display: flex; justify-content: center;' : ''">
         <el-button link style="font-weight: bold; display: block;" :disabled="!show_detail"
           @click.stop="openArtistSocial">{{
             token_meta.entity.artist }}</el-button>
@@ -59,6 +59,7 @@ import { useAccountStore } from "@/stores/account";
 import { deleteTokenMeta } from "@/api/token-meta";
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { useGalleryStore } from "@/stores/gallery";
+import useBreakpoints from "@/composables/breakpoints"
 
 const router = useRouter();
 interface ArtworkTileProps {
@@ -73,6 +74,7 @@ const tile_container = ref();
 const detail_container = ref();
 const account_store = useAccountStore();
 const gallery_store = useGalleryStore();
+const { screen_type } = useBreakpoints();
 
 const platform = computed(() => {
   return getPlatformDisplay(props.token_meta.entity.platform)
