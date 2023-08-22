@@ -1,5 +1,5 @@
 <template>
-    <el-header class="header">
+    <el-header class="header" :style="screen_type=='xs' ? 'padding: 0px 8px;' : ''">
         <el-image v-if="md_and_up" :src="getImageUrl('logo.png')"
             style="width: 40px; height: 40px; margin-right: 2em">
         </el-image>
@@ -49,7 +49,7 @@ const router = useRouter();
 const route = useRoute();
 const account_store = useAccountStore();
 const logout_loading = ref(false);
-const { md_and_up} = useBreakpoints();
+const { md_and_up, screen_type} = useBreakpoints();
 
 const handleClick = (tab: TabsPaneContext, event: Event) => {
     if (tab.paneName && typeof tab.paneName === 'string') {
@@ -97,7 +97,7 @@ const getImageUrl = (filename: string) => {
 
 <style scoped>
 .header {
-    padding: 0px 30px 0px 30px;
+    padding: 0px 30px;
     --el-header-height: 50px;
     display: flex;
     align-items: center;

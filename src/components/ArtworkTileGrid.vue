@@ -1,15 +1,18 @@
 <template>
-    <div class='subheader' style="display: flex; align-items: center;">
+    <div class='subheader' style="display: flex; align-items: center;"
+        :style="screen_type == 'xs' ? 'padding: 0px 8px 10px;' : ''">
         <el-input v-model="search_filter" :prefix-icon="Search" placeholder="Search artwork or artist"
             style="max-width: 350px" clearable>
         </el-input>
-        <ArtworkFilters :all_tokens="all_tokens" :search_filter="search_filter" :use_local_storage="true" @update-filtered-tokens="filtered_tokens = $event"></ArtworkFilters> 
+        <ArtworkFilters :all_tokens="all_tokens" :search_filter="search_filter" :use_local_storage="true"
+            @update-filtered-tokens="filtered_tokens = $event"></ArtworkFilters>
         <el-button icon="Plus" type="info" @click="router.push({ name: 'new-artwork' })" style="margin-left: 10px"
             size="small">Artwork</el-button>
     </div>
 
     <div style="padding-bottom: 40px;"></div>
-    <div id="masonry-container" ref="masonryContainer" style="overflow-y: auto; height: 100%; padding: 10px 10px 90px 10px;">
+    <div id="masonry-container" ref="masonryContainer"
+        style="overflow-y: auto; height: 100%; padding: 10px 10px 90px 10px;">
         <vue-masonry-wall v-if="paginated_tokens.length > 0" id="masonary-wall" :scroll-container="masonryContainer"
             :items="paginated_tokens" :column-width="min_column_width" :gap="gap_width"
             :style="`width: ${grid_width}px; margin: auto`" :max-columns="5">
@@ -140,5 +143,4 @@ onMounted(() => {
     padding: 0px 25px 10px;
     z-index: 5;
 }
-
 </style>

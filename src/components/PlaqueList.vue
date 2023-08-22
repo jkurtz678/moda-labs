@@ -1,8 +1,7 @@
 <template>
-    <div class='subheader' style="display: flex; align-items: center;">
+    <div class='subheader' style="display: flex; align-items: center;" :style="screen_type=='xs' ? 'padding: 0px 8px 10px;' : ''">
         <el-input v-model="search_filter" :prefix-icon="Search" placeholder="Search plaques" style="max-width: 350px"
             clearable></el-input>
-
         <el-popover placement="bottom" title="Plaque Filters" :width="300" trigger="click">
             <template #reference>
                 <el-button icon="Filter" style="margin-left: 10px;" type="info" size="small">Filters</el-button>
@@ -66,7 +65,7 @@ import { Search } from '@element-plus/icons-vue'
 import { isPlaqueOnline } from '@/util/util';
 
 const add_test_plaque_loading = ref(false);
-const { width, screen_type } = useBreakpoints();
+const { screen_type } = useBreakpoints();
 const show_add_plaque_dialog = ref(false);
 const router = useRouter();
 const account_store = useAccountStore();
