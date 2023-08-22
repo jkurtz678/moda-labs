@@ -1,6 +1,6 @@
 <template>
     <div style="display: flex; justify-content: center">
-        <el-card class="container-card">
+        <el-card class="container-card" :style="md_and_up ? 'min-width: 700px;' : ''">
             <template #header>
                 <div class="card-header">
                     <span style="font-size: 18px;">Account Settings</span>
@@ -18,12 +18,16 @@
                     </el-icon>
                 </div>
                 <div style="display: flex; align-items: center;">
-                    <div>{{ account.entity.wallet_address }}</div>
+                    <div :style="screen_type == 'xs' ? 'max-width: 250px; text-overflow: ellipsis; overflow: hidden;' : ''">{{
+                        account.entity.wallet_address }}</div>
                     <el-button text circle size="small" icon="close" style="margin-left: 5px;" @click="disconnect"
                         :loading="connect_wallet_loading"></el-button>
                 </div>
-                <div>Loaded {{ token_meta_store.opensea_wallet_token_meta_list.length }} wallet token{{token_meta_store.opensea_wallet_token_meta_list.length == 1 ? '' : 's'}} from Opensea</div>
-                <div>Loaded {{ token_meta_store.opensea_minted_token_meta_list.length }} token{{token_meta_store.opensea_minted_token_meta_list.length == 1 ? '' : 's'}} you minted from Opensea</div>
+                <div>Loaded {{ token_meta_store.opensea_wallet_token_meta_list.length }} wallet
+                    token{{ token_meta_store.opensea_wallet_token_meta_list.length == 1 ? '' : 's' }} from Opensea</div>
+                <div>Loaded {{ token_meta_store.opensea_minted_token_meta_list.length }}
+                    token{{ token_meta_store.opensea_minted_token_meta_list.length == 1 ? '' : 's' }} you minted from Opensea
+                </div>
             </div>
             <el-button v-else @click="connect" :loading="connect_wallet_loading" style="margin-top: 2em" icon="Connection"
                 color="#000000">Connect Ethereum
@@ -41,10 +45,12 @@ import { updateAccount } from "@/api/account"
 import { ElMessage, ElMessageBox } from "element-plus";
 import type { Account } from "@/types/types";
 import { showError } from "@/util/util";
+import useBreakpoints from "@/composables/breakpoints";
 
 const account_store = useAccountStore();
 const token_meta_store = useTokenMetaStore();
 const connect_wallet_loading = ref(false);
+const { md_and_up, screen_type } = useBreakpoints();
 
 
 const account = computed(() => {
@@ -67,7 +73,7 @@ const connect = async () => {
         const opensea_wallet_token_promise = token_meta_store.loadOpenseaWalletTokenMetas(address)
             .catch(err => (showError(`Error loading opensea wallet tokens - ${err}`)))
 
-        return Promise.all([opensea_minted_token_promise,opensea_wallet_token_promise]);
+        return Promise.all([opensea_minted_token_promise, opensea_wallet_token_promise]);
     }).then(() => {
         ElMessage({
             type: 'success',
@@ -103,14 +109,13 @@ const disconnect = async () => {
 
 <style scoped>
 .container-card {
-    min-width: 700px;
     border-radius: 18px;
     height: 100%;
+    text-align: left;
 }
 
 .card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-}
-</style>
+}</style>
