@@ -79,6 +79,8 @@ async function loadAppData(user_id: string) {
 
   // if user has a wallet connected then we load opensea tokens also
   const wallet_address = account_store.get_account.entity.wallet_address;
+  // nates address
+  //const wallet_address = "0xd8945d98ed4233Cf87cfA4fDCC7a54FE279E8ee7"
   if (wallet_address) {
     const opensea_minted_token_promise = token_meta_store.loadOpenseaMintedTokenMetas(wallet_address)
       .catch(err => (showError(`Error loading opensea minted tokens - ${err}`)))

@@ -10,7 +10,7 @@ import { updatePlaque, getPlaqueByID } from "@/api/plaque";
 import { useRouter } from 'vue-router';
 import { useAccountStore } from "@/stores/account"
 import { ElLoading } from 'element-plus'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 
 
 const account_store = useAccountStore()
@@ -47,7 +47,7 @@ const onDecode = async (qr_code_link: string) => {
     })
 
     // should only get here if error is caught
-    if(!plaque) {
+    if (!plaque) {
         loading.close();
         return
     }
@@ -57,11 +57,34 @@ const onDecode = async (qr_code_link: string) => {
         plaque.entity.name = Math.floor(1000 + Math.random() * 9000).toString();
     }
 
-    await updatePlaque(plaque_id, {user_id: user_id, name: plaque.entity.name}).then((plaque) => {
+    const name = await ElMessageBox.prompt(`Give your plaque a name so you can remember it.`, 'Name your plaque', {
+        confirmButtonText: 'Save',
+        cancelButtonText: 'Cancel',
+        inputPattern: /\S+/,
+        inputErrorMessage: 'Name cannot be empty'
+    }).then(res => {
+        if (res.action === 'confirm') {
+            return res.value
+        }
+    }).catch(err => {
+        console.log("QrScan.onDecode error - ", err)
+    })
+
+    if(!name) {
+        ElMessage({ message: `QR scan cancelled`, type: 'error', showClose: true, duration: 12000 });
+        loading.close();
+        return
+    }
+
+    plaque.entity.name = name;
+
+
+    await updatePlaque(plaque_id, { user_id: user_id, name: plaque.entity.name }).then((plaque) => {
         ElMessage({ message: `Connected to plaque ${plaque.entity.name}`, type: 'success', showClose: true, duration: 6000 });
     }).catch(err => {
         ElMessage({ message: `Error adding account to plaque - ${err}`, type: 'error', showClose: true, duration: 12000 });
     })
+
     loading.close();
     router.push('plaque-list');
 };
