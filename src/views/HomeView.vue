@@ -1,7 +1,8 @@
 <template>
   <el-container style="height: 100%; position: fixed; top: 0px; left: 0px; right: 0px; bottom: 0px;">
     <Header></Header>
-    <el-main style="background-color: #DAD9D7;" :class="route.fullPath.includes('artwork-tile-grid') ? 'remove-padding' : ''">
+    <el-main style="background-color: #DAD9D7;"
+      :class="route.fullPath.includes('artwork-tile-grid') ? 'remove-padding' : ''">
       <RouterView v-if="initial_load_done"></RouterView>
     </el-main>
   </el-container>
@@ -32,7 +33,7 @@ const initial_load_done = ref(false);
 const loading = ref();
 const route = useRoute()
 
-let unsubAuthStateChanged: any; 
+let unsubAuthStateChanged: any;
 
 onMounted(async () => {
   loading.value = ElLoading.service({
@@ -56,9 +57,9 @@ onMounted(async () => {
       } finally {
         loading.value.close();
       }
-    } 
-    
-    if(!user){
+    }
+
+    if (!user) {
       account_store.setAccount(null)
       loading.value.close();
       router.push({ name: "login", query: { redir: window.location.href } });
@@ -115,8 +116,9 @@ async function loadAppData(user_id: string) {
 
   // if plaque_id is passed in the query params and the plaque is not in the store, attempt to add this plaque to this account
   const plaque_id_qp = route.query.plaque_id;
-  if(plaque_id_qp && typeof plaque_id_qp === 'string') {
+  if (plaque_id_qp && typeof plaque_id_qp === 'string') {
     await addPlaqueToAccount(user_id, plaque_id_qp as string)
+    router.replace({ path: route.path, query: {}});
   }
   initial_load_done.value = true;
 };
