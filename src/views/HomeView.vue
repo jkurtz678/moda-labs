@@ -19,6 +19,9 @@ import { updatePlaque } from "@/api/plaque";
 import { useGalleryStore } from "@/stores/gallery";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/firebaseConfig";
+import type { FirestoreDocument, Plaque } from "@/types/types";
+import { addPlaqueToAccount } from "@/util/add-plaque";
+import { onUnmounted } from "vue";
 
 const account_store = useAccountStore();
 const plaque_store = usePlaqueStore();
@@ -29,6 +32,8 @@ const initial_load_done = ref(false);
 const loading = ref();
 const route = useRoute()
 
+let unsubAuthStateChanged: any; 
+
 onMounted(async () => {
   loading.value = ElLoading.service({
     lock: true,
@@ -37,7 +42,7 @@ onMounted(async () => {
   })
 
   // detect if user is logged in
-  onAuthStateChanged(auth, async (user) => {
+  unsubAuthStateChanged = onAuthStateChanged(auth, async (user) => {
 
     console.log("onAuthStateChanged", user)
     if (user) {
@@ -46,9 +51,14 @@ onMounted(async () => {
         text: 'Loading',
         background: 'rgba(0, 0, 0, 0.7)',
       })
-      await loadAppData(user.uid);
-      loading.value.close();
-    } else {
+      try {
+        await loadAppData(user.uid);
+      } finally {
+        loading.value.close();
+      }
+    } 
+    
+    if(!user){
       account_store.setAccount(null)
       loading.value.close();
       router.push({ name: "login", query: { redir: window.location.href } });
@@ -56,8 +66,14 @@ onMounted(async () => {
   })
 });
 
+onUnmounted(() => {
+  console.log("unsubscribe onAuthStateChanged on unmount")
+  unsubAuthStateChanged();
+})
+
 // loadAppData is the initial load for app data for the user
 async function loadAppData(user_id: string) {
+  console.log("LOAD APP DATA")
   await account_store.loadAccount(user_id)
 
   // must load gallery data before loading plaque data because we need to know which plaques to load
@@ -99,10 +115,8 @@ async function loadAppData(user_id: string) {
 
   // if plaque_id is passed in the query params and the plaque is not in the store, attempt to add this plaque to this account
   const plaque_id_qp = route.query.plaque_id;
-  if (plaque_id_qp && typeof plaque_id_qp === 'string' && !plaque_store.plaque_map[plaque_id_qp]) {
-    await updatePlaque(plaque_id_qp, { user_id: account_store.get_account.id, token_meta_id_list: [] }).catch(err => {
-      showError(`Error adding plaque from query param = ${err}`)
-    })
+  if(plaque_id_qp && typeof plaque_id_qp === 'string') {
+    await addPlaqueToAccount(user_id, plaque_id_qp as string)
   }
   initial_load_done.value = true;
 };
