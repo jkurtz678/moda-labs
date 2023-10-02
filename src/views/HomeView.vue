@@ -1,5 +1,5 @@
 <template>
-  <el-container style="height: 100%; flex-direction: column;">
+  <el-container style="height: 100%; position: fixed; top: 0px; left: 0px; right: 0px; bottom: 0px;">
     <Header></Header>
     <el-main style="background-color: #DAD9D7;" :class="route.fullPath.includes('artwork-tile-grid') ? 'remove-padding' : ''">
       <RouterView v-if="initial_load_done"></RouterView>

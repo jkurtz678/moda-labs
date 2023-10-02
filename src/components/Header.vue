@@ -97,10 +97,15 @@ const getImageUrl = (filename: string) => {
 
 <style scoped>
 .header {
-    padding: 0px 30px;
+    position:fixed;
+    top: 0px;
+    left: 0px; 
+    right: 0px;
     --el-header-height: 50px;
     display: flex;
     align-items: center;
+    z-index: 100;
+    background-color: white;
 }
 
 :deep(.el-tabs__header) {

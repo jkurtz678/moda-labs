@@ -10,7 +10,7 @@
             size="small">Artwork</el-button>
     </div>
 
-    <div style="padding-bottom: 40px;"></div>
+    <div style="padding-bottom: 90px;"></div>
     <div id="masonry-container" ref="masonryContainer"
         style="overflow-y: auto; height: 100%; padding: 10px 10px 90px 10px;">
         <vue-masonry-wall v-if="paginated_tokens.length > 0" id="masonary-wall" :scroll-container="masonryContainer"

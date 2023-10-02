@@ -1,5 +1,5 @@
 <template>
-    <div style="display: flex; justify-content: center">
+    <div style="display: flex; justify-content: center; margin-top: 50px;">
         <el-card class="container-card" :style="md_and_up ? 'min-width: 700px;' : ''">
             <template #header>
                 <div class="card-header">

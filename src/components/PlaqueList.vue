@@ -24,7 +24,7 @@
         <el-button icon="Camera" type="info" @click="router.push('qr-scan')" style="margin-left: 10px;"
             size="small">Scan</el-button>
     </div>
-    <div style="padding-bottom: 40px;"></div>
+    <div style="padding-bottom: 90px;"></div>
     <PlaqueCard :plaque="plaque" v-for="plaque in filtered_plaques" :key="plaque.id" />
     <div class='add-button-container'>
         <div style="display: flex; align-items: center; justify-content: center; height: 100%">
