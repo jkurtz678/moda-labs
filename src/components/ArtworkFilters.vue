@@ -23,6 +23,7 @@
             <el-option label="All" value=""></el-option>
             <el-option label="Moda Archive" value="moda_archive"></el-option>
             <el-option label="Opensea" value="opensea"></el-option>
+            <el-option label="Demo" value="archive_demo"></el-option>
         </el-select>
         <div class="caption">Sort order</div>
         <el-select v-model="sort_order" placeholder="Sort by" class="filter-select">
@@ -114,6 +115,11 @@ const filtered_tokens = computed(() => {
                     return false
                 }
                 break
+            case "archive_demo":
+                if (token.entity.platform != TokenPlatform.ArchiveDemo) {
+                    return false
+                }
+                break;
         }
 
 

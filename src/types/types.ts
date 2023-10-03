@@ -105,7 +105,8 @@ export enum Blockchain {
 export enum TokenPlatform {
     Archive = "archive", // tokens uploaded directly to the moda archive 
     Opensea = "opensea", // token from opensea api, not stored in moda archive
-    OpenseaArchive = "opensea_archive" // token from opensea api that has been added to moda archive
+    OpenseaArchive = "opensea_archive", // token from opensea api that has been added to moda archive
+    ArchiveDemo = "archive_demo" // tokens that are available to all users from the archive as demo art
 }
 
 // Gallery is a group of users and token metas

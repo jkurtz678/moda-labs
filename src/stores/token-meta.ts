@@ -14,6 +14,7 @@ export type RootTokenMetaState = {
     opensea_wallet_token_meta_list: OpenseaToken[];
     opensea_converted_tokens: FirestoreDocument<TokenMeta>[];
     gallery_token_meta_list: FirestoreDocument<TokenMeta>[];
+    demo_token_meta_list: FirestoreDocument<TokenMeta>[];
 }
 interface TokenMetaMap {
     [id: string]: FirestoreDocument<TokenMeta>;
@@ -26,6 +27,7 @@ export const useTokenMetaStore = defineStore({
         opensea_wallet_token_meta_list: [],
         opensea_converted_tokens: [],
         gallery_token_meta_list: [],
+        demo_token_meta_list: [],
     } as RootTokenMetaState),
     getters: {
         archive_token_meta_map: (state): TokenMetaMap => {
@@ -64,6 +66,12 @@ export const useTokenMetaStore = defineStore({
             state.gallery_token_meta_list.forEach((t) => {
                 token_meta_map[t.id] = t
             })
+
+            // add demo tokens
+            state.demo_token_meta_list.forEach((t) => {
+                token_meta_map[t.id] = t
+            })
+
             return token_meta_map;
         },
         sorted_all_token_metas(state): FirestoreDocument<TokenMeta>[] {
@@ -126,7 +134,6 @@ export const useTokenMetaStore = defineStore({
 
             await Promise.all(promise_list);
         
-            console.log("TOKEN META LIST", token_meta_list)
             this.opensea_converted_tokens = token_meta_list;
         },
         async loadGalleryTokenMetas(gallery_list: FirestoreDocument<Gallery>[]) {
@@ -142,6 +149,23 @@ export const useTokenMetaStore = defineStore({
             }
             this.gallery_token_meta_list = token_meta_list;
         },
+        async loadDemoTokenMetas() {
+            const demo_token_meta_id_list = [
+                "dIGjSTr40mihc1oGtpeL", // brooklyn colors, nate (landscape)
+                "RU2HdfpA2stEZ6QvXJcX", // out of sight out of mind, manhattan (square)
+                "xUnC4AYo18xqNIgh1vB7", // spinelicker, Good Boy William (portrait)
+            ];
+
+            const token_meta_list = await getTokenMetaListByIDList(demo_token_meta_id_list);
+
+            token_meta_list.forEach((t) => {
+                t.entity.platform = TokenPlatform.ArchiveDemo;
+            })
+
+            console.log("demo token_meta_list", token_meta_list)
+
+            this.demo_token_meta_list = token_meta_list;
+        }
     }
 })
 

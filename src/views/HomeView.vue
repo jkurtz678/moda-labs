@@ -90,6 +90,8 @@ async function loadAppData(user_id: string) {
     .catch(err => (showError(`Error loading archive token metas - ${err}`)));
   const gallery_token_promise = token_meta_store.loadGalleryTokenMetas(gallery_store.gallery_list)
     .catch(err => (showError(`Error loading token metas - ${err}`)));
+  const demo_token_promise = token_meta_store.loadDemoTokenMetas()
+    .catch(err => (showError(`Error loading demo token metas - ${err}`)));
 
 
   const promise_list = [plaque_promise, gallery_plaque_promise, archive_token_promise, gallery_plaque_promise, gallery_token_promise];
