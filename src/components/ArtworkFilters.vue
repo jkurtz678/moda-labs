@@ -34,7 +34,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed, defineProps, defineEmits, onMounted } from 'vue';
+import { ref, watch, computed, defineProps, defineEmits, onBeforeMount } from 'vue';
 import { useGalleryStore } from "@/stores/gallery";
 import { TokenPlatform, type FirestoreDocument, type TokenMeta } from '@/types/types';
 
@@ -78,7 +78,8 @@ watch(sort_order, (newVal) => {
     }
 })
 
-onMounted(() => {
+// use beforeMount here so that watchers/computeds start with the data from local storage (instead of the values before local storage)
+onBeforeMount(() => {
     if (props.use_local_storage) {
         filter_by_aspect_ratio.value = localStorage.getItem('artwork_grid_aspect_ratio_filter') || ""
         filter_by_gallery.value = localStorage.getItem('artwork_grid_filter_by_gallery') || ""
