@@ -62,15 +62,15 @@
 <script lang="ts" setup>
 import { reactive, ref, onMounted } from "vue";
 import type { FormInstance, FormRules } from "element-plus";
-import { createTokenMeta, updateTokenMeta } from "@/api/token-meta";
 import { createGalleryTokenMetaList } from "@/api/gallery-token";
+import { createTokenMetaWithReference, getTokenMetaDocumentRef, updateTokenMeta } from "@/api/token-meta";
 import { uploadFile } from "@/api/storage";
 import { type TokenMeta, Blockchain, TokenPlatform, type FirestoreDocument, type Gallery, type GalleryTokenMeta } from "@/types/types";
 import { useAccountStore } from "@/stores/account"
 import { useTokenMetaStore } from "@/stores/token-meta"
 import { showError } from "@/util/util";
 import type { UploadProps, UploadUserFile } from "element-plus";
-import { Timestamp } from "firebase/firestore"
+import { DocumentReference, Timestamp } from "firebase/firestore"
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { getAllGalleries } from "@/api/gallery";
 
@@ -151,6 +151,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         form.value.token_id = ""
     }
 
+    // if updating an existing token meta, update and return
     if (props.token_meta_id) {
         updateToken(props.token_meta_id);
         return
@@ -162,24 +163,33 @@ const submit = async (formEl: FormInstance | undefined) => {
         return;
     }
 
-    startFileUpload(formEl);
+    await startFileUpload(formEl);
 };
 
-const startFileUpload = (formEl: FormInstance) => {
+const startFileUpload = async (formEl: FormInstance) => {
     const file = file_list.value[0]
+
+    loading.value = true;
+
+    // first get a token meta document ref, we will use the document id to save the file
+    const ref = await getTokenMetaDocumentRef().catch(err => {
+        console.error(err)
+        loading.value = false;
+        showError(`Error getting moda archive token meta document - ${err}`);
+    });
+    if(!ref) {
+        return
+    }
 
     const progressCallback = (progress: number) => {
         loading_progress.value = `${Math.round(progress * 100)}%`
     }
-
     const successCallback = () => {
-        uploadSuccess(formEl, file)
+        uploadSuccess(formEl, file, ref)
     }
 
-    loading.value = true;
-
-    const file_uri = `${file.uid}.${file.name.split(".").pop()}`;
-    uploadFile(file_uri, file.raw as File, progressCallback, successCallback)
+    const file_uri = `${ref.id}.${file.name.split(".").pop()}`;
+    return uploadFile(file_uri, file.raw as File, progressCallback, successCallback)
         .catch(err => {
             console.error(err)
             loading.value = false;
@@ -187,13 +197,13 @@ const startFileUpload = (formEl: FormInstance) => {
         });
 }
 
-const uploadSuccess = async (formEl: FormInstance, file: UploadUserFile) => {
-    form.value.media_id = `${file.uid}`
+const uploadSuccess = async (formEl: FormInstance, file: UploadUserFile, ref: DocumentReference) => {
+    form.value.media_id = `${ref.id}`
     form.value.media_type = `.${file.name.split(".").pop()}`
 
     let new_token_meta: FirestoreDocument<TokenMeta>;
     try {
-        new_token_meta = await createTokenMeta(form.value)
+        new_token_meta = await createTokenMetaWithReference(ref, form.value)
     } catch (err) {
         showError(`Error uploading metadata to moda archive - ${err}`)
         loading.value = false;

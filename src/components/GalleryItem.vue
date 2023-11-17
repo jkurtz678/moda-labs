@@ -1,10 +1,10 @@
 <template>
   <div class="flex-container">
-    <div style="flex-grow: 1;">
+    <div style="flex-grow: 1; text-align: left;">
       <div class="bold" style="font-size: var(--el-font-size-large)">{{ props.gallery.entity.name }}</div>
       <div>{{ user_count_str }}</div>
     </div>
-    <div style="min-width: 120px;">
+    <div style="min-width: 100px; margin-left: 20px;">
       <div>{{ plaque_count_str }}</div>
       <div>{{ artwork_count_str }}</div>
     </div>

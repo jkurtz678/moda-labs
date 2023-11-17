@@ -1,7 +1,11 @@
 <template>
-    <el-input type="text" v-model="search_filter" :prefix-icon="Search"
-        placeholder="Search by artwork title or artist name" />
-    <div :style="{marginTop: '10px', overflowY: 'auto', maxHeight: props.max_height ? `${props.max_height}px` : ''}">
+    <div style="display: flex; align-items:center;">
+        <el-input type="text" v-model="search_filter" :prefix-icon="Search"
+            placeholder="Search by artwork title or artist name" />
+        <ArtworkFilters :all_tokens="props.token_meta_list" :search_filter="search_filter" :use_local_storage="false"
+            @update-filtered-tokens="updateFilteredTokenMetaList"></ArtworkFilters>
+    </div>
+    <div :style="{ marginTop: '10px', overflowY: 'auto', maxHeight: props.max_height ? `${props.max_height}px` : '' }">
         <div v-if="filtered_token_meta_list.length == 0">No artwork found</div>
         <AddTokenItem v-for="token in filtered_token_meta_list" :token_meta="token"
             :in_list="Boolean(selected_token_meta_set.has(token.id))" @update_token_list="updateSelectedTokenList">
@@ -15,39 +19,41 @@ import AddTokenItem from './AddTokenItem.vue';
 import { Search } from '@element-plus/icons-vue'
 import { computed, onMounted, ref } from 'vue';
 import type { FirestoreDocument, TokenMeta } from '@/types/types';
+import ArtworkFilters from "./ArtworkFilters.vue";
+import { watch } from 'vue';
 
 interface TokenSelectListProps {
     selected_token_meta_id_list: string[];
     token_meta_list: FirestoreDocument<TokenMeta>[];
     max_height?: number;
 }
+
 const props = defineProps<TokenSelectListProps>();
 const emit = defineEmits(['update:selected_token_meta_id_list'])
+const initial_sort_done = ref(false);
 
 const search_filter = ref("");
-const sorted_token_meta_list = ref<FirestoreDocument<TokenMeta>[]>([]);
+const filtered_token_meta_list = ref<FirestoreDocument<TokenMeta>[]>([]);
+// const sorted_token_meta_list = ref<FirestoreDocument<TokenMeta>[]>([]);
 
-onMounted(() => {
-    if (!props.token_meta_list) {
-        return
-    }
-    for (let token of props.token_meta_list) {
-        if (selected_token_meta_set.value.has(token.id)) {
-            sorted_token_meta_list.value.unshift(token)
-        } else {
-            sorted_token_meta_list.value.push(token)
+const updateFilteredTokenMetaList = (new_list: FirestoreDocument<TokenMeta>[]) => {
+    const filtered_tokens = [];
+    // when dialog first loads, put selected tokens in front
+    if (!initial_sort_done.value) {
+        for (let token of new_list) {
+            if (selected_token_meta_set.value.has(token.id)) {
+                filtered_tokens.unshift(token)
+            } else {
+                filtered_tokens.push(token)
+            }
         }
+        initial_sort_done.value = true;
+    } else {
+        filtered_tokens.push(...new_list);
     }
-})
 
-const filtered_token_meta_list = computed(() => {
-    if (search_filter.value.trim() !== '') {
-        return sorted_token_meta_list.value.filter((token) =>
-            token.entity.artist?.toLowerCase().includes(search_filter.value.toLowerCase()) || token.entity.name?.toLowerCase().includes(search_filter.value.toLowerCase())
-        );
-    }
-    return sorted_token_meta_list.value;
-})
+    filtered_token_meta_list.value = filtered_tokens;
+}
 
 const selected_token_meta_set = computed((): Set<string> => {
     return new Set(props.selected_token_meta_id_list);

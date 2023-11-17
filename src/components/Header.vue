@@ -1,6 +1,6 @@
 <template>
-    <el-header class="header">
-        <el-image v-if="screen_type != 'sm' && screen_type != 'xs'" :src="getImageUrl('logo.png')"
+    <el-header class="header" :style="screen_type=='xs' ? 'padding: 0px 8px;' : ''">
+        <el-image v-if="md_and_up" :src="getImageUrl('logo.png')"
             style="width: 40px; height: 40px; margin-right: 2em">
         </el-image>
         <template v-if="router.currentRoute.value.name == 'qr-scan'">
@@ -10,14 +10,14 @@
             </el-button>
         </template>
         <template v-else>
-            <el-tabs v-model="route.name" @tab-click="handleClick" :class="screen_type == 'lg' || screen_type == 'md' ? '' : 'small-tabs'">
+            <el-tabs v-model="route.name" @tab-click="handleClick" :class="md_and_up ? '' : 'small-tabs'">
                 <el-tab-pane label="Plaques" name="plaque-list"></el-tab-pane>
-                <el-tab-pane label="Artwork" name="token-list"></el-tab-pane>
+                <el-tab-pane label="Artwork" name="artwork-tile-grid"></el-tab-pane>
                 <el-tab-pane label="Galleries" name="gallery-list"></el-tab-pane>
                 <el-tab-pane label="Account" name="account-settings"></el-tab-pane>
             </el-tabs>
             <div style="flex-grow: 1"></div>
-            <div v-if="screen_type != 'sm' && screen_type != 'xs'" style="margin-right: 10px; display: flex; align-items: center;">
+            <div v-if="md_and_up" style="margin-right: 10px; display: flex; align-items: center;">
                 <div>{{ toolbar_address }}</div>
                 <el-button v-if="account_store.is_user_admin" type="info" round size="small"
                     style="margin-left: 8px">Admin</el-button>
@@ -49,7 +49,7 @@ const router = useRouter();
 const route = useRoute();
 const account_store = useAccountStore();
 const logout_loading = ref(false);
-const { width, screen_type } = useBreakpoints();
+const { md_and_up, screen_type} = useBreakpoints();
 
 const handleClick = (tab: TabsPaneContext, event: Event) => {
     if (tab.paneName && typeof tab.paneName === 'string') {
@@ -97,10 +97,15 @@ const getImageUrl = (filename: string) => {
 
 <style scoped>
 .header {
-    padding: 0px 30px 0px 30px;
+    position:fixed;
+    top: 0px;
+    left: 0px; 
+    right: 0px;
     --el-header-height: 50px;
     display: flex;
     align-items: center;
+    z-index: 100;
+    background-color: white;
 }
 
 :deep(.el-tabs__header) {

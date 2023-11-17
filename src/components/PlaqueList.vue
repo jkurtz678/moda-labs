@@ -1,8 +1,7 @@
 <template>
-    <div class='subheader' style="display: flex; align-items: center;">
+    <div class='subheader' style="display: flex; align-items: center;" :style="screen_type=='xs' ? 'padding: 0px 8px 10px;' : ''">
         <el-input v-model="search_filter" :prefix-icon="Search" placeholder="Search plaques" style="max-width: 350px"
             clearable></el-input>
-
         <el-popover placement="bottom" title="Plaque Filters" :width="300" trigger="click">
             <template #reference>
                 <el-button icon="Filter" style="margin-left: 10px;" type="info" size="small">Filters</el-button>
@@ -14,12 +13,18 @@
                     :label="`${gallery.entity.name}`" :value="gallery.id" />
             </el-select>
             <div style="font-size: var(--el-font-size-extra-small);">Online only</div>
-            <el-switch v-model="online_filter" />
+            <el-switch v-model="online_filter" style="margin-bottom: 1em;"/>
+
+            <div class="caption">Sort order</div>
+            <el-select v-model="sort_order" placeholder="Sort by" class="filter-select">
+                <el-option label="Sort by name" value="name"></el-option>
+                <el-option label="Sort by last activity" value="last_check_in_time"></el-option>
+            </el-select>
         </el-popover>
         <el-button icon="Camera" type="info" @click="router.push('qr-scan')" style="margin-left: 10px;"
             size="small">Scan</el-button>
     </div>
-    <div style="padding-bottom: 40px;"></div>
+    <div style="padding-bottom: 90px;"></div>
     <PlaqueCard :plaque="plaque" v-for="plaque in filtered_plaques" :key="plaque.id" />
     <div class='add-button-container'>
         <div style="display: flex; align-items: center; justify-content: center; height: 100%">
@@ -55,30 +60,35 @@ import { useAccountStore } from "@/stores/account";
 import { useGalleryStore } from "@/stores/gallery";
 import { ElMessage } from 'element-plus'
 import useBreakpoints from "@/composables/breakpoints"
-import type { FirestoreDocument, Plaque } from "@/types/types"
+import { OrientationType, type FirestoreDocument, type Plaque } from "@/types/types"
 import { Search } from '@element-plus/icons-vue'
 import { isPlaqueOnline } from '@/util/util';
 
 const add_test_plaque_loading = ref(false);
-const { width, screen_type } = useBreakpoints();
+const { screen_type } = useBreakpoints();
 const show_add_plaque_dialog = ref(false);
 const router = useRouter();
 const account_store = useAccountStore();
 const gallery_store = useGalleryStore();
-const search_filter = ref("")
-const filter_by_gallery = ref<string>(localStorage.getItem('plaque_list_filter_by_gallery') || "")
-const online_filter = ref<boolean>(localStorage.getItem('online_filter') === 'true' || false);
 
+/* plaque filters */
+const search_filter = ref("")
+
+const filter_by_gallery = ref<string>(localStorage.getItem('plaque_list_filter_by_gallery') || "")
 watch(filter_by_gallery, (newVal) => {
     localStorage.setItem('plaque_list_filter_by_gallery', newVal)
 })
-
+const online_filter = ref<boolean>(localStorage.getItem('online_filter') === 'true' || false);
 watch(online_filter, (newVal) => {
     if(newVal) {
         localStorage.setItem('online_filter', 'true')
         return
     }
     localStorage.setItem('online_filter', 'false')
+})
+const sort_order = ref(localStorage.getItem('plaque_list_sort_order') || "name")
+watch(sort_order, (newVal) => {
+    localStorage.setItem('plaque_list_sort_order', newVal)
 })
 
 const plaque_store = usePlaqueStore();
@@ -90,6 +100,20 @@ const createTestPlaque = async () => {
         token_meta_id_list: [],
         created_at: Timestamp.now(),
         updated_at: Timestamp.now(),
+        orientation: OrientationType.Landscape,
+        command: {
+            type: "",
+            time_sent: Timestamp.fromMillis(0),
+        },
+        last_check_in_time: Timestamp.fromMillis(0),
+        vpn_active: false,
+        machine_data: {
+            machine_name: "",
+            version: "",
+            local_ip: "",
+            public_ip: "",
+            updated_at: Timestamp.fromMillis(0),
+        }
     }).catch(err =>
         ElMessage({ message: `Error creating test plaque- ${err}`, type: 'error', showClose: true, duration: 12000 })
     );
@@ -121,6 +145,27 @@ const filtered_plaques = computed(() => {
 
     if (online_filter.value) {
         ret_plaques = ret_plaques.filter(p => isPlaqueOnline(p));
+    }
+
+    if( sort_order.value == "name") {
+        ret_plaques = ret_plaques.sort((a, b) => a.entity.name.localeCompare(b.entity.name));
+    } else if ( sort_order.value == "last_check_in_time") {
+        ret_plaques = ret_plaques.sort((a, b) => {
+            // if both art null return 0
+            if (a.entity.last_check_in_time == null && b.entity.last_check_in_time== null) {
+                return 0;
+            }
+
+            // then if one is null it should go last
+            if (a.entity.last_check_in_time== null) {
+                return 1;
+            }
+            if (b.entity.last_check_in_time == null) {
+                return -1;
+            }
+
+            return b.entity.last_check_in_time.seconds - a.entity.last_check_in_time.seconds
+        });
     }
 
     if (!search_filter.value) {

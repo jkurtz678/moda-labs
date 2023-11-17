@@ -14,6 +14,7 @@ const cors = require('cors')({ origin: true });
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 const ffmpeg = require('fluent-ffmpeg');
+const sharp = require('sharp');
 
 const app = express();
 
@@ -22,25 +23,18 @@ const THUMB_MAX_HEIGHT = 200;
 const THUMB_MAX_WIDTH = 200;
 const THUMB_PREFIX = 'thumb_';
 
+// medium is the middle sized image, used for the image gallery
+const MEDIUM_MAX_HEIGHT = 960;
+const MEDIUM_MAX_WIDTH = 960;
+const MEDIUM_PREFIX = 'medium_';
+
 const generateThumbnail = async (object: any) => {
     functions.logger.log('Generating thumbnail for', object);
     // File and directory paths.
     const file_path = object.name;
-    functions.logger.log(`generateThumbnail - file_path: ${file_path}`)
-    //const content_type = object.contentType;
-    const file_dir = path.dirname(file_path);
     const file_name = path.basename(file_path);
-    const file_name_no_ext = path.parse(file_name).name;
-    const thumbnail_file_path = path.normalize(path.join(file_dir, `${THUMB_PREFIX}${file_name_no_ext}.jpg`));
-    const temp_local_file = path.join(os.tmpdir(), file_path);
-    const temp_local_dir = path.dirname(temp_local_file);
-    const temp_local_thumb_file = path.join(os.tmpdir(), thumbnail_file_path);
-
-    // Exit if this is triggered on a file that is not an image.
-    /* if (!object.contentType.startsWith('image/')) {
-        functions.logger.log('This is not an image.');
-        return null;
-    } */
+    const file_id = path.parse(file_name).name;
+    functions.logger.log(`generateThumbnail - file_path: ${file_path}`)
 
     // Exit if the image is already a thumbnail.
     if (file_name.startsWith(THUMB_PREFIX)) {
@@ -48,6 +42,10 @@ const generateThumbnail = async (object: any) => {
         return null;
     }
 
+    if (file_name.startsWith(MEDIUM_PREFIX)) {
+        functions.logger.log('Already a Medium.');
+        return null;
+    }
 
     // Exit if this is a move or deletion event.
     if (object.resourceState === 'not_exists') {
@@ -57,47 +55,71 @@ const generateThumbnail = async (object: any) => {
 
     const bucket = admin.storage().bucket(object.bucket);
 
-    // Exit if thumbnail already exists
-    const file_exists_arr = await bucket.file(thumbnail_file_path).exists()
-    if (file_exists_arr && file_exists_arr[0]) {
-        functions.logger.log('Thumbnail already exists.');
-        return null;
-    } 
+    const temp_local_thumb_file = await generateResizedFile(bucket, file_path, THUMB_PREFIX, THUMB_MAX_WIDTH, THUMB_MAX_HEIGHT);
+    if(temp_local_thumb_file) {
+        // get aspect ratio of thumbnail
+        await calculateImageAspectRatio(file_id, temp_local_thumb_file);
+        fs.unlinkSync(temp_local_thumb_file);
+    }
 
-    // Cloud Storage files.
+    const temp_local_medium_file = await generateResizedFile(bucket, file_path, MEDIUM_PREFIX, MEDIUM_MAX_WIDTH, MEDIUM_MAX_HEIGHT);
+    if (temp_local_medium_file ){
+        fs.unlinkSync(temp_local_medium_file);
+    }
+
+    return true;
+}
+
+const calculateImageAspectRatio = async (file_id: string , temp_local_file: string) => {
+    const thumbnail_metadata = await sharp(temp_local_file).metadata()
+    const width = thumbnail_metadata.width;
+    const height = thumbnail_metadata.height;
+
+    // calculate aspect ratio
+    const aspect_ratio = width / height;
+    functions.logger.log("Calculated aspect ratio of thumbnail: ", aspect_ratio)
+
+    functions.logger.log("Updating aspect ratio of token-meta document: ", file_id)
+    // save aspect ratio to firestore
+    const token_meta_ref = admin.firestore().collection('token-meta').doc(file_id);
+    await token_meta_ref.set({ aspect_ratio: aspect_ratio }, { merge: true });
+    functions.logger.log("Successfully update firestore document with aspect ratio: ", aspect_ratio)
+}
+
+const generateResizedFile = async (bucket: any, file_path: string, new_file_prefix: string, width: number, height: number): Promise<string | null> => {
     const file = bucket.file(file_path);
-    //const thumb_file = bucket.file(thumbnail_file_path);
     const metadata = {
         contentType: "image/jpeg",
         'Cache-Control': 'public, max-age=31536000',
     }
 
+    const file_dir = path.dirname(file_path);
+    const file_name = path.basename(file_path);
+    const file_name_no_ext = path.parse(file_name).name; // this is also the document id of the firestore record
+    const temp_local_file = path.join(os.tmpdir(), file_path);
+    const temp_local_dir = path.dirname(temp_local_file);
+
     // Create the temp directory where the storage file will be downloaded.
     await mkdirp(temp_local_dir);
 
-    // Download file from bucket.
-    //
+    const new_file_path = path.normalize(path.join(file_dir, `${new_file_prefix}${file_name_no_ext}.jpg`));
+    const temp_local_new_file = path.join(os.tmpdir(), new_file_path);
 
-    // firebase file get the download url
-    //const url = await file.getSignedUrl({ action: 'read', expires: '03-09-2491' });
+    // if the file already exists we return null
+    const new_file_exists_arr = await bucket.file(new_file_path).exists()
+    if (new_file_exists_arr && new_file_exists_arr[0]) {
+        return null;
+    }
 
-    // download the first two seconds of the video
-    /* const download_ffmpeg_cmd = `ffmpeg -t 2 -i '${url}' ${temp_local_file}`
-    functions.logger.log("download_ffmpeg_cmd: ", download_ffmpeg_cmd)
-    const { stdout, stderr } = await exec(download_ffmpeg_cmd)
-    functions.logger.log("stdout: ", stdout)
-    functions.logger.log("stderr: ", stderr)
-    functions.logger.log('The file has been downloaded to', temp_local_file); */
-
-    // Generate a thumbnail using ImageMagick.
+    // process image
     if (file_name.endsWith('.png') || file_name.endsWith('.jpg') || file_name.endsWith('.jpeg')) {
+        // Generate an image using ImageMagick.
         functions.logger.log("Starting download for file: ", file_path)
         await file.download({ destination: temp_local_file, start: 0, end: 20000000 });
-        functions.logger.log(`Creating thumbnail for image ${file_name} with imagemajick`);
-        await spawn('convert', [temp_local_file, '-thumbnail', `${THUMB_MAX_WIDTH}x${THUMB_MAX_HEIGHT}>`, temp_local_thumb_file], { capture: ['stdout', 'stderr'] });
+        functions.logger.log(`Creating ${new_file_prefix} for image ${file_name} with imagemajick`);
+        await spawn('convert', [temp_local_file, '-thumbnail', `${width}x${height}>`, temp_local_new_file], { capture: ['stdout', 'stderr'] });
         fs.unlinkSync(temp_local_file);
-    } else {
-
+    } else { // process video
         // signing is broken on the emulator, use publicURL for local file urls
         let url: string;
         if (process.env.FUNCTIONS_EMULATOR) {
@@ -106,15 +128,12 @@ const generateThumbnail = async (object: any) => {
             const url_list = await file.getSignedUrl({ action: 'read', expires: '03-09-2491' })
             url = url_list[0]
         }
-        
-        //const url = await file.getDownloadURL()
-        functions.logger.log("media cloud url: ", url)
+
         functions.logger.log(`Creating thumbnail for video ${url} with ffmpeg`);
-        //await spawn('ffmpeg', ['-ss', '00:00:01', '-i', url, '-vf', 'scale=320:320:force_original_aspect_ratio=decrease', '-vframes', '1', temp_local_thumb_file], { capture: ['stdout', 'stderr'] });
         await new Promise((resolve, reject) => {
             ffmpeg(url)
-                .inputOptions("-ss 00:00:01")
-                .outputOptions(["-frames:v 1", "-q:v 5", "-vf scale=320:320:force_original_aspect_ratio=decrease"])
+                .inputOptions("-ss 00:00:05")
+                .outputOptions(["-frames:v 1", "-q:v 5", `-vf scale=${width}:${height}:force_original_aspect_ratio=decrease`])
                 .on('end', function () {
                     functions.logger.log('file has been converted succesfully');
                     resolve(null);
@@ -125,21 +144,17 @@ const generateThumbnail = async (object: any) => {
                     functions.logger.log('stderr: ' + stderr);
                     reject(err);
                 })
-                .save(temp_local_thumb_file);
+                .save(temp_local_new_file);
         });
     }
 
-    functions.logger.log('Thumbnail created at', temp_local_thumb_file);
-    // Uploading the Thumbnail.
-    await bucket.upload(temp_local_thumb_file, { destination: thumbnail_file_path, metadata: metadata });
-    functions.logger.log('Thumbnail uploaded to Storage at', thumbnail_file_path);
-    // Once the image has been uploaded delete the local files to free up disk space.
-    fs.unlinkSync(temp_local_thumb_file);
-    return true;
+    await bucket.upload(temp_local_new_file, { destination: new_file_path, metadata: metadata });
+    functions.logger.log(`${new_file_prefix} uploaded to Storage at ${new_file_path}`);   
+    return temp_local_new_file;
 }
 
 // generateThumbnail upon media upload
-exports.autoGenerateThumbnail = functions.runWith({memory: "2GB", timeoutSeconds: 360}).storage.object().onFinalize(async (object: any) => {
+exports.autoGenerateThumbnail = functions.runWith({ memory: "2GB", timeoutSeconds: 360 }).storage.object().onFinalize(async (object: any) => {
     await generateThumbnail(object);
 })
 
@@ -197,7 +212,7 @@ const validateFirebaseIdToken = async (req: any, res: any, next: any) => {
 };
 
 // generateThumbnail upon user request with filepath as a query parameter
-const generateThumbnailHandler = functions.runWith({memory: "2GB", timeoutSeconds: 360}).https.onRequest(async (req: any, res: any) => {
+const generateThumbnailHandler = functions.runWith({ memory: "2GB", timeoutSeconds: 360 }).https.onRequest(async (req: any, res: any) => {
     functions.logger.log("generateThumbnail user", req.user)
     const file_path = req.query.filepath;
     functions.logger.log("generateThumbnail called with filepath: ", file_path);
@@ -214,7 +229,7 @@ const generateThumbnailHandler = functions.runWith({memory: "2GB", timeoutSecond
 });
 
 // generateAllThumnailsHandler iterates through all firestore token metas and creates thumbnails for all media
-const generateAllThumbnailsHandler = functions.runWith({memory: "2GB", timeoutSeconds: 360}).https.onRequest(async (req: any, res: any) => {
+const generateAllThumbnailsHandler = functions.runWith({ memory: "2GB", timeoutSeconds: 360 }).https.onRequest(async (req: any, res: any) => {
     functions.logger.log("generateAllThumbnails user", req.user)
     const token_metas = await admin.firestore().collection('token-meta').get();
     functions.logger.log(`generateAllThumbnails starting generation for ${token_metas.size} tokens`);
@@ -259,4 +274,4 @@ const admin_whitelist = [
     "S1rNu5NLTz4NYaWf1kGWSBd8f2Vp", // jkurtz678@gmail.com local
     "9jtkHhU6XOVK2TUxYHawnP2yULD3" // jkurtz678@gmail.com live
 ];
-exports.app = functions.runWith({memory: "2GB", timeoutSeconds: 360}).https.onRequest(app);
+exports.app = functions.runWith({ memory: "2GB", timeoutSeconds: 360 }).https.onRequest(app);

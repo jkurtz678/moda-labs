@@ -4,16 +4,32 @@ const OPENSEA_API_KEY = import.meta.env.VITE_OPENSEA_API_KEY;
 
 // loadTokensByAccountID returns all associated opensea tokens for a given account id
 export async function loadTokensByAccountID(wallet_address: string): Promise<Array<OpenseaToken>> {
-    const res = await fetch(`https://api.opensea.io/api/v1/assets/?owner=${wallet_address}`, {
-        headers: {
-            'X-API-KEY': OPENSEA_API_KEY
+    const token_list = [];
+    let cursor = "";
+    while (true) {
+        const res = await fetch(`https://api.opensea.io/api/v1/assets/?owner=${wallet_address}&limit=200${cursor ? '&cursor=' + cursor : ""}`,
+            {
+                headers: {
+                    'X-API-KEY': OPENSEA_API_KEY
+                }
+            }
+        );
+
+        const res_json = await res.json();
+        handleOpenseaFetchError(res, res_json)
+        if (res_json.assets) {
+            token_list.push(...res_json.assets);
         }
-    });
 
-    const res_json = await res.json();
-    handleOpenseaFetchError(res, res_json) 
 
-    return res_json.assets;
+        // continue to call api until all tokens have been retrieved
+        cursor = res_json.next;
+        if (!cursor) {
+            break;
+        }
+    }
+
+    return token_list;
 }
 
 // loadTokensByAccountID returns opensea tokens by a list asset contract addresses and token ids
@@ -40,7 +56,7 @@ export const loadTokensCreatedByAddress = async (wallet_address: string): Promis
     const token_list = [];
     let cursor = "";
     while (true) {
-        const res = await fetch(`https://api.opensea.io/api/v1/events?account_address=${wallet_address}&event_type=created&limit=50${cursor ? '&cursor=' + cursor : ""}`,
+        const res = await fetch(`https://api.opensea.io/api/v1/events?account_address=${wallet_address}&event_type=created&limit=200${cursor ? '&cursor=' + cursor : ""}`,
             {
                 headers: {
                     'X-API-KEY': OPENSEA_API_KEY
@@ -49,7 +65,7 @@ export const loadTokensCreatedByAddress = async (wallet_address: string): Promis
         );
 
         const res_json = await res.json();
-        handleOpenseaFetchError(res, res_json) 
+        handleOpenseaFetchError(res, res_json)
         // add creator to fit with other opensea endpoint pattern
 
         if (res_json.asset_events) {
@@ -70,10 +86,10 @@ export const loadTokensCreatedByAddress = async (wallet_address: string): Promis
 
 const handleOpenseaFetchError = (res: Response, body: any) => {
     if (res.status >= 400) {
-        if(body.detail) {
+        if (body.detail) {
             throw body.detail
         }
-        if(res.status == 429) {
+        if (res.status == 429) {
             throw "Error - opensea rejected request due to rate limiting"
         }
         throw "Error loading opensea tokens"

@@ -1,7 +1,8 @@
 <template>
-  <el-container style="height: 100%; flex-direction: column;">
+  <el-container style="height: 100%; position: fixed; top: 0px; left: 0px; right: 0px; bottom: 0px;">
     <Header></Header>
-    <el-main style="background-color: #DAD9D7;">
+    <el-main style="background-color: #DAD9D7;"
+      :class="route.fullPath.includes('artwork-tile-grid') ? 'remove-padding' : ''">
       <RouterView v-if="initial_load_done"></RouterView>
     </el-main>
   </el-container>
@@ -19,6 +20,9 @@ import { updatePlaque } from "@/api/plaque";
 import { useGalleryStore } from "@/stores/gallery";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/firebaseConfig";
+import type { FirestoreDocument, Plaque } from "@/types/types";
+import { addPlaqueToAccount } from "@/util/add-plaque";
+import { onUnmounted } from "vue";
 
 const account_store = useAccountStore();
 const plaque_store = usePlaqueStore();
@@ -29,6 +33,8 @@ const initial_load_done = ref(false);
 const loading = ref();
 const route = useRoute()
 
+let unsubAuthStateChanged: any;
+
 onMounted(async () => {
   loading.value = ElLoading.service({
     lock: true,
@@ -37,7 +43,7 @@ onMounted(async () => {
   })
 
   // detect if user is logged in
-  onAuthStateChanged(auth, async (user) => {
+  unsubAuthStateChanged = onAuthStateChanged(auth, async (user) => {
 
     console.log("onAuthStateChanged", user)
     if (user) {
@@ -46,9 +52,14 @@ onMounted(async () => {
         text: 'Loading',
         background: 'rgba(0, 0, 0, 0.7)',
       })
-      await loadAppData(user.uid);
-      loading.value.close();
-    } else {
+      try {
+        await loadAppData(user.uid);
+      } finally {
+        loading.value.close();
+      }
+    }
+
+    if (!user) {
       account_store.setAccount(null)
       loading.value.close();
       router.push({ name: "login", query: { redir: window.location.href } });
@@ -56,8 +67,14 @@ onMounted(async () => {
   })
 });
 
+onUnmounted(() => {
+  console.log("unsubscribe onAuthStateChanged on unmount")
+  unsubAuthStateChanged();
+})
+
 // loadAppData is the initial load for app data for the user
 async function loadAppData(user_id: string) {
+  console.log("LOAD APP DATA")
   await account_store.loadAccount(user_id)
 
   // must load gallery data before loading plaque data because we need to know which plaques to load
@@ -73,12 +90,16 @@ async function loadAppData(user_id: string) {
     .catch(err => (showError(`Error loading archive token metas - ${err}`)));
   const gallery_token_promise = token_meta_store.loadGalleryTokenMetas(gallery_store.gallery_list)
     .catch(err => (showError(`Error loading token metas - ${err}`)));
+  const demo_token_promise = token_meta_store.loadDemoTokenMetas()
+    .catch(err => (showError(`Error loading demo token metas - ${err}`)));
 
 
-  const promise_list = [plaque_promise, gallery_plaque_promise, archive_token_promise, gallery_plaque_promise];
+  const promise_list = [plaque_promise, gallery_plaque_promise, archive_token_promise, gallery_plaque_promise, gallery_token_promise];
 
   // if user has a wallet connected then we load opensea tokens also
   const wallet_address = account_store.get_account.entity.wallet_address;
+  // nates address
+  //const wallet_address = "0xd8945d98ed4233Cf87cfA4fDCC7a54FE279E8ee7"
   if (wallet_address) {
     const opensea_minted_token_promise = token_meta_store.loadOpenseaMintedTokenMetas(wallet_address)
       .catch(err => (showError(`Error loading opensea minted tokens - ${err}`)))
@@ -90,16 +111,16 @@ async function loadAppData(user_id: string) {
   }
 
   await Promise.all(promise_list);
+  await token_meta_store.loadOpenseaConvertedTokens();
 
   // delay opensea_wallet_load to possibly help with rate limit
   // await opensea_wallet_token_promise;
 
   // if plaque_id is passed in the query params and the plaque is not in the store, attempt to add this plaque to this account
   const plaque_id_qp = route.query.plaque_id;
-  if (plaque_id_qp && typeof plaque_id_qp === 'string' && !plaque_store.plaque_map[plaque_id_qp]) {
-    await updatePlaque(plaque_id_qp, { user_id: account_store.get_account.id, token_meta_id_list: [] }).catch(err => {
-      showError(`Error adding plaque from query param = ${err}`)
-    })
+  if (plaque_id_qp && typeof plaque_id_qp === 'string') {
+    await addPlaqueToAccount(user_id, plaque_id_qp as string)
+    router.replace({ path: route.path, query: {}});
   }
   initial_load_done.value = true;
 };
@@ -115,5 +136,10 @@ async function loadAppData(user_id: string) {
   .el-main {
     text-align: center;
   }
+}
+
+.remove-padding {
+  padding: 0px !important;
+  overflow-y: hidden;
 }
 </style>

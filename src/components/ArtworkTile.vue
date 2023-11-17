@@ -1,22 +1,27 @@
 <template>
-  <div ref="tile_container" class="custom-card" @click="() => { show_detail = !show_detail; animateTileHeight(show_detail); }">
+  <div ref="tile_container" class="custom-card" @click="toggleTileDetail" :style="`height: ${tile_height}px !important`">
     <img :class="show_detail ? 'absolute' : ''" :src="thumbnail_url" />
-    <div :class="show_detail ? 'show-blur' : 'hide-blur'" class="absolute overlay transition" ></div>
+    <div :class="show_detail ? 'show-blur' : 'hide-blur'" class="absolute overlay transition"></div>
     <div class="transition absolute" :class="!show_detail ? 'show-blur' : 'hide-blur'">
       <div class="header">
         {{ `${token_meta.entity.name} | ${token_meta.entity.artist}` }}
       </div>
       <div class="platform">{{ platform }}</div>
     </div>
-    <div ref="detail_container" class='detail-container transition'
-      :class="show_detail ? 'show-blur' : 'hide-blur absolute-no-b'">
+    <div ref="detail_container" class='detail-container transition' :class="show_detail ? 'show-blur' : 'hide-blur'">
       <div style="font-size: 1.6em; font-weight: bold;">{{ token_meta.entity.name }}</div>
-      <div v-if="token_meta.entity.artist_social_link">
-        <el-button link style="font-weight: bold; display: block;" @click.stop="openArtistSocial">{{
-          token_meta.entity.artist }}</el-button>
+      <div v-if="token_meta.entity.artist_social_link" :style="screen_type == 'xs' ? 'display: flex; justify-content: center;' : ''">
+        <el-button link style="font-weight: bold; display: block;" :disabled="!show_detail"
+          @click.stop="openArtistSocial">{{
+            token_meta.entity.artist }}</el-button>
       </div>
       <div v-else style="font-weight: bold;">{{ token_meta.entity.artist }}</div>
       <template v-if="show_detail">
+        <el-tooltip class="box-item" effect="dark" content="Edit art data" placement="top">
+          <el-button icon="Edit" text circle
+            @click.stop="router.push({ name: 'edit-artwork', params: { 'token_meta_id': props.token_meta.id } })">
+          </el-button>
+        </el-tooltip>
         <el-tooltip class="box-item" effect="dark" content="Download art" placement="top">
           <el-button icon="Download" text circle @click.stop="openArt"></el-button>
         </el-tooltip>
@@ -27,37 +32,49 @@
           placement="top">
           <el-button icon="Link" text circle @click.stop="qrCodeLink"></el-button>
         </el-tooltip>
-        <el-tooltip class="box-item" effect="dark" content="Edit art data" placement="top">
-          <el-button icon="Edit" text circle
-            @click.stop="router.push({ name: 'edit-artwork', params: { 'token_meta_id': props.token_meta.id } })">
-          </el-button>
+        <el-tooltip v-if="account_store.is_user_admin" class="box-item" effect="dark" content="Delete Artwork"
+          placement="top">
+          <el-button icon="Delete" text circle @click.stop="deleteConfirm"></el-button>
         </el-tooltip>
       </template>
       <div v-else style="height: 32px;"></div>
       <div style="font-size: 0.9em; line-height: 1.3em">{{ token_meta.entity.description }}</div>
+      <div style="margin: 10px 0px">
+        <el-button v-for="g in gallery_store.token_id_to_gallery_map.get(props.token_meta.id)" size="small" round plain
+          type="primary" style="margin: 3px 10px 3px 0px;">{{ g.entity.name }}</el-button>
+      </div>
     </div>
   </div>
 </template>
   
 <script setup lang="ts">
-import useThumbnail from '@/composables/thumbnail-image';
+import { useMediumThumbnail } from "@/composables/thumbnail-image";
 import { getPlatformDisplay, type FirestoreDocument, type TokenMeta, getSourceFile } from '@/types/types';
 import { showError } from '@/util/util';
 import { ref } from 'vue';
 import { computed } from 'vue';
 import { toRef } from 'vue';
 import { useRouter } from 'vue-router';
+import { useAccountStore } from "@/stores/account";
+import { deleteTokenMeta } from "@/api/token-meta";
+import { ElMessage, ElMessageBox } from 'element-plus';
+import { useGalleryStore } from "@/stores/gallery";
+import useBreakpoints from "@/composables/breakpoints"
 
 const router = useRouter();
 interface ArtworkTileProps {
   token_meta: FirestoreDocument<TokenMeta>;
+  column_width: number;
 }
 const props = defineProps<ArtworkTileProps>();
-const thumbnail_url = useThumbnail(toRef(props, "token_meta"));
+const thumbnail_url = useMediumThumbnail(toRef(props, "token_meta"));
 const show_detail = ref(false);
 const starting_height = ref<number>(0);
 const tile_container = ref();
 const detail_container = ref();
+const account_store = useAccountStore();
+const gallery_store = useGalleryStore();
+const { screen_type } = useBreakpoints();
 
 const platform = computed(() => {
   return getPlatformDisplay(props.token_meta.entity.platform)
@@ -74,6 +91,15 @@ const openArt = async () => {
   window.open(url, '_blank');
 }
 
+const tile_height = computed(() => {
+
+  if (!props.token_meta.entity.aspect_ratio) {
+    return props.column_width
+  }
+
+  return props.column_width / props.token_meta.entity.aspect_ratio
+})
+
 
 const previewPlaque = () => {
   const link = router.resolve({ name: 'preview-plaque', params: { token_meta_id: props.token_meta.id } });
@@ -88,26 +114,25 @@ const openArtistSocial = () => {
   window.open(props.token_meta.entity.artist_social_link, '_blank');
 }
 
-function animateTileHeight(detail: boolean) {
-
-
+function toggleTileDetail() {
   if (!tile_container.value) {
     console.log("animateDivHeight - error finding tile container")
     return
   }
 
-  if (detail && starting_height.value == 0) {
+  if (!show_detail.value && starting_height.value == 0) {
     starting_height.value = tile_container.value.offsetHeight
   }
+
+  show_detail.value = !show_detail.value;
 
   if (!detail_container.value) {
     console.log("animateDivHeight - error finding detail container")
     return
   }
 
-
   let targetHeight: number;
-  if (detail) {
+  if (show_detail.value && detail_container.value.offsetHeight > starting_height.value) {
     targetHeight = detail_container.value.offsetHeight; // The final height you want to animate to (in pixels)
   } else {
     targetHeight = starting_height.value
@@ -133,6 +158,26 @@ function animateTileHeight(detail: boolean) {
     const newHeight = startHeight + incrementSize * currentIncrement;
     tile_container.value.style.height = newHeight + "px";
   }, frameRate);
+}
+
+const deleteConfirm = () => {
+  ElMessageBox.prompt(`Are you sure you want to delete ${props.token_meta.entity.name}? Please type the word 'DELETE' to proceed.`, 'Delete Artwork', {
+    confirmButtonText: 'Delete',
+    cancelButtonText: 'Cancel',
+    inputPattern: /^DELETE$/i,
+    inputErrorMessage: 'Please enter the word DELETE to confirm.'
+  })
+    .then(({ value }) => {
+      if (value) {
+        return deleteTokenMeta(props.token_meta.id)
+      }
+    })
+    .then(() => {
+      ElMessage({ message: 'Artwork deleted', type: 'success', showClose: true, duration: 12000 });
+    })
+    .catch((err) => {
+      ElMessage({ message: `Error deleting artwork - ${err}`, type: 'error', showClose: true, duration: 12000 });
+    });
 }
 
 </script>
@@ -217,7 +262,6 @@ img {
   background-color: transparent;
   opacity: 0;
   padding: 1em;
-  min-height: 279px;
 }
 
 .absolute {

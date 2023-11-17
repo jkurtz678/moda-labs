@@ -2,7 +2,7 @@
 <template>
   <div class="dialog-container">
     <el-dialog center v-model="show_dialog" title="Add artwork to plaque" :close-on-click-modal="false"
-      :fullscreen="screen_type == 'xs'" top="2vh">
+      :fullscreen="screen_type == 'xs'" top="2vh" destroy-on-close>
       <TokenSelectList v-model:selected_token_meta_id_list="new_token_meta_id_list" :token_meta_list="token_meta_list"></TokenSelectList> 
       <template #footer>
         <div class="dialog-footer">

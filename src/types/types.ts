@@ -93,6 +93,8 @@ export interface TokenMeta extends BaseDocument {
     platform: TokenPlatform; // token id for ethereum token
     external_thumbnail_url?: string; // url to thumbnail image from outside moda archives (e.g. from opensea servers)
     external_media_url?: string; // url to media source file from outside moda archives (e.g. opensea servers)
+    aspect_ratio?: number
+    deleted?: boolean; // if true this token meta has been soft deleted and wont be displayed in the UI
 }
 
 export enum Blockchain {
@@ -103,7 +105,8 @@ export enum Blockchain {
 export enum TokenPlatform {
     Archive = "archive", // tokens uploaded directly to the moda archive 
     Opensea = "opensea", // token from opensea api, not stored in moda archive
-    OpenseaArchive = "opensea_archive" // token from opensea api that has been added to moda archive
+    OpenseaArchive = "opensea_archive", // token from opensea api that has been added to moda archive
+    ArchiveDemo = "archive_demo" // tokens that are available to all users from the archive as demo art
 }
 
 // Gallery is a group of users and token metas
@@ -181,6 +184,39 @@ export async function getTokenMetaThumbnailImageURL(token_meta: FirestoreDocumen
     } catch (err) {
         console.log(`getTokenMetaThumbnailImageURL - failed to find archive thumbnail image ${token_meta.entity.name}`, err)
     }
+
+
+    // then we check external thumbnail url
+    if (token_meta.entity.external_thumbnail_url) {
+        return token_meta.entity.external_thumbnail_url
+    }
+
+    // if none found return moda logo as placeholder image
+    return new URL(`../assets/logo.png`, import.meta.url).href
+}
+
+// getTokenMetaThumbnailImageURL returns the url to the thumbnail image for a token meta
+export async function getTokenMetaMediumImageURL(token_meta: FirestoreDocument<TokenMeta>): Promise<string> {
+    // first check if archive medium image exist in firebase storage
+    const storage = getStorage();
+    const medium_path_ref = ref(storage, `medium_${token_meta.entity.media_id}.jpg`);
+    try {
+        const url = await getDownloadURL(medium_path_ref)
+        console.log(`getTokenMetaThumbnailImageURL - found url for image ${token_meta.entity.name}`, url)
+        return url
+    } catch (err) {
+        console.log(`getTokenMetaThumbnailImageURL - failed to find archive medium image ${token_meta.entity.name}`, err)
+    }
+
+    // then fallback to thumbnail if it exists
+    const thumbnail_path_ref = ref(storage, `thumb_${token_meta.entity.media_id}.jpg`);
+    try {
+        const url = await getDownloadURL(thumbnail_path_ref)
+        console.log(`getTokenMetaThumbnailImageURL - found url for image ${token_meta.entity.name}`, url)
+        return url
+    } catch (err) {
+        console.log(`getTokenMetaThumbnailImageURL - failed to find archive thumbnail image ${token_meta.entity.name}`, err)
+    } 
 
 
     // then we check external thumbnail url

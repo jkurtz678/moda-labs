@@ -10,7 +10,8 @@ import { updatePlaque, getPlaqueByID } from "@/api/plaque";
 import { useRouter } from 'vue-router';
 import { useAccountStore } from "@/stores/account"
 import { ElLoading } from 'element-plus'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import {addPlaqueToAccount} from "@/util/add-plaque"
 
 
 const account_store = useAccountStore()
@@ -40,28 +41,12 @@ const onDecode = async (qr_code_link: string) => {
         background: 'rgba(0, 0, 0, 0.7)',
     })
 
-    // set plaque.entity.name to a random 4 digit number if it is empty
-    const plaque = await getPlaqueByID(plaque_id).catch(err => {
-        console.log("QrScan.onDecode error - ", err)
-        ElMessage({ message: `Error adding loading plaque when trying to add - ${err}`, type: 'error', showClose: true, duration: 12000 });
-    })
-
-    // should only get here if error is caught
-    if(!plaque) {
+    const success = await addPlaqueToAccount(user_id, plaque_id)
+    if (!success) {
         loading.close();
         return
-    }
+    } 
 
-    // set plaque.entity.name to a random 4 digit number if it is empty
-    if (!plaque.entity.name) {
-        plaque.entity.name = Math.floor(1000 + Math.random() * 9000).toString();
-    }
-
-    await updatePlaque(plaque_id, {user_id: user_id, name: plaque.entity.name}).then((plaque) => {
-        ElMessage({ message: `Connected to plaque ${plaque.entity.name}`, type: 'success', showClose: true, duration: 6000 });
-    }).catch(err => {
-        ElMessage({ message: `Error adding account to plaque - ${err}`, type: 'error', showClose: true, duration: 12000 });
-    })
     loading.close();
     router.push('plaque-list');
 };
