@@ -81,20 +81,21 @@ async function loadAppData(user_id: string) {
   await gallery_store.loadGalleryList(user_id)
     .catch(err => (showError(`Error loading galleries - ${err}`)));
 
+  console.log("done loading galleries")
+
   // then load all tokens and plaques in parallel 
   const plaque_promise = plaque_store.loadPlaques(user_id)
     .catch(err => (showError(`Error loading plaques - ${err}`)));
-  const gallery_plaque_promise = plaque_store.loadGalleryPlaques(gallery_store.gallery_list)
+  const gallery_plaque_promise = plaque_store.loadGalleryPlaques(gallery_store.gallery_plaque_list)
     .catch(err => (showError(`Error loading gallery plaques - ${err}`)));
   const archive_token_promise = token_meta_store.loadArchiveTokenMetas(user_id)
     .catch(err => (showError(`Error loading archive token metas - ${err}`)));
-  const gallery_token_promise = token_meta_store.loadGalleryTokenMetas(gallery_store.gallery_list)
+  const gallery_token_promise = token_meta_store.loadGalleryTokenMetas(gallery_store.gallery_token_meta_list)
     .catch(err => (showError(`Error loading token metas - ${err}`)));
   const demo_token_promise = token_meta_store.loadDemoTokenMetas()
     .catch(err => (showError(`Error loading demo token metas - ${err}`)));
 
-
-  const promise_list = [plaque_promise, gallery_plaque_promise, archive_token_promise, gallery_plaque_promise, gallery_token_promise];
+  const promise_list = [plaque_promise, gallery_plaque_promise, archive_token_promise, gallery_plaque_promise, gallery_token_promise, demo_token_promise];
 
   // if user has a wallet connected then we load opensea tokens also
   const wallet_address = account_store.get_account.entity.wallet_address;

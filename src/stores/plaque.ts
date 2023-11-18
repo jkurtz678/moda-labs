@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import type { FirestoreDocument, Gallery, Plaque } from "@/types/types"
+import type { FirestoreDocument, Gallery, GalleryPlaque, Plaque } from "@/types/types"
 import { getPlaquesByUserIDWithListener, getAllPlaquesWithListener, getPlaquesByPlaqueIDList } from "@/api/plaque";
 import { useAccountStore } from "./account";
 import { useGalleryStore } from "./gallery";
@@ -71,10 +71,10 @@ export const usePlaqueStore = defineStore({
                 this.plaque_list = plaques;
             })
         },
-        async loadGalleryPlaques(gallery_list: FirestoreDocument<Gallery>[]) {
+        async loadGalleryPlaques(gallery_plaque_list: FirestoreDocument<GalleryPlaque>[]) {
             const plaque_id_list: string[] = [];
-            gallery_list.forEach(g => {
-                plaque_id_list.push(...g.entity.plaque_id_list);
+            gallery_plaque_list.forEach(g => {
+                plaque_id_list.push(g.entity.plaque_id);
             });
 
             console.log("plaque_id_list", plaque_id_list); // TODO: remove")

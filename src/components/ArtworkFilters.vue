@@ -101,7 +101,9 @@ const filtered_tokens = computed(() => {
         if (props.search_filter && !token.entity.artist?.toLowerCase().includes(props.search_filter.toLowerCase()) && !token.entity.name?.toLowerCase().includes(props.search_filter.toLowerCase())) {
             return false
         }
-        if (filter_by_gallery.value && !gallery_store.gallery_list.find(g => g.id == filter_by_gallery.value)?.entity.token_meta_id_list.includes(token.id)) {
+
+        const matching_token = gallery_store.gallery_token_meta_list.find(g => (g.entity.gallery_id == filter_by_gallery.value))
+        if (filter_by_gallery.value && !(matching_token?.entity.token_meta_id == token.id)) {
             return false
         }
 

@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { type FirestoreDocument, type OpenseaToken, type TokenMeta, Blockchain, TokenPlatform, type Gallery } from "@/types/types"
+import { type FirestoreDocument, type OpenseaToken, type TokenMeta, Blockchain, TokenPlatform, type Gallery, type GalleryTokenMeta } from "@/types/types"
 import { getUniqueOpenseaID, getTokenMetaUniqueChainID } from "@/types/types"
 
 import { getAllTokenMetasWithListener, getTokenMetaListByIDList, getTokenMetaListByUserIDWithListener } from "@/api/token-meta";
@@ -136,10 +136,10 @@ export const useTokenMetaStore = defineStore({
         
             this.opensea_converted_tokens = token_meta_list;
         },
-        async loadGalleryTokenMetas(gallery_list: FirestoreDocument<Gallery>[]) {
+        async loadGalleryTokenMetas(gallery_token_meta_list: FirestoreDocument<GalleryTokenMeta>[]) {
             const token_meta_id_list: string[] = [];
-            gallery_list.forEach(g => {
-                token_meta_id_list.push(...g.entity.token_meta_id_list);
+            gallery_token_meta_list.forEach(g => {
+                token_meta_id_list.push(g.entity.token_meta_id);
             })
             // getTokenMetaListByIDList in increments of 10 
             const token_meta_list: FirestoreDocument<TokenMeta>[] = [];

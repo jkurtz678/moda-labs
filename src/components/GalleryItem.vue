@@ -20,22 +20,24 @@
 import router from '@/router';
 import type { FirestoreDocument, Gallery } from '@/types/types';
 import { computed } from 'vue';
+import { useGalleryStore } from "@/stores/gallery";
+const gallery_store = useGalleryStore();
 
 interface GalleryItemProps {
   gallery: FirestoreDocument<Gallery>;
 }
 const props = defineProps<GalleryItemProps>();
 const user_count_str = computed(() => {
-  const user_count = props.gallery.entity.user_id_list.length;
+  const user_count = gallery_store.gallery_user_id_map.get(props.gallery.id)?.length || 0;
   return `${user_count} user${user_count == 1 ? '' : 's'}`;
 
 })
 const plaque_count_str = computed(() => {
-  const plaque_count = props.gallery.entity.plaque_id_list.length;
+  const plaque_count = gallery_store.gallery_plaque_id_map.get(props.gallery.id)?.length || 0;
   return `${plaque_count} plaque${plaque_count == 1 ? '' : 's'}`;
 })
 const artwork_count_str = computed(() => {
-  const artwork_count = props.gallery.entity.token_meta_id_list.length;
+  const artwork_count = gallery_store.gallery_token_meta_id_map.get(props.gallery.id)?.length || 0;
   return `${artwork_count} artwork${artwork_count == 1 ? '' : 's'}`
 })
 
