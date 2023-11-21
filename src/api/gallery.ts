@@ -1,6 +1,6 @@
 
 import { BaseEntity, type FirestoreDocument, type Gallery } from "@/types/types"
-import { Timestamp, addDoc, doc, getDoc, getFirestore, onSnapshot, setDoc, updateDoc, where } from "firebase/firestore";
+import { Timestamp, addDoc, doc, documentId, getDoc, getFirestore, onSnapshot, setDoc, updateDoc, where } from "firebase/firestore";
 import firebaseConfig from "../firebaseConfig"
 import { collection, query, getDocs } from "firebase/firestore";
 
@@ -53,7 +53,7 @@ export const getGalleryByID = async (gallery_id: string): Promise<FirestoreDocum
 
 // // getGalleryListByGalleryIDList returns a list of galleries for a given list of gallery ids
 export const getGalleryListByGalleryIDList = async (gallery_id_list: string[]): Promise<FirestoreDocument<Gallery>[]> => {
-    const q = query(gallery_ref, where("id", "in", gallery_id_list));
+    const q = query(gallery_ref, where(documentId(), "in", gallery_id_list));
     const query_snapshot = await getDocs(q)
     return query_snapshot.docs.map(s => ({
         id: s.id, entity: s.data() as Gallery,

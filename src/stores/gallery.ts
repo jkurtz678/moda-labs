@@ -39,6 +39,7 @@ export const useGalleryStore = defineStore({
         gallery_user_id_map: (state): Map<string, string[]> => {
             const map = new Map<string, string[]>();
             state.gallery_user_list.forEach((gu) => {
+                console.log("gu", gu);
                 const gallery_id = gu.entity.gallery_id
                 const user_id = gu.entity.user_id
                 if (map.has(gallery_id)) {
@@ -82,8 +83,8 @@ export const useGalleryStore = defineStore({
             state.gallery_token_meta_list.forEach((gtm) => {
                 const token_meta_id = gtm.entity.token_meta_id
                 const gallery = this.gallery_map.get(gtm.entity.gallery_id);
-                
-                if(!gallery) {
+
+                if (!gallery) {
                     console.error(`gallery not found for gallery_token_meta ${gtm.id}`)
                     return
                 }
@@ -106,7 +107,7 @@ export const useGalleryStore = defineStore({
                     this.gallery_user_list = gallery_user_list;
                     const gallery_id_list = gallery_user_list.map(g => g.entity.gallery_id);
                     const batch_size = 10;
-                    
+
                     const gallery_promise_id_list = [];
                     for (let i = 0; i < gallery_id_list.length; i += batch_size) {
                         const gallery_id_batch = gallery_id_list.slice(i, i + batch_size);
@@ -114,8 +115,8 @@ export const useGalleryStore = defineStore({
                     }
                     const gallery_promise = Promise.all(gallery_promise_id_list).then((gallery_resp_list) => {
                         this.gallery_list = Array<FirestoreDocument<Gallery>>().concat.apply(Array<FirestoreDocument<Gallery>>(), gallery_resp_list);
-                    }).catch(err => (showError(`error loading galleries: ${err}`)))
-                    
+                    }).catch(err => (showError(`error loading gallery names: ${err}`)))
+
                     // call getGalleryPlaqueListByGalleryIDList in parallel batches of 10
                     const gallery_plaque_promise_list = [];
                     for (let i = 0; i < gallery_id_list.length; i += batch_size) {
@@ -146,6 +147,14 @@ export const useGalleryStore = defineStore({
             //     });
             // })
 
-        }, 
+        },
+        addGalleryToStore(gallery: FirestoreDocument<Gallery>, gallery_user_list: FirestoreDocument<GalleryUser>[], gallery_plaque_list: FirestoreDocument<GalleryPlaque>[], gallery_token_meta_list: FirestoreDocument<GalleryTokenMeta>[]) {
+            console.log("adding gallery to store", gallery, gallery_user_list, gallery_plaque_list, gallery_token_meta_list);
+            // replace all associated records with given records
+            this.gallery_list = this.gallery_list.filter(g => g.id !== gallery.id).concat(gallery);
+            this.gallery_user_list = this.gallery_user_list.filter(gu => gu.entity.gallery_id !== gallery.id).concat(gallery_user_list);
+            this.gallery_plaque_list = this.gallery_plaque_list.filter(gp => gp.entity.gallery_id !== gallery.id).concat(gallery_plaque_list);
+            this.gallery_token_meta_list = this.gallery_token_meta_list.filter(gtm => gtm.entity.gallery_id !== gallery.id).concat(gallery_token_meta_list);
+        }
     }
 })

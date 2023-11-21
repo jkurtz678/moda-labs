@@ -179,7 +179,7 @@ export async function getTokenMetaThumbnailImageURL(token_meta: FirestoreDocumen
     const path_ref = ref(storage, `thumb_${token_meta.entity.media_id}.jpg`);
     try {
         const url = await getDownloadURL(path_ref)
-        console.log(`getTokenMetaThumbnailImageURL - found url for image ${token_meta.entity.name}`, url)
+        //console.log(`getTokenMetaThumbnailImageURL - found url for image ${token_meta.entity.name}`, url)
         return url
     } catch (err) {
         console.log(`getTokenMetaThumbnailImageURL - failed to find archive thumbnail image ${token_meta.entity.name}`, err)
@@ -202,7 +202,7 @@ export async function getTokenMetaMediumImageURL(token_meta: FirestoreDocument<T
     const medium_path_ref = ref(storage, `medium_${token_meta.entity.media_id}.jpg`);
     try {
         const url = await getDownloadURL(medium_path_ref)
-        console.log(`getTokenMetaThumbnailImageURL - found url for image ${token_meta.entity.name}`, url)
+        //console.log(`getTokenMetaThumbnailImageURL - found url for image ${token_meta.entity.name}`, url)
         return url
     } catch (err) {
         console.log(`getTokenMetaThumbnailImageURL - failed to find archive medium image ${token_meta.entity.name}`, err)
@@ -212,7 +212,7 @@ export async function getTokenMetaMediumImageURL(token_meta: FirestoreDocument<T
     const thumbnail_path_ref = ref(storage, `thumb_${token_meta.entity.media_id}.jpg`);
     try {
         const url = await getDownloadURL(thumbnail_path_ref)
-        console.log(`getTokenMetaThumbnailImageURL - found url for image ${token_meta.entity.name}`, url)
+        //console.log(`getTokenMetaThumbnailImageURL - found url for image ${token_meta.entity.name}`, url)
         return url
     } catch (err) {
         console.log(`getTokenMetaThumbnailImageURL - failed to find archive thumbnail image ${token_meta.entity.name}`, err)
@@ -238,7 +238,7 @@ export async function getSourceFile(token_meta: FirestoreDocument<TokenMeta>): P
     console;
     try {
         const url = await getDownloadURL(path_ref)
-        console.log(`getTokenMetaThumbnailImageURL - found url for image ${token_meta.entity.name}`, url)
+        //console.log(`getTokenMetaThumbnailImageURL - found url for image ${token_meta.entity.name}`, url)
         return url
     } catch (err) {
         console.log(`getTokenMetaThumbnailImageURL - failed to find archive thumbnail image ${token_meta.entity.name}`, err)
