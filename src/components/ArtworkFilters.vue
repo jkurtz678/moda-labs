@@ -91,6 +91,20 @@ const show_filter_dot = computed(() => {
     return filter_by_aspect_ratio.value || filter_by_gallery.value || filter_by_platform.value;
 })
 
+const tokens_in_gallery_set = computed(() => {
+    const set = new Set<string>()
+    if(filter_by_gallery.value) {
+       gallery_store.gallery_token_meta_list.forEach((gtm) => {
+            if(gtm.entity.gallery_id == filter_by_gallery.value) {
+                set.add(gtm.entity.token_meta_id);
+            }
+       }) 
+    }
+    console.log("ret set ", set)
+    return set; 
+})
+
+
 const filtered_tokens = computed(() => {
     if (!props.all_tokens) {
         return []
@@ -102,9 +116,10 @@ const filtered_tokens = computed(() => {
             return false
         }
 
-        const matching_token = gallery_store.gallery_token_meta_list.find(g => (g.entity.gallery_id == filter_by_gallery.value))
-        if (filter_by_gallery.value && !(matching_token?.entity.token_meta_id == token.id)) {
-            return false
+        if (filter_by_gallery.value) {
+            if (!tokens_in_gallery_set.value.has(token.id)) {
+                return false
+            } 
         }
 
         switch (filter_by_platform.value) {

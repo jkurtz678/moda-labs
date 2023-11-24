@@ -5,7 +5,7 @@
             style="max-width: 350px" clearable>
         </el-input>
         <ArtworkFilters :all_tokens="all_tokens" :search_filter="search_filter" :use_local_storage="true"
-            @update-filtered-tokens="filtered_tokens = $event"></ArtworkFilters>
+            @update-filtered-tokens="updateFilteredTokens($event)"></ArtworkFilters>
         <el-button icon="Plus" type="info" @click="router.push({ name: 'new-artwork' })" style="margin-left: 10px"
             size="small">Artwork</el-button>
     </div>
@@ -124,6 +124,11 @@ onMounted(() => {
 
     });
 })
+
+const updateFilteredTokens = (new_list: FirestoreDocument<TokenMeta>[]) => {
+    console.log("updateFilteredTokens", new_list)
+    filtered_tokens.value = new_list;
+}
 
 </script>
 

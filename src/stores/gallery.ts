@@ -39,7 +39,6 @@ export const useGalleryStore = defineStore({
         gallery_user_id_map: (state): Map<string, string[]> => {
             const map = new Map<string, string[]>();
             state.gallery_user_list.forEach((gu) => {
-                console.log("gu", gu);
                 const gallery_id = gu.entity.gallery_id
                 const user_id = gu.entity.user_id
                 if (map.has(gallery_id)) {
@@ -63,6 +62,7 @@ export const useGalleryStore = defineStore({
             });
             return map;
         },
+        // map with the key as the gallery_id and the value as a list of token_meta_ids
         gallery_token_meta_id_map: (state): Map<string, string[]> => {
             const map = new Map<string, string[]>();
             state.gallery_token_meta_list.forEach((gtm) => {
@@ -76,6 +76,21 @@ export const useGalleryStore = defineStore({
             });
             return map;
         },
+        // // map with the key as the gallery_id and the value as a set of token_meta_ids
+        // gallery_id_to_token_meta_set: (state): Map<string, Set<string>> => {
+        //     console.log("BUILDING TOKEN META SET")
+        //     const map_to_set = new Map<string, Set<string>>();
+        //     state.gallery_token_meta_list.forEach((gtm) => {
+        //         const token_meta_id = gtm.entity.token_meta_id
+        //         const gallery_id = gtm.entity.gallery_id
+        //         if(map_to_set.has(gallery_id)){
+        //             map_to_set.get(gallery_id)?.add(token_meta_id);
+        //         } else {
+        //             map_to_set.set(gallery_id, new Set<string>());
+        //         }
+        //     })
+        //     return map_to_set;
+        // },
         token_id_to_gallery_map(state): Map<string, FirestoreDocument<Gallery>[]> {
 
             // map has a key of token_meta_id and value of a list of galleries
@@ -126,8 +141,6 @@ export const useGalleryStore = defineStore({
                         this.gallery_user_list = Array<FirestoreDocument<GalleryUser>>()
                             .concat.apply(Array<FirestoreDocument<GalleryUser>>(), gallery_user_resp_list);
                     }).catch(err => (showError(`error loading gallery users: ${err}`)))
-
-
 
                     // call getGalleryPlaqueListByGalleryIDList in parallel batches of 10
                     const gallery_plaque_promise_list = [];
