@@ -13,9 +13,14 @@
                             <el-row style="display: block; margin-bottom: 1em">
                                 <el-table :data="account_list" style="width: 100%">
                                     <el-table-column prop="entity.email" label="Email" />
+                                    <el-table-column label="Role">
+                                        <template #default="scope">
+                                            <div>{{gallery_user_list.find(gu => {return gu.user_id == scope.row.id})?.role || "not found"}}</div>
+                                        </template>
+                                    </el-table-column>
                                     <el-table-column fixed="right" label="" width="50">
                                         <template #default="scope">
-                                            <div v-if="scope.$index">
+                                            <div v-if="scope.$index && can_edit">
                                                 <el-button link type="primary" size="small" icon="close"
                                                     @click="removeUser(scope.$index)">
                                                 </el-button>
@@ -23,11 +28,11 @@
                                         </template>
                                     </el-table-column>
                                 </el-table>
-                                <div>{{ `Users in gallery: ${gallery_user_id_list.length}` }}</div>
-                                <div style="display: flex; align-items: center; padding: 1em 0em; max-width: 350px;">
+                                <div>{{ `Users in gallery: ${gallery_user_list.length}` }}</div>
+                                <div  v-if="can_edit" style="display: flex; align-items: center; padding: 1em 0em; max-width: 350px;">
                                     <el-input v-model="add_user_email" placeholder="Email"></el-input>
-                                    <el-button icon="Plus" color="#000000" size="small" style="margin-left: 1em;"
-                                        @click="addUser">
+                                    <el-button icon="Plus" color="#000000" size="small"
+                                        style="margin-left: 1em;" @click="addUser">
                                         Add user
                                     </el-button>
                                 </div>
@@ -58,7 +63,7 @@
                 <div class="dialog-footer">
 
                     <div style="flex-grow: 1"></div>
-                    <el-button color="#000000" @click="handleSave(form_ref)">Save</el-button>
+                    <el-button v-if="can_edit" color="#000000" @click="handleSave(form_ref)">Save</el-button>
                 </div>
             </template>
         </el-dialog>
@@ -70,6 +75,7 @@ import { useTokenMetaStore } from '@/stores/token-meta';
 import { getAccountByAccountIDList, getAccountByEmail } from "@/api/account";
 import { saveGallery, updateGallery } from "@/api/gallery";
 import { type Gallery, type FirestoreDocument, type TokenMeta, type Account, type Plaque, TokenPlatform, type GalleryUser, type GalleryTokenMeta, type GalleryPlaque } from '@/types/types';
+import { GalleryUserRole } from '@/types/types';
 import { Timestamp } from '@firebase/firestore';
 import { ElMessage, ElTable, type FormInstance, type FormRules } from 'element-plus';
 import { computed, onMounted, reactive, ref, toRaw } from 'vue';
@@ -80,7 +86,6 @@ import useBreakpoints from '@/composables/breakpoints';
 import { usePlaqueStore } from '@/stores/plaque';
 import TokenSelectList from "./TokenSelectList.vue";
 import PlaqueSelectList from './PlaqueSelectList.vue';
-import { types } from 'util';
 import { createGalleryUserList, deleteGalleryUsersByGalleryID } from '@/api/gallery-user';
 import { createGalleryPlaqueList, deleteGalleryPlaquesByGalleryID } from '@/api/gallery-plaque';
 import { createGalleryTokenMetaList, deleteGalleryTokenMetaByGalleryID } from '@/api/gallery-token';
@@ -91,7 +96,7 @@ const gallery = ref<Gallery>({
     created_at: Timestamp.now(),
     updated_at: Timestamp.now(),
 });
-const gallery_user_id_list = ref<string[]>([]);
+const gallery_user_list = ref<GalleryUser[]>([]);
 const gallery_plaque_id_list = ref<string[]>([]);
 const gallery_token_meta_id_list = ref<string[]>([]);
 
@@ -115,10 +120,20 @@ const { screen_type } = useBreakpoints();
 // table lists
 const loaded_accounts = ref<FirestoreDocument<Account>[]>([]);
 const account_list = computed(() => {
-    return gallery_user_id_list.value.map((id) => {
-        return loaded_accounts.value.find((account) => account.id == id);
+    return gallery_user_list.value.map((gu) => {
+        return loaded_accounts.value.find((account) => account.id == gu.user_id);
     })
 });
+const can_edit = computed(() => {
+    if (account_store.is_user_admin) {
+        return true;
+    }
+    const gallery_user = gallery_user_list.value.find(gu => gu.user_id == account_store.get_account.id)
+    if (!gallery_user) {
+        return false;
+    }
+    return gallery_user.role == GalleryUserRole.Owner || gallery_user.role == GalleryUserRole.Editor;
+})
 const plaque_list = computed(() => {
     return Object.values(plaque_store.plaque_map);
 })
@@ -138,14 +153,27 @@ onMounted(async () => {
 
         // load gallery data from the store
         gallery.value = g.entity;
-        gallery_user_id_list.value = gallery_store.gallery_user_list.filter(gu => gu.entity.gallery_id == g.id).map(gu => gu.entity.user_id);
+        gallery_user_list.value = gallery_store.gallery_user_list
+            .filter(gu => gu.entity.gallery_id == g.id)
+            .sort((a, b) => {
+                // Sort by role: owner > editor > reader
+                if (a.entity.role === GalleryUserRole.Owner) {
+                    return -1;
+                } else if (b.entity.role === GalleryUserRole.Owner) {
+                    return 1;
+                } else if (a.entity.role === GalleryUserRole.Editor) {
+                    return -1;
+                } else if (b.entity.role === GalleryUserRole.Editor) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }).map(gu => gu.entity);
         gallery_plaque_id_list.value = gallery_store.gallery_plaque_list.filter(gp => gp.entity.gallery_id == g.id).map(gp => gp.entity.plaque_id);
         gallery_token_meta_id_list.value = gallery_store.gallery_token_meta_list.filter(gt => gt.entity.gallery_id == g.id).map(gt => gt.entity.token_meta_id);
 
-        console.log("gallery.value", gallery.value)
-        await getAccountByAccountIDList(gallery_user_id_list.value)
+        await getAccountByAccountIDList(gallery_user_list.value.map(gu => gu.user_id))
             .then((accounts) => {
-                console.log("accounts");
                 accounts.forEach((account) => {
                     loaded_accounts.value.push(account);
                 })
@@ -155,7 +183,8 @@ onMounted(async () => {
 
     } else { // new gallery
         loaded_accounts.value.push(account_store.get_account);
-        gallery_user_id_list.value = [account_store.get_account.id];
+        const gallery_user = { user_id: account_store.get_account.id, role: GalleryUserRole.Owner, created_at: Timestamp.now(), updated_at: Timestamp.now(), gallery_id: "" }
+        gallery_user_list.value = [gallery_user];
     }
 })
 
@@ -200,14 +229,13 @@ const handleSave = async (form_el: FormInstance | undefined) => {
         ])
     }
 
-    const save_gallery_user_promise = createGalleryUserList(gallery_user_id_list.value.map((user_id) => {
-        return {
-            gallery_id: db_gallery.id,
-            user_id: user_id,
-            created_at: Timestamp.now(),
-            updated_at: Timestamp.now(),
-        }
-    }));
+    gallery_user_list.value.forEach((gu) => {
+        gu.gallery_id = db_gallery.id;
+        gu.created_at = Timestamp.now();
+        gu.updated_at = Timestamp.now();
+    })
+
+    const save_gallery_user_promise = createGalleryUserList(gallery_user_list.value);
     const save_gallery_plaque_promise = createGalleryPlaqueList(gallery_plaque_id_list.value.map((plaque_id) => {
         return {
             gallery_id: db_gallery.id,
@@ -259,7 +287,7 @@ const addUser = async () => {
         .then((account) => {
             if (account) {
                 loaded_accounts.value.push(account);
-                gallery_user_id_list.value.push(account.id);
+                gallery_user_list.value.push({gallery_id: "", user_id: account.id, role: GalleryUserRole.Reader, created_at: Timestamp.now(), updated_at: Timestamp.now()});
             }
         }).catch((error) => {
             console.log(error);
@@ -268,7 +296,7 @@ const addUser = async () => {
 }
 
 const removeUser = (i: number) => {
-    gallery_user_id_list.value.splice(i, 1);
+    gallery_user_list.value.splice(i, 1);
     loaded_accounts.value.splice(i, 1);
 }
 

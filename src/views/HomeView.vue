@@ -112,7 +112,11 @@ async function loadAppData(user_id: string) {
   }
 
   await Promise.all(promise_list);
-  await token_meta_store.loadOpenseaConvertedTokens();
+
+  // load aspect ratio of opensea tokens
+  if (wallet_address) {
+    await token_meta_store.loadOpenseaConvertedTokens();
+  }
 
   // delay opensea_wallet_load to possibly help with rate limit
   // await opensea_wallet_token_promise;
@@ -121,7 +125,7 @@ async function loadAppData(user_id: string) {
   const plaque_id_qp = route.query.plaque_id;
   if (plaque_id_qp && typeof plaque_id_qp === 'string') {
     await addPlaqueToAccount(user_id, plaque_id_qp as string)
-    router.replace({ path: route.path, query: {}});
+    router.replace({ path: route.path, query: {} });
   }
   initial_load_done.value = true;
 };

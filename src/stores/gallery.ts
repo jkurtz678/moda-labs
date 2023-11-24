@@ -1,7 +1,7 @@
 
 import { defineStore } from "pinia";
 import type { FirestoreDocument, Gallery, GalleryPlaque, GalleryTokenMeta, GalleryUser } from "@/types/types"
-import { getGalleryUserListByUserID } from "@/api/gallery-user";
+import { getGalleryUserListByGalleryIDList, getGalleryUserListByUserID } from "@/api/gallery-user";
 import { getAllGalleries, getGalleryListByGalleryIDList } from "@/api/gallery";
 import { useAccountStore } from "./account";
 import { showError } from "@/util/util";
@@ -102,10 +102,9 @@ export const useGalleryStore = defineStore({
         // loadGalleryList will load all the users galleries and their associated joins
         async loadGalleryList(user_id: string) {
             return getGalleryUserListByUserID(user_id)
-                .then(async (gallery_user_list) => {
-                    console.log("done loading gallery users", gallery_user_list);
-                    this.gallery_user_list = gallery_user_list;
-                    const gallery_id_list = gallery_user_list.map(g => g.entity.gallery_id);
+                .then(async (gallery_user_list_for_user) => {
+                    console.log("done loading gallery users", gallery_user_list_for_user);
+                    const gallery_id_list = gallery_user_list_for_user.map(g => g.entity.gallery_id);
                     const batch_size = 10;
 
                     const gallery_promise_id_list = [];
@@ -116,6 +115,19 @@ export const useGalleryStore = defineStore({
                     const gallery_promise = Promise.all(gallery_promise_id_list).then((gallery_resp_list) => {
                         this.gallery_list = Array<FirestoreDocument<Gallery>>().concat.apply(Array<FirestoreDocument<Gallery>>(), gallery_resp_list);
                     }).catch(err => (showError(`error loading gallery names: ${err}`)))
+
+                    // load gallery users
+                    const gallery_user_promise_list = [];
+                    for (let i = 0; i < gallery_id_list.length; i += batch_size) {
+                        const gallery_id_batch = gallery_id_list.slice(i, i + batch_size);
+                        gallery_user_promise_list.push(getGalleryUserListByGalleryIDList(gallery_id_batch));
+                    }
+                    const gallery_user_promise = Promise.all(gallery_user_promise_list).then((gallery_user_resp_list) => {
+                        this.gallery_user_list = Array<FirestoreDocument<GalleryUser>>()
+                            .concat.apply(Array<FirestoreDocument<GalleryUser>>(), gallery_user_resp_list);
+                    }).catch(err => (showError(`error loading gallery users: ${err}`)))
+
+
 
                     // call getGalleryPlaqueListByGalleryIDList in parallel batches of 10
                     const gallery_plaque_promise_list = [];
@@ -137,7 +149,7 @@ export const useGalleryStore = defineStore({
                         this.gallery_token_meta_list = Array<FirestoreDocument<GalleryTokenMeta>>().concat.apply(Array<FirestoreDocument<GalleryTokenMeta>>(), gallery_token_meta_resp_list);
                     }).catch(err => (showError(`error loading gallery token metas: ${err}`)));
 
-                    await Promise.all([gallery_promise, gallery_plaque_promise, gallery_token_meta_promise]);
+                    await Promise.all([gallery_promise, gallery_user_promise, gallery_plaque_promise, gallery_token_meta_promise]);
 
                 })
             // return new Promise(resolve => {

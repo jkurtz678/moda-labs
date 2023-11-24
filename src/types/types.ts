@@ -121,6 +121,14 @@ export interface Gallery extends BaseDocument {
 export interface GalleryUser extends BaseDocument {
     gallery_id: string;
     user_id: string;
+    role: GalleryUserRole;
+}
+
+// GalleryUserRole is the role a user has in a gallery
+export enum GalleryUserRole {
+    Owner = "owner",
+    Editor = "editor",
+    Reader = "reader"
 }
 
 // GalleryPlaque is a mapping between a gallery and a plaque

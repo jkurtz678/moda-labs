@@ -16,6 +16,21 @@ export const getGalleryUserListByUserID = async (user_id: string): Promise<Fires
     return gallery_users; 
 }
 
+// getGalleryUserListByGalleryIDList returns a list of gallery user for a given gallery id list
+export const getGalleryUserListByGalleryIDList = async (gallery_id_list: string[]): Promise<FirestoreDocument<GalleryUser>[]> => {
+    if( gallery_id_list.length == 0) {
+        return [];
+    }
+
+    const q = query (gallery_user_meta_ref, where("gallery_id", "in", gallery_id_list));
+    const query_snapshot = await getDocs(q)
+    const gallery_users: FirestoreDocument<GalleryUser>[] = [];
+    query_snapshot.forEach((doc) => {
+        gallery_users.push({ id: doc.id, entity: doc.data() as GalleryUser });
+    });
+    return gallery_users;
+}
+
 // getGalleryUserListByGalleryID returns a list of gallery user for a given gallery id
 export const getGalleryUserListByGalleryID = async (gallery_id: string): Promise<FirestoreDocument<GalleryUser>[]> => {
     const q = query(gallery_user_meta_ref, where("gallery_id", "==", gallery_id));
