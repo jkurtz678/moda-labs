@@ -63,7 +63,7 @@
                 <div class="dialog-footer">
 
                     <div style="flex-grow: 1"></div>
-                    <el-button v-if="can_edit" color="#000000" @click="handleSave(form_ref)">Save</el-button>
+                    <el-button v-if="can_edit" color="#000000" @click="handleSave(form_ref)" :loading="save_loading">Save</el-button>
                 </div>
             </template>
         </el-dialog>
