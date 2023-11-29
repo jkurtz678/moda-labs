@@ -151,9 +151,8 @@ export const useTokenMetaStore = defineStore({
         },
         async loadDemoTokenMetas() {
             const demo_token_meta_id_list = [
-                "dIGjSTr40mihc1oGtpeL", // brooklyn colors, nate (landscape)
+                "D0tO2S6iMjZRvCOp1rRJ", // williamsburg hearts, nate (landscape)
                 "RU2HdfpA2stEZ6QvXJcX", // out of sight out of mind, manhattan (square)
-                "xUnC4AYo18xqNIgh1vB7", // spinelicker, Good Boy William (portrait)
             ];
 
             const token_meta_list = await getTokenMetaListByIDList(demo_token_meta_id_list);
