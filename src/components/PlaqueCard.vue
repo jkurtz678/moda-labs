@@ -89,15 +89,16 @@
           <div>Public IP: {{ plaque.entity.machine_data?.public_ip ?? "N/A" }}</div>
           <div>Updated At: {{ machine_data_updated_at }}</div>
         </div>
-        <div style="margin-bottom: 1em">
-          <div class="caption">Enable Support VPN</div>
-          <el-switch v-model="vpn_active" active-text="Enabled" inactive-text="Off" />
-        </div>
+
         <div v-if="account_store.is_user_admin" style="margin-bottom: 1em">
-          <div style="font-size: var(--el-font-size-extra-small)">Admin only commands</div>
+          <div class="caption">Admin only commands</div>
           <el-button plain @click="downloadLogsCommand" :loading="download_logs_loading">Upload Logs To Cloud</el-button>
           <el-button type="danger" plain @click="restartMachineCommand" :loading="restart_machine_loading">Restart
             Machine</el-button>
+          <div style="margin-top: 1em">
+            <div class="caption">Enable Support VPN</div>
+            <el-switch v-model="vpn_active" active-text="Enabled" inactive-text="Off" />
+          </div>
         </div>
         <div style="display: flex; justify-content: end;">
           <el-button @click="plaque_view = 'detail'">Close<el-icon class="el-icon--right">
