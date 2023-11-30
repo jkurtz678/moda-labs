@@ -89,9 +89,12 @@
           <div>Public IP: {{ plaque.entity.machine_data?.public_ip ?? "N/A" }}</div>
           <div>Updated At: {{ machine_data_updated_at }}</div>
         </div>
-        <div>
+        <div style="margin-bottom: 1em">
           <div class="caption">Enable Support VPN</div>
           <el-switch v-model="vpn_active" active-text="Enabled" inactive-text="Off" />
+        </div>
+        <div>
+          <el-button plain @click="downloadLogsCommand" :loading="download_logs_loading">Download Logs</el-button>
         </div>
         <div style="display: flex; justify-content: end;">
           <el-button @click="plaque_view = 'detail'">Close<el-icon class="el-icon--right">
@@ -108,7 +111,7 @@
 </template>
 <script setup lang="ts">
 import { computed, watch } from "vue";
-import type { FirestoreDocument, Plaque, TokenMeta } from "@/types/types";
+import type { Command, FirestoreDocument, Plaque, TokenMeta } from "@/types/types";
 import AddTokenDialog from './AddTokenDialog.vue';
 import PlaqueController from './PlaqueController.vue';
 import PlaqueTokenItem from "./PlaqueTokenItem.vue";
@@ -125,6 +128,7 @@ import {
   Loading
 } from '@element-plus/icons-vue'
 import { getAccountByID } from "@/api/account";
+import { Timestamp } from "firebase/firestore";
 
 interface PlaqueCardProps {
   plaque: FirestoreDocument<Plaque>;
@@ -137,6 +141,7 @@ const show_add_token_dialog = ref(false);
 const edit_plaque_name = ref(false);
 const user_email = ref("");
 const edit_loading = ref(false);
+const download_logs_loading = ref(false);
 const updatePlaqueName = async () => {
   edit_loading.value = true;
   await updatePlaque(props.plaque.id, { name: props.plaque.entity.name }).catch(err => {
@@ -283,6 +288,24 @@ const machine_data_updated_at = computed(() => {
   return date.toLocaleString();
 })
 
+const downloadLogsCommand = () => {
+  const command: Command = { type: "upload_logs", time_sent: Timestamp.now() };
+  download_logs_loading.value = true;
+
+  updatePlaque(props.plaque.id, { command: command })
+    .then(() => {
+      plaque_store.plaque_map[props.plaque.id].entity.command = command;
+      ElMessage({
+        type: 'success',
+        message: 'Command sent to plaque',
+      })
+    })
+    .catch((err) => {
+      showError(`Error sending command to plaque - ${err}`);
+    }).finally(() => {
+      download_logs_loading.value = false;
+    })
+}
 </script>
 
 <style scoped>
