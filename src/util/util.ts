@@ -48,3 +48,13 @@ export function isPlaqueOnline(plaque: FirestoreDocument<Plaque>) {
       const hours_diff = time_diff / (60 * 60);
       return hours_diff < 2
 }
+
+export function isLocalStorageSupported(): boolean{
+    try {
+        localStorage.setItem('test', 'test');
+        localStorage.removeItem('test');
+        return true;
+    } catch(e) {
+        return false;
+    }
+}
