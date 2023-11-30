@@ -93,8 +93,8 @@
           <div class="caption">Enable Support VPN</div>
           <el-switch v-model="vpn_active" active-text="Enabled" inactive-text="Off" />
         </div>
-        <div>
-          <el-button plain @click="downloadLogsCommand" :loading="download_logs_loading">Download Logs</el-button>
+        <div v-if="account_store.is_user_admin">
+          <el-button plain @click="downloadLogsCommand" :loading="download_logs_loading">Upload Logs To Cloud</el-button>
         </div>
         <div style="display: flex; justify-content: end;">
           <el-button @click="plaque_view = 'detail'">Close<el-icon class="el-icon--right">
@@ -122,6 +122,7 @@ import { useTokenMetaStore } from "../stores/token-meta";
 import { useRouter } from 'vue-router';
 import { isPlaqueOnline, showError } from "@/util/util";
 import { usePlaqueStore } from "@/stores/plaque"
+import { useAccountStore } from "@/stores/account"
 import {
   Edit,
   Select,
@@ -150,6 +151,7 @@ const updatePlaqueName = async () => {
   edit_plaque_name.value = false;
   edit_loading.value = false;
 }
+const account_store = useAccountStore()
 const token_meta_store = useTokenMetaStore()
 
 interface TokenMetaMap {
