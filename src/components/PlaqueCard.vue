@@ -93,8 +93,11 @@
           <div class="caption">Enable Support VPN</div>
           <el-switch v-model="vpn_active" active-text="Enabled" inactive-text="Off" />
         </div>
-        <div v-if="account_store.is_user_admin">
+        <div v-if="account_store.is_user_admin" style="margin-bottom: 1em">
+          <div style="font-size: var(--el-font-size-extra-small)">Admin only commands</div>
           <el-button plain @click="downloadLogsCommand" :loading="download_logs_loading">Upload Logs To Cloud</el-button>
+          <el-button type="danger" plain @click="restartMachineCommand" :loading="restart_machine_loading">Restart
+            Machine</el-button>
         </div>
         <div style="display: flex; justify-content: end;">
           <el-button @click="plaque_view = 'detail'">Close<el-icon class="el-icon--right">
@@ -143,6 +146,7 @@ const edit_plaque_name = ref(false);
 const user_email = ref("");
 const edit_loading = ref(false);
 const download_logs_loading = ref(false);
+const restart_machine_loading = ref(false);
 const updatePlaqueName = async () => {
   edit_loading.value = true;
   await updatePlaque(props.plaque.id, { name: props.plaque.entity.name }).catch(err => {
@@ -307,6 +311,28 @@ const downloadLogsCommand = () => {
     }).finally(() => {
       download_logs_loading.value = false;
     })
+}
+
+const restartMachineCommand = () => {
+  ElMessageBox.confirm(`Are you sure you want to restart the plaque '${props.plaque.entity.name}'?`, "Restart plaque", {
+    type: 'warning'
+  }).then(() => {
+    const command: Command = { type: "restart_machine", time_sent: Timestamp.now() };
+    restart_machine_loading.value = true;
+    updatePlaque(props.plaque.id, { command: command })
+      .then(() => {
+        plaque_store.plaque_map[props.plaque.id].entity.command = command;
+        ElMessage({
+          type: 'success',
+          message: 'Command sent to plaque',
+        })
+      })
+      .catch((err) => {
+        showError(`Error sending command to plaque - ${err}`);
+      }).finally(() => {
+        restart_machine_loading.value = false;
+      })
+  })
 }
 </script>
 
