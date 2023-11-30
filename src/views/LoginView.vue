@@ -85,8 +85,9 @@ const submit = async (form_el: FormInstance | undefined) => {
     loading.value = true;
     signInWithEmailAndPassword(auth, form.value.email, form.value.password)
         .then((userCredential) => {
-
-            localStorage.setItem("saved_email", form.value.email);
+            if(userCredential?.user?.email) {
+                localStorage.setItem("saved_email", userCredential.user.email);
+            }
             if (route.query.redir && typeof route.query.redir === 'string') {
                 window.location.assign(route.query.redir);
                 return
