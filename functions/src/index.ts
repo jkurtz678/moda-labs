@@ -47,6 +47,12 @@ const generateThumbnail = async (object: any) => {
         return null;
     }
 
+    // Check if the file is in the viewer-logs/ directory
+    if (file_path.startsWith('viewer-logs/')) {
+        functions.logger.log('File is in the viewer-logs/ directory. Skipping.');
+        return null;
+    }
+
     // Exit if this is a move or deletion event.
     if (object.resourceState === 'not_exists') {
         functions.logger.log('This is a deletion event.');
@@ -55,22 +61,30 @@ const generateThumbnail = async (object: any) => {
 
     const bucket = admin.storage().bucket(object.bucket);
 
+    // calculate file size
+    const file = bucket.file(object.name)
+    const [metadata] = await file.getMetadata();
+    const media_file_size = metadata.size;
+    const token_meta_ref = admin.firestore().collection('token-meta').doc(file_id);
+    await token_meta_ref.set({ media_size: media_file_size }, { merge: true });
+    functions.logger.log("finished setting file size: ", media_file_size)
+
     const temp_local_thumb_file = await generateResizedFile(bucket, file_path, THUMB_PREFIX, THUMB_MAX_WIDTH, THUMB_MAX_HEIGHT);
-    if(temp_local_thumb_file) {
+    if (temp_local_thumb_file) {
         // get aspect ratio of thumbnail
         await calculateImageAspectRatio(file_id, temp_local_thumb_file);
         fs.unlinkSync(temp_local_thumb_file);
     }
 
     const temp_local_medium_file = await generateResizedFile(bucket, file_path, MEDIUM_PREFIX, MEDIUM_MAX_WIDTH, MEDIUM_MAX_HEIGHT);
-    if (temp_local_medium_file ){
+    if (temp_local_medium_file) {
         fs.unlinkSync(temp_local_medium_file);
     }
 
     return true;
 }
 
-const calculateImageAspectRatio = async (file_id: string , temp_local_file: string) => {
+const calculateImageAspectRatio = async (file_id: string, temp_local_file: string) => {
     const thumbnail_metadata = await sharp(temp_local_file).metadata()
     const width = thumbnail_metadata.width;
     const height = thumbnail_metadata.height;
@@ -149,7 +163,7 @@ const generateResizedFile = async (bucket: any, file_path: string, new_file_pref
     }
 
     await bucket.upload(temp_local_new_file, { destination: new_file_path, metadata: metadata });
-    functions.logger.log(`${new_file_prefix} uploaded to Storage at ${new_file_path}`);   
+    functions.logger.log(`${new_file_prefix} uploaded to Storage at ${new_file_path}`);
     return temp_local_new_file;
 }
 
