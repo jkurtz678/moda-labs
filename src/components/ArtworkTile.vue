@@ -10,32 +10,36 @@
     </div>
     <div ref="detail_container" class='detail-container transition' :class="show_detail ? 'show-blur' : 'hide-blur'">
       <div style="font-size: 1.6em; font-weight: bold;">{{ token_meta.entity.name }}</div>
-      <div v-if="token_meta.entity.artist_social_link" :style="screen_type == 'xs' ? 'display: flex; justify-content: center;' : ''">
+      <div v-if="token_meta.entity.artist_social_link"
+        :style="screen_type == 'xs' ? 'display: flex; justify-content: center;' : ''">
         <el-button link style="font-weight: bold; display: block;" :disabled="!show_detail"
           @click.stop="openArtistSocial">{{
             token_meta.entity.artist }}</el-button>
       </div>
       <div v-else style="font-weight: bold;">{{ token_meta.entity.artist }}</div>
       <template v-if="show_detail">
-        <el-tooltip class="box-item" effect="dark" content="Edit art data" placement="top">
-          <el-button icon="Edit" text circle
-            @click.stop="router.push({ name: 'edit-artwork', params: { 'token_meta_id': props.token_meta.id } })">
-          </el-button>
-        </el-tooltip>
-        <el-tooltip class="box-item" effect="dark" content="Download art" placement="top">
-          <el-button icon="Download" text circle @click.stop="openArt"></el-button>
-        </el-tooltip>
-        <el-tooltip class="box-item" effect="dark" content="Preview plaque" placement="top">
-          <el-button icon="Tickets" text circle @click.stop="previewPlaque"></el-button>
-        </el-tooltip>
-        <el-tooltip v-if="token_meta.entity.public_link" class="box-item" effect="dark" content="QR Code Link"
-          placement="top">
-          <el-button icon="Link" text circle @click.stop="qrCodeLink"></el-button>
-        </el-tooltip>
-        <el-tooltip v-if="account_store.is_user_admin" class="box-item" effect="dark" content="Delete Artwork"
-          placement="top">
-          <el-button icon="Delete" text circle @click.stop="deleteConfirm"></el-button>
-        </el-tooltip>
+        <div style="display: flex; align-items: center;">
+          <el-tooltip class="box-item" effect="dark" content="Edit art data" placement="top">
+            <el-button icon="Edit" text circle
+              @click.stop="router.push({ name: 'edit-artwork', params: { 'token_meta_id': props.token_meta.id } })">
+            </el-button>
+          </el-tooltip>
+          <el-tooltip class="box-item" effect="dark" content="Download art" placement="top">
+            <el-button icon="Download" text circle @click.stop="openArt"></el-button>
+          </el-tooltip>
+          <el-tooltip class="box-item" effect="dark" content="Preview plaque" placement="top">
+            <el-button icon="Tickets" text circle @click.stop="previewPlaque"></el-button>
+          </el-tooltip>
+          <el-tooltip v-if="token_meta.entity.public_link" class="box-item" effect="dark" content="QR Code Link"
+            placement="top">
+            <el-button icon="Link" text circle @click.stop="qrCodeLink"></el-button>
+          </el-tooltip>
+          <el-tooltip v-if="account_store.is_user_admin" class="box-item" effect="dark" content="Delete Artwork"
+            placement="top">
+            <el-button icon="Delete" text circle @click.stop="deleteConfirm"></el-button>
+          </el-tooltip>
+          <span v-if="media_size_display" style="font-size: 0.8em; padding-left: 1em; color: #606266">{{ media_size_display }}</span>
+        </div>
       </template>
       <div v-else style="height: 32px;"></div>
       <div style="font-size: 0.9em; line-height: 1.3em">{{ token_meta.entity.description }}</div>
@@ -99,6 +103,29 @@ const tile_height = computed(() => {
 
   return props.column_width / props.token_meta.entity.aspect_ratio
 })
+
+
+// media_size_display is a string that displays the media size in a human readable format, using metric definition of KB, MB, GB (1000, 1000^2, 1000^3)
+const media_size_display = computed(() => {
+  const media_size = props.token_meta?.entity?.media_size;
+  if (!media_size) {
+    return "";
+  }
+
+  const kb = 1000;
+  const mb = kb * 1000;
+  const gb = mb * 1000;
+
+  if (media_size < kb) {
+    return `${media_size} B`;
+  } else if (media_size < mb) {
+    return `${(media_size / kb).toFixed(2)} KB`;
+  } else if (media_size < gb) {
+    return `${(media_size / mb).toFixed(2)} MB`;
+  } else {
+    return `${(media_size / gb).toFixed(2)} GB`;
+  }
+});
 
 
 const previewPlaque = () => {

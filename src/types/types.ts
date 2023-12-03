@@ -95,6 +95,7 @@ export interface TokenMeta extends BaseDocument {
     external_media_url?: string; // url to media source file from outside moda archives (e.g. opensea servers)
     aspect_ratio?: number
     deleted?: boolean; // if true this token meta has been soft deleted and wont be displayed in the UI
+    media_size?: number; // size of media in bytes
 }
 
 export enum Blockchain {
