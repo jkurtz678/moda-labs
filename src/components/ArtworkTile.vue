@@ -309,4 +309,8 @@ img {
 :deep(.el-button>span) {
   font-weight: bold;
 }
+
+.el-button+.el-button {
+    margin-left: 8px;
+}
 </style>
