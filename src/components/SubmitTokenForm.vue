@@ -231,7 +231,7 @@ const uploadSuccess = async (formEl: FormInstance, file: UploadUserFile, ref: Do
     selected_galleries.value = [];
     ElMessage({
         type: 'success',
-        message: 'Successfully submitted token',
+        message: 'Successfully submitted artwork. Please wait a few moments for your artwork to appear.',
     })
     loading.value = false;
 }
@@ -241,7 +241,7 @@ const updateToken = (token_meta_id: string) => {
     updateTokenMeta(token_meta_id, form.value).then(() => {
         ElMessage({
             type: 'success',
-            message: 'Successfully updated token',
+            message: 'Successfully updated artwork',
         })
     }).catch((err) => {
         showError(`Error updating token metadata - ${err}`);

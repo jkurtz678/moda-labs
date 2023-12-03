@@ -8,7 +8,10 @@
             <p class="bold">{{ props.token_meta.entity.name }}</p>
             <p class="bold">{{ props.token_meta.entity.artist }}</p>
         </div>
-        <div style="margin-right: 35px; opacity: 0.5;">{{ platform }}</div>
+        <div style="margin-right: 10px; min-width: 100px;">
+        <div style="opacity: 0.5; font-size: var(--el-font-size-extra-small)">{{ platform }}</div>
+        <div v-if="media_size_display" style="opacity: 0.5; font-size: var(--el-font-size-extra-small)">{{ media_size_display }}</div>
+        </div>
         <el-checkbox v-model="in_list" style="margin-right: 25px;" />
     </div>
 </template>
@@ -19,6 +22,7 @@ import { computed, toRef } from "vue";
 import { getPlatformDisplay } from "@/types/types";
 import type { FirestoreDocument, TokenMeta } from "@/types/types";
 import {useThumbnail} from "@/composables/thumbnail-image";
+import { mediaSizeDisplay } from "@/util/util";
 
 interface AddTokenItemProps {
     in_list: boolean;
@@ -35,6 +39,16 @@ const emit = defineEmits(['update_token_list'])
 const platform = computed(() => {
     return getPlatformDisplay(props.token_meta.entity.platform)
 })
+
+// media_size_display is a string that displays the media size in a human readable format, using metric definition of KB, MB, GB (1000, 1000^2, 1000^3)
+const media_size_display = computed(() => {
+  const media_size = props.token_meta?.entity?.media_size;
+  if (!media_size) {
+    return "";
+  }
+
+  return mediaSizeDisplay(media_size);
+});
 
 // checkbox computed v-model
 const in_list = computed({

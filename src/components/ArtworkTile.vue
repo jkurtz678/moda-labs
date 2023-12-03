@@ -64,6 +64,7 @@ import { deleteTokenMeta } from "@/api/token-meta";
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { useGalleryStore } from "@/stores/gallery";
 import useBreakpoints from "@/composables/breakpoints"
+import {mediaSizeDisplay} from "@/util/util";
 
 const router = useRouter();
 interface ArtworkTileProps {
@@ -112,19 +113,7 @@ const media_size_display = computed(() => {
     return "";
   }
 
-  const kb = 1000;
-  const mb = kb * 1000;
-  const gb = mb * 1000;
-
-  if (media_size < kb) {
-    return `${media_size} B`;
-  } else if (media_size < mb) {
-    return `${(media_size / kb).toFixed(2)} KB`;
-  } else if (media_size < gb) {
-    return `${(media_size / mb).toFixed(2)} MB`;
-  } else {
-    return `${(media_size / gb).toFixed(2)} GB`;
-  }
+  return mediaSizeDisplay(media_size);
 });
 
 

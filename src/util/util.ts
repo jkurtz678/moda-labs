@@ -58,3 +58,19 @@ export function isLocalStorageSupported(): boolean{
         return false;
     }
 }
+
+export function mediaSizeDisplay(media_size: number) {
+    const kb = 1000;
+    const mb = kb * 1000;
+    const gb = mb * 1000;
+  
+    if (media_size < kb) {
+      return `${media_size} B`;
+    } else if (media_size < mb) {
+      return `${(media_size / kb).toFixed(2)} KB`;
+    } else if (media_size < gb) {
+      return `${(media_size / mb).toFixed(2)} MB`;
+    } else {
+      return `${(media_size / gb).toFixed(2)} GB`;
+    }
+}
