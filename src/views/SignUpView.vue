@@ -9,7 +9,7 @@
             </template>
             <el-form ref="form_ref" :model="form" :rules="rules" label-position="left" label-width="140px"
                 @keyup.enter.native="submit(form_ref)">
-                <el-form-item label="Username" prop="email">
+                <el-form-item label="Email" prop="email">
                     <el-input v-model="form.email" />
                 </el-form-item>
                 <el-form-item label="Password" prop="password">
