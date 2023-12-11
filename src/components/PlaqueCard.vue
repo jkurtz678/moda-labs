@@ -170,7 +170,7 @@ const first_token = computed(() => {
   return plaque_tokens.value[0];
 })
 const plaque_tokens = computed(() => {
-  const token_map = token_meta_store.archive_token_meta_map;
+  const token_map = token_meta_store.all_token_metas;
   let res = props.plaque.entity.token_meta_id_list.map(token_id => token_map[token_id])
   return res;
 })
