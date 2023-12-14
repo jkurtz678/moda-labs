@@ -131,7 +131,8 @@ const generateResizedFile = async (bucket: any, file_path: string, new_file_pref
         functions.logger.log("Starting download for file: ", file_path)
         await file.download({ destination: temp_local_file, start: 0, end: 20000000 });
         functions.logger.log(`Creating ${new_file_prefix} for image ${file_name} with imagemajick`);
-        await spawn('convert', [temp_local_file, '-thumbnail', `${width}x${height}>`, temp_local_new_file], { capture: ['stdout', 'stderr'] });
+        // -auto-orient flag causes portrait images to preserve their rotation (without it they will sometimes be rotated landscape)
+        await spawn('convert', [temp_local_file, '-thumbnail', `${width}x${height}>`, '-auto-orient', temp_local_new_file], { capture: ['stdout', 'stderr'] });
         fs.unlinkSync(temp_local_file);
     } else { // process video
         // signing is broken on the emulator, use publicURL for local file urls
