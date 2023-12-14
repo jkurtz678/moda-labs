@@ -64,10 +64,16 @@ const generateThumbnail = async (object: any) => {
     // calculate file size
     const file = bucket.file(object.name)
     const [metadata] = await file.getMetadata();
-    const media_file_size = metadata.size;
-    const token_meta_ref = admin.firestore().collection('token-meta').doc(file_id);
-    await token_meta_ref.set({ media_size: media_file_size }, { merge: true });
-    functions.logger.log("finished setting file size: ", media_file_size)
+
+    const media_file_size = parseInt(metadata.size);
+    if(!isNaN(media_file_size)) {
+        const token_meta_ref = admin.firestore().collection('token-meta').doc(file_id);
+        await token_meta_ref.set({ media_size: media_file_size }, { merge: true });
+        functions.logger.log("finished setting file size: ", media_file_size)
+    } else {
+        functions.logger.log("error getting file size: ", media_file_size)
+    }
+    
 
     const temp_local_thumb_file = await generateResizedFile(bucket, file_path, THUMB_PREFIX, THUMB_MAX_WIDTH, THUMB_MAX_HEIGHT);
     if (temp_local_thumb_file) {
