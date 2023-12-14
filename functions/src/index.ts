@@ -65,6 +65,7 @@ const generateThumbnail = async (object: any) => {
     const file = bucket.file(object.name)
     const [metadata] = await file.getMetadata();
 
+    // metadata.size returns a string so we need to convert to number
     const media_file_size = parseInt(metadata.size);
     if(!isNaN(media_file_size)) {
         const token_meta_ref = admin.firestore().collection('token-meta').doc(file_id);

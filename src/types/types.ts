@@ -54,6 +54,14 @@ export interface Plaque extends BaseDocument {
     machine_data: MachineData;
     last_check_in_time: Timestamp;
     vpn_active: boolean;
+    uploaded_log_files?: UploadedLogFile[];
+}
+
+// UploadedLogFile is a log file uploaded from a plaque
+export interface UploadedLogFile {
+    file_name: string;
+    bytes: number
+    UploadTime: Timestamp;
 }
 
 export interface Command {
@@ -244,7 +252,6 @@ export async function getSourceFile(token_meta: FirestoreDocument<TokenMeta>): P
     console.log("path", path);
     const path_ref = ref(storage, path);
 
-    console;
     try {
         const url = await getDownloadURL(path_ref)
         //console.log(`getTokenMetaThumbnailImageURL - found url for image ${token_meta.entity.name}`, url)

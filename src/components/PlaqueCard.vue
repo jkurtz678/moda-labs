@@ -93,8 +93,29 @@
         <div v-if="account_store.is_user_admin" style="margin-bottom: 1em">
           <div class="caption">Admin only commands</div>
           <el-button plain @click="downloadLogsCommand" :loading="download_logs_loading">Upload Logs To Cloud</el-button>
+          <el-button plain @click="show_logs_dialog = true">View Logs</el-button>
           <el-button type="danger" plain @click="restartMachineCommand" :loading="restart_machine_loading">Restart
             Machine</el-button>
+          <el-dialog v-model="show_logs_dialog" title="Uploaded Logs" width="75%">
+            <el-table :data="plaque.entity.uploaded_log_files">
+              <el-table-column prop="file_name" label="File Name" width="400"></el-table-column>
+              <el-table-column prop="upload_time" label="Time Uploaded">
+                <template #default="{ row }">
+                  {{ formatTime(row.upload_time) }}
+                </template>
+              </el-table-column>
+              <el-table-column prop="bytes" label="Size">
+                <template #default="{ row }">
+                  {{ mediaSizeDisplay(row.bytes) }}
+                </template>
+              </el-table-column>
+              <el-table-column fixed="right" label="" width="80">
+                <template #default="{ row }">
+                  <el-button icon="Download" text circle @click="downloadLogs(row.file_name)"></el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-dialog>
           <div style="margin-top: 1em">
             <div class="caption">Enable Support VPN</div>
             <el-switch v-model="vpn_active" active-text="Enabled" inactive-text="Off" />
@@ -124,7 +145,7 @@ import { ref } from "vue";
 import { updatePlaque, deletePlaqueByID } from "@/api/plaque";
 import { useTokenMetaStore } from "../stores/token-meta";
 import { useRouter } from 'vue-router';
-import { isPlaqueOnline, showError } from "@/util/util";
+import { isPlaqueOnline, mediaSizeDisplay, showError } from "@/util/util";
 import { usePlaqueStore } from "@/stores/plaque"
 import { useAccountStore } from "@/stores/account"
 import {
@@ -134,6 +155,8 @@ import {
 } from '@element-plus/icons-vue'
 import { getAccountByID } from "@/api/account";
 import { Timestamp } from "firebase/firestore";
+import type { el } from "element-plus/es/locale";
+import { getDownloadURL, getStorage, ref as storageRef } from "firebase/storage";
 
 interface PlaqueCardProps {
   plaque: FirestoreDocument<Plaque>;
@@ -148,6 +171,10 @@ const user_email = ref("");
 const edit_loading = ref(false);
 const download_logs_loading = ref(false);
 const restart_machine_loading = ref(false);
+const show_logs_dialog = ref(false);
+
+const sample_file_list = [{ file_name: "mKMwEFebeBaA6MM3NUxj-20231214074903.log", bytes: 57167794, upload_time: Timestamp.now() }]
+
 const updatePlaqueName = async () => {
   edit_loading.value = true;
   await updatePlaque(props.plaque.id, { name: props.plaque.entity.name }).catch(err => {
@@ -196,6 +223,19 @@ const last_check_in_time_formatted = computed(() => {
     hour12: true
   });
 })
+
+const formatTime = (firebase_timestamp: Timestamp): string => {
+  const date = new Date(firebase_timestamp.seconds * 1000)
+  return date.toLocaleString('en-US', {
+    year: '2-digit',
+    month: '2-digit',
+    day: '2-digit',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+    hour12: true
+  });
+}
 
 const clearTokens = () => {
   ElMessageBox.confirm(`Are you sure you want to clear tokens for plaque '${props.plaque.entity.name}'?`, "Clear tokens", {
@@ -334,6 +374,22 @@ const restartMachineCommand = () => {
         restart_machine_loading.value = false;
       })
   })
+}
+
+const downloadLogs = async (file_name: string) => {
+  const storage = getStorage();
+
+  const path = `viewer-logs/${file_name}`
+  const path_ref = storageRef(storage, path);
+  try {
+    const url = await getDownloadURL(path_ref)
+    window.open(url, '_blank');
+    return;
+  } catch (err) {
+    console.log(`downloadLogs - failed to download logs for ${file_name}`, err)
+    showError(`Error downloading logs - ${err}`)
+  }
+  return ""
 }
 </script>
 
