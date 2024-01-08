@@ -9,14 +9,9 @@
             <div style="font-size: var(--el-font-size-extra-small)">Email</div>
             <div>{{ account_store.get_account.entity.email }}</div>
 
-            <div v-if="account.entity.wallet_address" style="margin-top: 2em">
+            <div style="font-size: var(--el-font-size-extra-small); margin-top: 2em">Ethereum Wallet</div>
+            <div v-if="account.entity.wallet_address">
 
-                <div style="font-size: var(--el-font-size-extra-small); display: flex; align-items: center;">
-                    <div>Connected Ethereum Wallet</div>
-                    <el-icon style="color: green; font-size: 1.5em; margin-left: 5px">
-                        <Check />
-                    </el-icon>
-                </div>
                 <div style="display: flex; align-items: center;">
                     <div :style="screen_type == 'xs' ? 'max-width: 250px; text-overflow: ellipsis; overflow: hidden;' : ''">{{
                         account.entity.wallet_address }}</div>
@@ -26,12 +21,28 @@
                 <div>Loaded {{ token_meta_store.opensea_wallet_token_meta_list.length }} wallet
                     token{{ token_meta_store.opensea_wallet_token_meta_list.length == 1 ? '' : 's' }} from Opensea</div>
                 <div>Loaded {{ token_meta_store.opensea_minted_token_meta_list.length }}
-                    token{{ token_meta_store.opensea_minted_token_meta_list.length == 1 ? '' : 's' }} you minted from Opensea
+                    token{{ token_meta_store.opensea_minted_token_meta_list.length == 1 ? '' : 's' }} you minted from
+                    Opensea
                 </div>
             </div>
-            <el-button v-else @click="connect" :loading="connect_wallet_loading" style="margin-top: 2em" icon="Connection"
-                color="#000000">Connect Ethereum
-                Wallet</el-button>
+            <template v-else>
+                <div v-if="metamask_check_loading" v-loading="metamask_check_loading" style="width: 60px; height: 60px;">
+                </div>
+                <el-button v-else-if="metamask_supported" @click="connect" :loading="connect_wallet_loading"
+                    icon="Connection" color="#000000">
+                    Connect With Metamask
+                </el-button>
+                <el-alert v-else type="warning" show-icon title="Metamask extension not found" style="margin-bottom: 1.5em"
+                    :closable="false">
+                    The Metamask browser extension is required to connect your wallet, and this extension was not detected
+                    on your browser.
+                    <br />Please
+                    <el-link type="primary" style="font-size: 12px; vertical-align: top;"
+                        href="https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en">
+                        install Metamask
+                    </el-link> and then refresh the page.
+                </el-alert>
+            </template>
         </el-card>
     </div>
 </template>
@@ -39,19 +50,41 @@
 <script setup lang="ts">
 import { useAccountStore } from "@/stores/account"
 import { useTokenMetaStore } from "@/stores/token-meta"
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { connectWallet } from "@/web3Interface"
 import { updateAccount } from "@/api/account"
-import { ElMessage, ElMessageBox } from "element-plus";
+import { ElLoading, ElMessage, ElMessageBox } from "element-plus";
 import type { Account } from "@/types/types";
-import { showError } from "@/util/util";
+import { showError, isMobileBrowser } from "@/util/util";
 import useBreakpoints from "@/composables/breakpoints";
+import detectEthereumProvider from "@metamask/detect-provider";
 
 const account_store = useAccountStore();
 const token_meta_store = useTokenMetaStore();
 const connect_wallet_loading = ref(false);
 const { md_and_up, screen_type } = useBreakpoints();
 
+const metamask_supported = ref(false);
+const metamask_check_loading = ref(false);
+
+onMounted(() => {
+    checkMetamaskExtension();
+})
+
+const checkMetamaskExtension = async () => {
+    // had difficulties detecting metamask on mobile browsers, always show connect button on mobile for now
+    if (isMobileBrowser()) {
+        metamask_supported.value = true;
+        return
+    }
+
+    metamask_check_loading.value = true
+    const provider = await detectEthereumProvider().catch((err: Error) => {
+        showError(`Error detecting ethereum provider - ${err}`)
+    });
+    metamask_supported.value = Boolean(provider);
+    metamask_check_loading.value = false;
+}
 
 const account = computed(() => {
     return account_store.get_account;
@@ -118,4 +151,5 @@ const disconnect = async () => {
     display: flex;
     justify-content: space-between;
     align-items: center;
-}</style>
+}
+</style>
