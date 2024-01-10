@@ -7,6 +7,7 @@ import { loadTokensByAccountID, loadTokensCreatedByAddress } from "@/api/opensea
 import { getAdminUserIDList } from "@/util/util";
 import { useAccountStore } from "./account";
 import type { Firestore } from "firebase/firestore";
+import { convertOpenseaToTokenMeta } from "./util";
 
 export type RootTokenMetaState = {
     archive_token_meta_list: FirestoreDocument<TokenMeta>[];
@@ -168,23 +169,6 @@ export const useTokenMetaStore = defineStore({
     }
 })
 
-const convertOpenseaToTokenMeta = (o: OpenseaToken): FirestoreDocument<TokenMeta> => {
-    return {
-        id: getUniqueOpenseaID(o),
-        entity: {
-            name: o.name,
-            artist: o.creator?.user?.username || "N/A",
-            description: o.description,
-            public_link: o.permalink,
-            blockchain: Blockchain.Ethereum,
-            asset_contract_address: o.asset_contract.address,
-            token_id: o.token_id,
-            platform: TokenPlatform.Opensea,
-            external_thumbnail_url: o.image_thumbnail_url,
-            external_media_url: o.animation_url ? o.animation_url : o.image_url,
-        }
-    } as FirestoreDocument<TokenMeta>
-}
 
 const getAspectRatio = (url: string): Promise<number> => {
     const local_storage_key = `${url}_aspect_ratio`
