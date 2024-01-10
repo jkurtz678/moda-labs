@@ -13,8 +13,9 @@
             <div v-if="account.entity.wallet_address">
 
                 <div style="display: flex; align-items: center;">
-                    <div :style="screen_type == 'xs' ? 'max-width: 250px; text-overflow: ellipsis; overflow: hidden;' : ''">{{
-                        account.entity.wallet_address }}</div>
+                    <div :style="screen_type == 'xs' ? 'max-width: 250px; text-overflow: ellipsis; overflow: hidden;' : ''">
+                        {{
+                            account.entity.wallet_address }}</div>
                     <el-button text circle size="small" icon="close" style="margin-left: 5px;" @click="disconnect"
                         :loading="connect_wallet_loading"></el-button>
                 </div>
@@ -107,6 +108,8 @@ const connect = async () => {
             .catch(err => (showError(`Error loading opensea wallet tokens - ${err}`)))
 
         return Promise.all([opensea_minted_token_promise, opensea_wallet_token_promise]);
+    }).then(() => {
+        return token_meta_store.loadOpenseaConvertedTokens();
     }).then(() => {
         ElMessage({
             type: 'success',
