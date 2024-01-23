@@ -92,10 +92,17 @@
 
         <div v-if="account_store.is_user_admin" style="margin-bottom: 1em">
           <div class="caption">Admin only commands</div>
-          <el-button plain @click="downloadLogsCommand" :loading="download_logs_loading">Upload Logs To Cloud</el-button>
-          <el-button plain @click="show_logs_dialog = true">View Logs</el-button>
-          <el-button type="danger" plain @click="restartMachineCommand" :loading="restart_machine_loading">Restart
-            Machine</el-button>
+          <div style="margin-bottom: 1em">
+            <el-button plain @click="downloadLogsCommand" :loading="download_logs_loading">Upload Logs To
+              Cloud</el-button>
+            <el-button plain @click="show_logs_dialog = true">View Logs</el-button>
+          </div>
+          <div style="margin-bottom: 1em">
+            <el-button type="danger" plain @click="restartAppCommand" :loading="restart_app_loading">Restart
+              App</el-button>
+            <el-button type="danger" plain @click="restartMachineCommand" :loading="restart_machine_loading">Restart
+              Machine</el-button>
+          </div>
           <el-dialog v-model="show_logs_dialog" title="Uploaded Logs" width="75%">
             <el-table :data="plaque.entity.uploaded_log_files">
               <el-table-column prop="file_name" label="File Name" width="400"></el-table-column>
@@ -171,6 +178,7 @@ const user_email = ref("");
 const edit_loading = ref(false);
 const download_logs_loading = ref(false);
 const restart_machine_loading = ref(false);
+const restart_app_loading = ref(false);
 const show_logs_dialog = ref(false);
 
 const sample_file_list = [{ file_name: "mKMwEFebeBaA6MM3NUxj-20231214074903.log", bytes: 57167794, upload_time: Timestamp.now() }]
@@ -372,6 +380,28 @@ const restartMachineCommand = () => {
         showError(`Error sending command to plaque - ${err}`);
       }).finally(() => {
         restart_machine_loading.value = false;
+      })
+  })
+}
+
+const restartAppCommand = () => {
+  ElMessageBox.confirm(`Are you sure you want to restart the app on plaque '${props.plaque.entity.name}'?`, "Restart app", {
+    type: 'warning'
+  }).then(() => {
+    const command: Command = { type: "restart_app", time_sent: Timestamp.now() };
+    restart_app_loading.value = true;
+    updatePlaque(props.plaque.id, { command: command })
+      .then(() => {
+        plaque_store.plaque_map[props.plaque.id].entity.command = command;
+        ElMessage({
+          type: 'success',
+          message: 'Command sent to plaque',
+        })
+      })
+      .catch((err) => {
+        showError(`Error sending command to plaque - ${err}`);
+      }).finally(() => {
+        restart_app_loading.value = false;
       })
   })
 }
