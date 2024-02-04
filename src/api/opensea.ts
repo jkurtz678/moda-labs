@@ -5,9 +5,11 @@ const OPENSEA_API_KEY = import.meta.env.VITE_OPENSEA_API_KEY;
 // loadTokensByAccountID returns all associated opensea tokens for a given account id
 export async function loadTokensByAccountID(wallet_address: string): Promise<Array<OpenseaToken>> {
     const token_list = [];
+    const chain = "ethereum"
     let cursor = "";
     while (true) {
-        const res = await fetch(`https://api.opensea.io/api/v1/assets/?owner=${wallet_address}&limit=200${cursor ? '&cursor=' + cursor : ""}`,
+        // https://api.opensea.io/api/v2/chain/{chain}/account/{address}/nfts
+        const res = await fetch(`https://api.opensea.io/api/v2/chain/${chain}/account/${wallet_address}/nfts?limit=200${cursor ? '&next=' + cursor : ""}`,
             {
                 headers: {
                     'X-API-KEY': OPENSEA_API_KEY
@@ -17,8 +19,8 @@ export async function loadTokensByAccountID(wallet_address: string): Promise<Arr
 
         const res_json = await res.json();
         handleOpenseaFetchError(res, res_json)
-        if (res_json.assets) {
-            token_list.push(...res_json.assets);
+        if (res_json.nfts) {
+            token_list.push(...res_json.nfts);
         }
 
 

@@ -153,23 +153,39 @@ export interface GalleryTokenMeta extends BaseDocument {
 }
 
 // OpenseaToken is the structure of tokens returned from the opensea API
+// export interface OpenseaTokenOld {
+//     image_url: string;
+//     image_thumbnail_url: string;
+//     animation_url: string;
+//     name: string;
+//     asset_contract: { address: string; };
+//     token_id: string;
+//     description: string;
+//     permalink: string;
+//     creator: { user: { username: string } };
+//     orders: Array<any>;
+//     external_link: string;
+// }
+
+// OpenseaToken is the structure of tokens returned from the opensea API
 export interface OpenseaToken {
-    image_url: string;
-    image_thumbnail_url: string;
-    animation_url: string;
+    identifier: string;
+    collection: string;
+    contract: string;
+    token_standard: string;
     name: string;
-    asset_contract: { address: string; };
-    token_id: string;
     description: string;
-    permalink: string;
-    creator: { user: { username: string } };
-    orders: Array<any>;
-    external_link: string;
+    image_url: string;
+    metadata_url: string | null;
+    opensea_url: string;
+    updated_at: string;
+    is_disabled: boolean;
+    is_nsfw: boolean;
 }
 
 // getUniqueOpenseaID returns a unique identifier for opensea tokens
 export function getUniqueOpenseaID(opensea_token: OpenseaToken): string {
-    return `${opensea_token.asset_contract.address}/${opensea_token.token_id}`
+    return `${opensea_token.contract}/${opensea_token.identifier}`
 }
 
 // getTokenMetaUniqueChainID returns a unique identifier for token metas that are on chain

@@ -5,15 +5,15 @@ export const convertOpenseaToTokenMeta = (o: OpenseaToken): FirestoreDocument<To
         id: getUniqueOpenseaID(o),
         entity: {
             name: o.name,
-            artist: o.creator?.user?.username || "N/A",
+            artist: "",
             description: o.description,
-            public_link: o.permalink,
+            public_link: o.opensea_url,
             blockchain: Blockchain.Ethereum,
-            asset_contract_address: o.asset_contract.address,
-            token_id: o.token_id,
+            asset_contract_address: o.contract,
+            token_id: o.identifier,
             platform: TokenPlatform.Opensea,
-            external_thumbnail_url: o.image_thumbnail_url,
-            external_media_url: o.animation_url ? o.animation_url : o.image_url,
+            external_thumbnail_url: o.image_url,
+            external_media_url: o.image_url,
         }
     } as FirestoreDocument<TokenMeta>
 }

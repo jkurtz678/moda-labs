@@ -6,6 +6,7 @@
       <RouterView v-if="initial_load_done"></RouterView>
     </el-main>
   </el-container>
+  <!-- <WelcomeDialog /> -->
 </template>
 <script setup lang="ts">
 import Header from "@/components/Header.vue";
@@ -23,6 +24,7 @@ import { auth } from "@/firebaseConfig";
 import type { FirestoreDocument, Plaque } from "@/types/types";
 import { addPlaqueToAccount } from "@/util/add-plaque";
 import { onUnmounted } from "vue";
+import WelcomeDialog from "@/components/WelcomeDialog.vue";
 
 const account_store = useAccountStore();
 const plaque_store = usePlaqueStore();
@@ -102,12 +104,12 @@ async function loadAppData(user_id: string) {
   // nates address
   //const wallet_address = "0xd8945d98ed4233Cf87cfA4fDCC7a54FE279E8ee7"
   if (wallet_address) {
-    const opensea_minted_token_promise = token_meta_store.loadOpenseaMintedTokenMetas(wallet_address)
-      .catch(err => (showError(`Error loading opensea minted tokens - ${err}`)))
+    // const opensea_minted_token_promise = token_meta_store.loadOpenseaMintedTokenMetas(wallet_address)
+    //   .catch(err => (showError(`Error loading opensea minted tokens - ${err}`)))
     const opensea_wallet_token_promise = token_meta_store.loadOpenseaWalletTokenMetas(wallet_address)
       .catch(err => (showError(`Error loading opensea wallet tokens - ${err}`)))
 
-    promise_list.push(opensea_minted_token_promise);
+    //promise_list.push(opensea_minted_token_promise);
     promise_list.push(opensea_wallet_token_promise);
   }
 

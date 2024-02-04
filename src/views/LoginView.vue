@@ -28,6 +28,7 @@
             </el-button>
         </div>
     </el-container>
+    <!-- <WelcomeDialog /> -->
 </template>
 <script lang="ts" setup>
 import { onMounted, ref } from "vue";
@@ -38,6 +39,7 @@ import type { FormInstance, FormRules } from "element-plus";
 import { ElMessage } from 'element-plus'
 import { useRoute, useRouter } from "vue-router";
 import {isLocalStorageSupported } from "@/util/util";
+import WelcomeDialog from "@/components/WelcomeDialog.vue";
 
 const loading = ref(false);
 const form_ref = ref<FormInstance>();
