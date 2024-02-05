@@ -104,12 +104,12 @@ async function loadAppData(user_id: string) {
   // nates address
   //const wallet_address = "0xd8945d98ed4233Cf87cfA4fDCC7a54FE279E8ee7"
   if (wallet_address) {
-    // const opensea_minted_token_promise = token_meta_store.loadOpenseaMintedTokenMetas(wallet_address)
-    //   .catch(err => (showError(`Error loading opensea minted tokens - ${err}`)))
+    const opensea_minted_token_promise = token_meta_store.loadOpenseaMintedTokenMetas(wallet_address)
+      .catch(err => (showError(`Error loading opensea minted tokens - ${err}`)))
     const opensea_wallet_token_promise = token_meta_store.loadOpenseaWalletTokenMetas(wallet_address)
       .catch(err => (showError(`Error loading opensea wallet tokens - ${err}`)))
 
-    //promise_list.push(opensea_minted_token_promise);
+    promise_list.push(opensea_minted_token_promise);
     promise_list.push(opensea_wallet_token_promise);
   }
 

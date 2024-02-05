@@ -58,7 +58,7 @@ export const loadTokensCreatedByAddress = async (wallet_address: string): Promis
     const token_list = [];
     let cursor = "";
     while (true) {
-        const res = await fetch(`https://api.opensea.io/api/v1/events?account_address=${wallet_address}&event_type=created&limit=200${cursor ? '&cursor=' + cursor : ""}`,
+        const res = await fetch(`https://api.opensea.io/api/v2/events/accounts/${wallet_address}?chain=ethereum&event_type=listing&limit=50${cursor ? '&next=' + cursor : ""}`,
             {
                 headers: {
                     'X-API-KEY': OPENSEA_API_KEY
@@ -72,7 +72,7 @@ export const loadTokensCreatedByAddress = async (wallet_address: string): Promis
 
         if (res_json.asset_events) {
             token_list.push(...res_json.asset_events.map((e: any) => {
-                return { ...e.asset, creator: e.from_account };
+                return { ...e.asset  };
             }));
         }
 

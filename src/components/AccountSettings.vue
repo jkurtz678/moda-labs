@@ -102,13 +102,12 @@ const connect = async () => {
     updateAccount(account.value.id, update_data).then(() => {
         return account_store.loadAccount(account.value.id);
     }).then(() => {
-        // const opensea_minted_token_promise = token_meta_store.loadOpenseaMintedTokenMetas(address)
-        //     .catch(err => (showError(`Error loading opensea minted tokens - ${err}`)))
+        const opensea_minted_token_promise = token_meta_store.loadOpenseaMintedTokenMetas(address)
+            .catch(err => (showError(`Error loading opensea minted tokens - ${err}`)))
         const opensea_wallet_token_promise = token_meta_store.loadOpenseaWalletTokenMetas(address)
             .catch(err => (showError(`Error loading opensea wallet tokens - ${err}`)))
 
-        return Promise.all([opensea_wallet_token_promise]);
-        //return Promise.all([opensea_minted_token_promise, opensea_wallet_token_promise]);
+        return Promise.all([opensea_minted_token_promise, opensea_wallet_token_promise]);
     }).then(() => {
         return token_meta_store.loadOpenseaConvertedTokens();
     }).then(() => {
