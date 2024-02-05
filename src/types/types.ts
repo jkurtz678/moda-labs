@@ -262,15 +262,18 @@ export async function getTokenMetaMediumImageURL(token_meta: FirestoreDocument<T
 }
 
 export async function getSourceFile(token_meta: FirestoreDocument<TokenMeta>): Promise<string> {
-    console.log("token_meta", token_meta);
     const storage = getStorage();
-    const path = `${token_meta.entity.media_id}${token_meta.entity.media_type}`
-    console.log("path", path);
+    let path;
+    if(token_meta.entity?.media_id) {
+        path = `${token_meta.entity.media_id}${token_meta.entity.media_type}`
+    } else if (token_meta.entity?.external_media_url) {
+        return token_meta.entity.external_media_url;
+    }
+
     const path_ref = ref(storage, path);
 
     try {
         const url = await getDownloadURL(path_ref)
-        //console.log(`getTokenMetaThumbnailImageURL - found url for image ${token_meta.entity.name}`, url)
         return url
     } catch (err) {
         console.log(`getTokenMetaThumbnailImageURL - failed to find archive thumbnail image ${token_meta.entity.name}`, err)
