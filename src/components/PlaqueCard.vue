@@ -98,6 +98,10 @@
             <el-button plain @click="show_logs_dialog = true">View Logs</el-button>
           </div>
           <div style="margin-bottom: 1em">
+            <el-button plain @click="extendDisplayCommand" :loading="extend_display_loading">Extend Display</el-button>
+            <el-button plain @click="mirrorDisplayCommand" :loading="mirror_display_loading">Mirror Display</el-button>
+          </div>
+          <div style="margin-bottom: 1em">
             <el-button type="danger" plain @click="restartAppCommand" :loading="restart_app_loading">Restart
               App</el-button>
             <el-button type="danger" plain @click="restartMachineCommand" :loading="restart_machine_loading">Restart
@@ -180,6 +184,8 @@ const download_logs_loading = ref(false);
 const restart_machine_loading = ref(false);
 const restart_app_loading = ref(false);
 const show_logs_dialog = ref(false);
+const extend_display_loading = ref(false);
+const mirror_display_loading = ref(false);
 
 const sample_file_list = [{ file_name: "mKMwEFebeBaA6MM3NUxj-20231214074903.log", bytes: 57167794, upload_time: Timestamp.now() }]
 
@@ -403,6 +409,36 @@ const restartAppCommand = () => {
       }).finally(() => {
         restart_app_loading.value = false;
       })
+  })
+}
+
+const sendPlaqueCommand = (plaque_id: string, command: Command): Promise<void> => {
+  return updatePlaque(plaque_id, { command: command })
+    .then(() => {
+      plaque_store.plaque_map[plaque_id].entity.command = command;
+      ElMessage({
+        type: 'success',
+        message: 'Command sent to plaque',
+      })
+    })
+    .catch((err) => {
+      showError(`Error sending command to plaque - ${err}`);
+    })
+}
+
+const extendDisplayCommand = () => {
+  const command: Command = { type: "display_extend", time_sent: Timestamp.now() };
+  extend_display_loading.value = true;
+  sendPlaqueCommand(props.plaque.id, command).finally(() => {
+    extend_display_loading.value = false;
+  })
+}
+
+const mirrorDisplayCommand = () => {
+  const command: Command = { type: "display_mirror", time_sent: Timestamp.now() };
+  mirror_display_loading.value = true;
+  sendPlaqueCommand(props.plaque.id, command).finally(() => {
+    mirror_display_loading.value = false;
   })
 }
 
