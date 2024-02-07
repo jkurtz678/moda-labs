@@ -1,26 +1,10 @@
 <template>
-    <el-form ref="formRef" :model="form" :rules="rules" label-position="left" label-width="180px" style="max-width: 750px">
-        <el-form-item label="Artwork Title" style="max-width: 550px" prop="name">
+    <el-form ref="formRef" :model="form" :rules="rules" label-position="left" label-width="180px" style="margin: 0 auto;">
+        <el-form-item label="Artwork Title"  prop="name">
             <el-input v-model="form.name" />
         </el-form-item>
-        <el-form-item label="Artist Name" style="max-width: 550px" prop="artist">
+        <el-form-item label="Artist Name"  prop="artist">
             <el-input v-model="form.artist" />
-        </el-form-item>
-        <el-form-item label="Artist Social Media Link" style="max-width: 550px" prop="artist_social_link">
-            <el-input v-model="form.artist_social_link" />
-        </el-form-item>
-        <el-form-item label="Link to Blockchain">
-            <el-radio-group v-model="form.blockchain">
-                <el-radio label="off_chain">Off-chain</el-radio>
-                <el-radio label="ethereum">Ethereum</el-radio>
-            </el-radio-group>
-        </el-form-item>
-        <el-form-item v-if="form.blockchain == 'ethereum'" label="Asset Contract Address" style="max-width: 550px;"
-            prop="asset_contract_address">
-            <el-input v-model="form.asset_contract_address" />
-        </el-form-item>
-        <el-form-item v-if="form.blockchain == 'ethereum'" label="Token ID" style="max-width: 550px;" prop="token_id">
-            <el-input v-model="form.token_id" />
         </el-form-item>
         <el-form-item label="Plaque Description" prop="description">
             <el-input v-model="form.description" type="textarea" rows="3" />
@@ -28,7 +12,25 @@
         <el-form-item label="Plaque QR Code Link" prop="public_link">
             <el-input v-model="form.public_link" />
         </el-form-item>
-        <el-form-item v-if="!props.token_meta_id" label="Add to Gallery">
+        <el-form-item label="Artist Social Media Link"  prop="artist_social_link">
+            <el-input v-model="form.artist_social_link" />
+        </el-form-item>
+        <el-form-item label="Link to Blockchain">
+            <el-switch v-model="using_blockchain" :active-text="using_blockchain ? 'Enabled' : 'Disabled'"/>
+        </el-form-item>
+        <el-form-item v-if="using_blockchain" label="Blockchain" prop="blockchain">
+            <el-select v-model="form.blockchain" >
+                <el-option label="Ethereum" value="ethereum" />
+            </el-select>
+        </el-form-item>
+        <el-form-item v-if="using_blockchain" label="Contract Address" 
+            prop="asset_contract_address">
+            <el-input v-model="form.asset_contract_address" />
+        </el-form-item>
+        <el-form-item v-if="using_blockchain" label="Token ID"  prop="token_id">
+            <el-input v-model="form.token_id" />
+        </el-form-item>
+        <el-form-item v-if="!props.token_meta_id" label="Share to Gallery(s)">
             <el-select v-model="selected_galleries" multiple placeholder="N/A" filterable>
                 <el-option v-for="gallery in gallery_list" :key="gallery.id" :label="`${gallery.entity.name}`"
                     :value="gallery.id" />
@@ -73,6 +75,7 @@ import type { UploadProps, UploadUserFile } from "element-plus";
 import { DocumentReference, Timestamp } from "firebase/firestore"
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { getAllGalleries } from "@/api/gallery";
+import { computed } from "vue";
 
 interface SubmitTokenFormProps {
     token_meta_id?: string;
@@ -128,6 +131,13 @@ const beforeRemove: UploadProps["beforeRemove"] = (uploadFile, uploadFiles) => {
         () => false
     );
 };
+
+const using_blockchain = computed({
+    get: () => form.value.blockchain === Blockchain.Ethereum,
+    set: (value: boolean) => {
+        form.value.blockchain = value ? Blockchain.Ethereum : Blockchain.OffChain;
+    },
+});
 
 const handleRemove = () => {
     // TODO
@@ -250,7 +260,13 @@ const updateToken = (token_meta_id: string) => {
 
 </script>
 
-<style>
+<style scoped>
+.el-form-item {
+    max-width: 650px;
+}
+.el-form {
+    max-width: 650px;
+}
 .el-upload {
     --el-upload-dragger-padding-horizontal: 4px;
     --el-upload-dragger-padding-vertical: 10px;
