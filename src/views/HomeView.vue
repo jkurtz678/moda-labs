@@ -6,7 +6,7 @@
       <RouterView v-if="initial_load_done"></RouterView>
     </el-main>
   </el-container>
-  <!-- <WelcomeDialog /> -->
+  <WelcomeDialog />
 </template>
 <script setup lang="ts">
 import Header from "@/components/Header.vue";

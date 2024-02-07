@@ -28,7 +28,7 @@
             </el-button>
         </div>
     </el-container>
-    <!-- <WelcomeDialog /> -->
+    <WelcomeDialog />
 </template>
 <script lang="ts" setup>
 import { onMounted, ref } from "vue";
