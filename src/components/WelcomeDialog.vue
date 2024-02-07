@@ -1,5 +1,5 @@
 <template>
-    <el-dialog v-model="show_dialog" :fullscreen="screen_type == 'xs'" style="text-align:center;" :before-close="close">
+    <el-dialog v-model="show_dialog" :fullscreen="screen_type == 'xs'" style="text-align:center; max-width: 600px;" :before-close="close" >
         <div style="margin: 0 auto; max-width: 320px; padding-bottom: 8px;">
             <h1>Welcome to MODA LABS</h1>
             <br />
