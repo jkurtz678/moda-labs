@@ -88,6 +88,7 @@
           <div>Local IP: {{ plaque.entity.machine_data?.local_ip ?? "N/A" }}</div>
           <div>Public IP: {{ plaque.entity.machine_data?.public_ip ?? "N/A" }}</div>
           <div>Updated At: {{ machine_data_updated_at }}</div>
+          <div>Free Space: {{plaque.entity.free_space ? mediaSizeDisplay(plaque.entity.free_space) : "N/A"}}</div>
         </div>
 
         <div v-if="account_store.is_user_admin" style="margin-bottom: 1em">

@@ -55,6 +55,7 @@ export interface Plaque extends BaseDocument {
     last_check_in_time: Timestamp;
     vpn_active: boolean;
     uploaded_log_files?: UploadedLogFile[];
+    free_space: number; // number of bytes free on the plaque
 }
 
 // UploadedLogFile is a log file uploaded from a plaque
