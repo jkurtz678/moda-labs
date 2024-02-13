@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import type { FirestoreDocument, Gallery, GalleryPlaque, Plaque } from "@/types/types"
+import type { FirestoreDocument, Gallery, GalleryPlaque, Plaque, PlaqueLocalMedia } from "@/types/types"
 import { getPlaquesByUserIDWithListener, getAllPlaquesWithListener, getPlaquesByPlaqueIDList } from "@/api/plaque";
 import { useAccountStore } from "./account";
 import { useGalleryStore } from "./gallery";
@@ -11,6 +11,9 @@ export type RootPlaqueState = {
 }
 interface PlaqueMap {
     [id: string]: FirestoreDocument<Plaque>;
+}
+interface PlaqueMediaMap {
+    [id: string]: {[file_name: string]: PlaqueLocalMedia};
 }
 export const usePlaqueStore = defineStore({
     id: 'plaque',
@@ -31,6 +34,21 @@ export const usePlaqueStore = defineStore({
                 plaque_map[p.id] = p;
             });
             return plaque_map;
+        },
+        plaque_media_map(state): PlaqueMediaMap {
+            const plaque_media_map: PlaqueMediaMap = {};
+            this.all_plaque_list.forEach((p: FirestoreDocument<Plaque>) => {
+                plaque_media_map[p.id] = {};
+
+                if(!p.entity.local_media_list) {
+                    return;
+                }
+
+                p.entity.local_media_list.forEach((m: PlaqueLocalMedia) => {
+                    plaque_media_map[p.id][m.file_name] = m;
+                });
+            });
+            return plaque_media_map
         },
         meta_in_playlist(): (plaque_id: string, token_meta_id: string) => boolean {
             return (plaque_id, token_meta_id) => {

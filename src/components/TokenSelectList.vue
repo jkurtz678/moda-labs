@@ -8,7 +8,7 @@
     <div :style="{ marginTop: '10px', overflowY: 'auto', maxHeight: props.max_height ? `${props.max_height}px` : '' }">
         <div v-if="filtered_token_meta_list.length == 0">No artwork found</div>
         <AddTokenItem v-for="token in filtered_token_meta_list" :token_meta="token"
-            :in_list="Boolean(selected_token_meta_set.has(token.id))" @update_token_list="updateSelectedTokenList">
+            :in_list="Boolean(selected_token_meta_set.has(token.id))" @update_token_list="updateSelectedTokenList" :plaque_id="plaque_id">
         </AddTokenItem>
         <hr class="hr" />
     </div>
@@ -26,6 +26,7 @@ interface TokenSelectListProps {
     selected_token_meta_id_list: string[];
     token_meta_list: FirestoreDocument<TokenMeta>[];
     max_height?: number;
+    plaque_id?: string; // id of plaque if this is being used to select tokens for the plaque
 }
 
 const props = defineProps<TokenSelectListProps>();

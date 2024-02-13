@@ -56,6 +56,14 @@ export interface Plaque extends BaseDocument {
     vpn_active: boolean;
     uploaded_log_files?: UploadedLogFile[];
     free_space: number; // number of bytes free on the plaque
+    local_media_list: PlaqueLocalMedia[];
+}
+
+// PlaqueLocalMedia is a media file stored on the plaque
+export interface PlaqueLocalMedia {
+    file_name: string;
+    total_bytes: number;
+    bytes_downloaded: number;
 }
 
 // UploadedLogFile is a log file uploaded from a plaque
@@ -266,7 +274,7 @@ export async function getSourceFile(token_meta: FirestoreDocument<TokenMeta>): P
     const storage = getStorage();
     let path;
     if(token_meta.entity?.media_id) {
-        path = `${token_meta.entity.media_id}${token_meta.entity.media_type}`
+        path = getTokenMetaFileName(token_meta)
     } else if (token_meta.entity?.external_media_url) {
         return token_meta.entity.external_media_url;
     }
@@ -280,4 +288,8 @@ export async function getSourceFile(token_meta: FirestoreDocument<TokenMeta>): P
         console.log(`getTokenMetaThumbnailImageURL - failed to find archive thumbnail image ${token_meta.entity.name}`, err)
     }
     return ""
+}
+
+export function getTokenMetaFileName(token_meta: FirestoreDocument<TokenMeta>): string {
+    return `${token_meta.entity.media_id}${token_meta.entity.media_type}`
 }
