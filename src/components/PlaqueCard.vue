@@ -460,12 +460,13 @@ const clearMediaFilesCommand = async () => {
     })
 
     // wait for 3 seconds to give time for the plaque to clear the files
-    await setTimeout(() => { }, 3000); 
+    setTimeout(() => {
+      const command: Command = { type: "clear_media_files", time_sent: Timestamp.now() };
+      sendPlaqueCommand(props.plaque.id, command).finally(() => {
+        clear_media_files_loading.value = false;
+      })
+    }, 3000);
 
-    const command: Command = { type: "clear_media_files", time_sent: Timestamp.now() };
-    sendPlaqueCommand(props.plaque.id, command).finally(() => {
-      clear_media_files_loading.value = false;
-    })
   })
 
 }
