@@ -25,6 +25,14 @@
             <el-option label="Opensea" value="opensea"></el-option>
             <el-option label="Demo" value="archive_demo"></el-option>
         </el-select>
+        <template v-if="plaque_id">
+            <div class="caption">Filter by downloaded</div>
+            <el-select v-model="filter_by_downloaded" class="filter-select">
+                <el-option label="All" value=""></el-option>
+                <el-option label="Downloaded" value="downloaded"></el-option>
+                <el-option label="Not Downloaded" value="not_downloaded"></el-option>
+            </el-select>
+        </template>
         <div class="caption">Sort order</div>
         <el-select v-model="sort_order" placeholder="Sort by" class="filter-select">
             <el-option label="Sort by name" value="name"></el-option>
@@ -36,15 +44,18 @@
 <script setup lang="ts">
 import { ref, watch, computed, defineProps, defineEmits, onBeforeMount } from 'vue';
 import { useGalleryStore } from "@/stores/gallery";
-import { TokenPlatform, type FirestoreDocument, type TokenMeta } from '@/types/types';
+import { TokenPlatform, type FirestoreDocument, type TokenMeta, getTokenMetaFileName } from '@/types/types';
+import { usePlaqueStore } from '@/stores/plaque';
 
 interface ArtworkFilterProps {
     all_tokens: FirestoreDocument<TokenMeta>[];
     search_filter: string;
     use_local_storage: boolean;
+    plaque_id?: string;
 }
 const props = defineProps<ArtworkFilterProps>();
 const gallery_store = useGalleryStore();
+const plaque_store = usePlaqueStore();
 
 const emits = defineEmits(['update-filtered-tokens']);
 
@@ -71,11 +82,25 @@ watch(filter_by_platform, (newVal) => {
         localStorage.setItem('artwork_grid_filter_by_platform', newVal)
     }
 })
+const filter_by_downloaded = ref<string>("")
+watch(filter_by_downloaded, (newVal) => {
+    if (props.use_local_storage) {
+        localStorage.setItem('artwork_grid_filter_by_downloaded', newVal)
+    }
+})
+
 const sort_order = ref("created_at")
 watch(sort_order, (newVal) => {
     if (props.use_local_storage) {
         localStorage.setItem('artwork_grid_sort_order', newVal)
     }
+})
+
+const plaque_media_map = computed(() => {
+    if (!props.plaque_id){ 
+        return null
+    }
+    return plaque_store.plaque_media_map[props.plaque_id]
 })
 
 // use beforeMount here so that watchers/computeds start with the data from local storage (instead of the values before local storage)
@@ -84,24 +109,25 @@ onBeforeMount(() => {
         filter_by_aspect_ratio.value = localStorage.getItem('artwork_grid_aspect_ratio_filter') || ""
         filter_by_gallery.value = localStorage.getItem('artwork_grid_filter_by_gallery') || ""
         filter_by_platform.value = localStorage.getItem('artwork_grid_filter_by_platform') || ""
+        filter_by_downloaded.value = localStorage.getItem('artwork_grid_filter_by_downloaded') || ""
         sort_order.value = localStorage.getItem('artwork_grid_sort_order') || "name"
     }
 })
 const show_filter_dot = computed(() => {
-    return filter_by_aspect_ratio.value || filter_by_gallery.value || filter_by_platform.value;
+    return filter_by_aspect_ratio.value || filter_by_gallery.value || filter_by_platform.value || filter_by_downloaded.value;
 })
 
 const tokens_in_gallery_set = computed(() => {
     const set = new Set<string>()
-    if(filter_by_gallery.value) {
-       gallery_store.gallery_token_meta_list.forEach((gtm) => {
-            if(gtm.entity.gallery_id == filter_by_gallery.value) {
+    if (filter_by_gallery.value) {
+        gallery_store.gallery_token_meta_list.forEach((gtm) => {
+            if (gtm.entity.gallery_id == filter_by_gallery.value) {
                 set.add(gtm.entity.token_meta_id);
             }
-       }) 
+        })
     }
     console.log("ret set ", set)
-    return set; 
+    return set;
 })
 
 
@@ -119,7 +145,7 @@ const filtered_tokens = computed(() => {
         if (filter_by_gallery.value) {
             if (!tokens_in_gallery_set.value.has(token.id)) {
                 return false
-            } 
+            }
         }
 
         switch (filter_by_platform.value) {
@@ -138,6 +164,20 @@ const filtered_tokens = computed(() => {
                     return false
                 }
                 break;
+        }
+
+        if (plaque_media_map.value) {
+            switch (filter_by_downloaded.value) {
+                case "downloaded":
+                    if (!plaque_media_map.value[getTokenMetaFileName(token)]) {
+                        return false
+                    }
+                    break;
+                case "not_downloaded":
+                    if (plaque_media_map.value[getTokenMetaFileName(token)]) {
+                        return false
+                    }
+            }
         }
 
 

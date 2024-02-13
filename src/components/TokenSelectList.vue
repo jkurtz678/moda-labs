@@ -3,7 +3,7 @@
         <el-input type="text" v-model="search_filter" :prefix-icon="Search"
             placeholder="Search by artwork title or artist name" />
         <ArtworkFilters :all_tokens="props.token_meta_list" :search_filter="search_filter" :use_local_storage="false"
-            @update-filtered-tokens="updateFilteredTokenMetaList"></ArtworkFilters>
+            @update-filtered-tokens="updateFilteredTokenMetaList" :plaque_id="plaque_id"></ArtworkFilters>
     </div>
     <div :style="{ marginTop: '10px', overflowY: 'auto', maxHeight: props.max_height ? `${props.max_height}px` : '' }">
         <div v-if="filtered_token_meta_list.length == 0">No artwork found</div>
