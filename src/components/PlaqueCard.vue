@@ -88,7 +88,7 @@
           <div>Local IP: {{ plaque.entity.machine_data?.local_ip ?? "N/A" }}</div>
           <div>Public IP: {{ plaque.entity.machine_data?.public_ip ?? "N/A" }}</div>
           <div>Updated At: {{ machine_data_updated_at }}</div>
-          <div>Free Space: {{plaque.entity.free_space ? mediaSizeDisplay(plaque.entity.free_space) : "N/A"}}</div>
+          <div>Free Space: {{ plaque.entity.free_space ? mediaSizeDisplay(plaque.entity.free_space) : "N/A" }}</div>
         </div>
 
         <div v-if="account_store.is_user_admin" style="margin-bottom: 1em">
@@ -107,6 +107,10 @@
               App</el-button>
             <el-button type="danger" plain @click="restartMachineCommand" :loading="restart_machine_loading">Restart
               Machine</el-button>
+          </div>
+          <div style="margin-bottom: 1em">
+            <el-button type="danger" plain @click="clearMediaFilesCommand" :loading="clear_media_files_loading">
+              Clear Media Files</el-button>
           </div>
           <el-dialog v-model="show_logs_dialog" title="Uploaded Logs" width="75%">
             <el-table :data="plaque.entity.uploaded_log_files">
@@ -187,6 +191,7 @@ const restart_app_loading = ref(false);
 const show_logs_dialog = ref(false);
 const extend_display_loading = ref(false);
 const mirror_display_loading = ref(false);
+const clear_media_files_loading = ref(false);
 
 const sample_file_list = [{ file_name: "mKMwEFebeBaA6MM3NUxj-20231214074903.log", bytes: 57167794, upload_time: Timestamp.now() }]
 
@@ -441,6 +446,25 @@ const mirrorDisplayCommand = () => {
   sendPlaqueCommand(props.plaque.id, command).finally(() => {
     mirror_display_loading.value = false;
   })
+}
+
+const clearMediaFilesCommand = async () => {
+  ElMessageBox.confirm(`Are you sure you want to clear all media files on this plaque? They files will have to be redownloaded if you want to play them again.`, "Clear files", {
+    type: 'warning'
+
+  }).then(async () => {
+    clear_media_files_loading.value = true;
+    // first clear playlist
+    await updatePlaque(props.plaque.id, { token_meta_id_list: [] }).catch(err => {
+      showError(`Error clearing media files - ${err}`)
+    })
+
+    const command: Command = { type: "clear_media_files", time_sent: Timestamp.now() };
+    sendPlaqueCommand(props.plaque.id, command).finally(() => {
+      clear_media_files_loading.value = false;
+    })
+  })
+
 }
 
 const downloadLogs = async (file_name: string) => {
