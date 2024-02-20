@@ -111,6 +111,8 @@
           <div style="margin-bottom: 1em">
             <el-button type="danger" plain @click="clearMediaFilesCommand" :loading="clear_media_files_loading">
               Clear Media Files</el-button>
+            <el-button type="danger" plain @click="clearWifiProfilesCommand" :loading="clear_wifi_profiles_loading">
+              Clear WiFi Profiles</el-button>
           </div>
           <el-dialog v-model="show_logs_dialog" title="Uploaded Logs" width="75%">
             <el-table :data="plaque.entity.uploaded_log_files">
@@ -192,6 +194,7 @@ const show_logs_dialog = ref(false);
 const extend_display_loading = ref(false);
 const mirror_display_loading = ref(false);
 const clear_media_files_loading = ref(false);
+const clear_wifi_profiles_loading = ref(false);
 
 const sample_file_list = [{ file_name: "mKMwEFebeBaA6MM3NUxj-20231214074903.log", bytes: 57167794, upload_time: Timestamp.now() }]
 
@@ -449,15 +452,18 @@ const mirrorDisplayCommand = () => {
 }
 
 const clearMediaFilesCommand = async () => {
-  ElMessageBox.confirm(`Are you sure you want to clear all media files on this plaque? They files will have to be redownloaded if you want to play them again.`, "Clear files", {
+  ElMessageBox.confirm(`Are you sure you want to clear all media files on this plaque? The files will have to be redownloaded if you want to play them again.`, "Clear files", {
     type: 'warning'
 
   }).then(async () => {
     clear_media_files_loading.value = true;
     // first clear playlist
-    await updatePlaque(props.plaque.id, { token_meta_id_list: [] }).catch(err => {
-      showError(`Error clearing media files - ${err}`)
-    })
+    await updatePlaque(props.plaque.id, { token_meta_id_list: [] })
+      .then(() => {
+        plaque_store.plaque_map[props.plaque.id].entity.token_meta_id_list = [];
+      }).catch(err => {
+        showError(`Error clearing media files - ${err}`)
+      })
 
     // wait for 3 seconds to give time for the plaque to clear the files
     setTimeout(() => {
@@ -466,6 +472,32 @@ const clearMediaFilesCommand = async () => {
         clear_media_files_loading.value = false;
       })
     }, 3000);
+
+  })
+
+}
+
+const clearWifiProfilesCommand = async () => {
+  ElMessageBox.confirm(`Are you sure you want to clear all wifi profiles on this plaque? The plaque will have to be reconnected to wifi before it can be controlled through this app.`, "Clear WiFi profiles", {
+    type: 'warning'
+
+  }).then(async () => {
+    clear_wifi_profiles_loading.value = true;
+    // first clear playlist
+    await updatePlaque(props.plaque.id, { user_id: "", token_meta_id_list: [] })
+      .then(() => {
+        plaque_store.plaque_map[props.plaque.id].entity.user_id = "";
+        plaque_store.plaque_map[props.plaque.id].entity.token_meta_id_list = [];
+      }).catch(err => {
+        showError(`Error clearing media wifi profiles - ${err}`)
+      })
+
+    setTimeout(() => {
+      const command: Command = { type: "clear_wifi_profiles", time_sent: Timestamp.now() };
+      sendPlaqueCommand(props.plaque.id, command).finally(() => {
+        clear_wifi_profiles_loading.value = false;
+      })
+    }, 5000);
 
   })
 
