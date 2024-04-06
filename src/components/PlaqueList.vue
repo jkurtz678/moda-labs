@@ -113,7 +113,9 @@ const createTestPlaque = async () => {
             local_ip: "",
             public_ip: "",
             updated_at: Timestamp.fromMillis(0),
-        }
+        },
+        free_space: 0,
+        local_media_list: [],
     }).catch(err =>
         ElMessage({ message: `Error creating test plaque- ${err}`, type: 'error', showClose: true, duration: 12000 })
     );
@@ -130,6 +132,20 @@ const sorted_plaques = computed(() => {
     })
 })
 
+const plaques_in_gallery_set = computed(() => {
+    const set = new Set<string>();
+
+    if (filter_by_gallery.value) {
+        gallery_store.gallery_plaque_list.forEach((gpl) => {
+            if(gpl.entity.gallery_id == filter_by_gallery.value) {
+                set.add(gpl.entity.plaque_id)
+            }
+        })
+    }
+
+    return set;
+})
+
 const filtered_plaques = computed(() => {
 
     let ret_plaques = [...sorted_plaques.value];
@@ -140,7 +156,9 @@ const filtered_plaques = computed(() => {
     })
 
     if (filter_by_gallery.value) {
-        ret_plaques = ret_plaques.filter(p => gallery_store.gallery_list.find(g => g.id == filter_by_gallery.value)?.entity.plaque_id_list.includes(p.id))
+        ret_plaques = ret_plaques.filter(plaque => {
+            return plaques_in_gallery_set.value.has(plaque.id)
+        })
     }
 
     if (online_filter.value) {

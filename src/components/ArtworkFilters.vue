@@ -126,7 +126,6 @@ const tokens_in_gallery_set = computed(() => {
             }
         })
     }
-    console.log("ret set ", set)
     return set;
 })
 
