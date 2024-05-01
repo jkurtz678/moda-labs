@@ -30,19 +30,19 @@
 
                 <div v-show="status == Status.STATUS_DISPLAY">
                     <div class="grid">
-                        <div style="flex-basis: 61.8%; text-align: left;">
+                        <div style="flex-basis: 67%; text-align: left;">
                             <div class="title">{{ token_meta?.entity?.name }}</div>
                             <div class="artist" style="margin-bottom: 22px;">{{ token_meta?.entity?.artist }}</div>
                             <div :class="description_class" style="white-space: pre-line; text-align: justify">{{ token_meta?.entity?.description }}</div>
                         </div>
-                        <div style="display: flex; justify-content: center; align-items: center; flex-basis: 38.2%;">
-                            <QrcodeVue v-if="token_meta?.entity?.public_link" :value="token_meta?.entity?.public_link" :size="220" level="H" />
+                        <div style="display: flex; justify-content: center; align-items: center; flex-basis: 33%;">
+                            <QrcodeVue :value="qr_code_value" :size="220" level="H" />
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div style="position: fixed; bottom: 10px; right: 15px; font-style: italic; opacity: 0.7; font-size: 14px">
+        <div style="position: fixed; bottom: 10px; right: 15px; font-style: italic; opacity: 0.7; font-size: 0.8em">
             Powered by MoDA Labs
         </div>
     </div>
@@ -86,6 +86,15 @@ const status = computed(() => {
     return Status.STATUS_DISPLAY
 })
 
+const qr_code_value = computed(() => {
+    const public_link = token_meta?.value?.entity?.public_link 
+    if(public_link) {
+        return public_link 
+    }
+
+    return "https://modadisplay.art/MODA-Labs"
+})
+
 const description_class = computed(() => {
     if(!token_meta?.value?.entity?.description) {
         return "description-medium"
@@ -98,6 +107,7 @@ const description_class = computed(() => {
     }
     return "description-medium"
 })
+
 
 onMounted(() => {
     const token_meta_id = route?.params?.token_meta_id;
@@ -117,6 +127,9 @@ onMounted(() => {
 </script>
 
 <style>
+ html {
+        font-family: K2D, Avenir, Helvetica, Arial, sans-serif;
+ }
 .background {
     background-color: black;
     position: absolute;
@@ -129,7 +142,7 @@ onMounted(() => {
 body {
     margin: 0px;
     color: #FFFFFF;
-    font-size: 18px;
+    font-size: 25px;
 }
 
 
@@ -149,7 +162,7 @@ body {
     top: 50%;
     left: 50%;
     padding-left: 4rem;
-    padding-right: 4rem;
+    padding-right: 0rem;
     -ms-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
     text-align: left;
@@ -159,11 +172,12 @@ body {
 
 .title {
     text-align: left;
-    font-size: 40px;
+    font-size: 2.5em;
     font-weight: bold;
 }
 .artist {
     font-weight: bold;
+    font-size: 1.5em;
 }
 
 .description-medium {
