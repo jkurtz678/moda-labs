@@ -113,11 +113,18 @@ export interface TokenMeta extends BaseDocument {
     aspect_ratio?: number
     deleted?: boolean; // if true this token meta has been soft deleted and wont be displayed in the UI
     media_size?: number; // size of media in bytes
+    price?: number;
+    price_unit?: PriceUnit;
 }
 
 export enum Blockchain {
     Ethereum = "ethereum", // nft on ethereum blockchain, has a asset_contract_adress and token_id that can link it to the token on ethereum
     OffChain = "off_chain" // off chain art, stored in moda archive but cannot be found on chain
+}
+
+export enum PriceUnit {
+    USD = "usd",
+    ETH = "eth"
 }
 
 export enum TokenPlatform {

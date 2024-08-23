@@ -30,6 +30,15 @@
         <el-form-item v-if="using_blockchain" label="Token ID"  prop="token_id">
             <el-input v-model="form.token_id" />
         </el-form-item>
+        <el-form-item label="Price"  prop="price">
+            <div style="display: flex; align-items: center">
+                <el-input-number v-model="form.price" :controls="false" placeholder="no price" style="max-width:133px;"/>
+                <el-select v-model="form.price_unit" style="margin-left: 12px; max-width: 90px;">
+                    <el-option label="USD" :value="PriceUnit.USD" />
+                    <el-option label="ETH" :value="PriceUnit.ETH"/>
+                </el-select>
+            </div>
+        </el-form-item>
         <el-form-item v-if="!props.token_meta_id" label="Share to Gallery(s)">
             <el-select v-model="selected_galleries" multiple placeholder="N/A" filterable>
                 <el-option v-for="gallery in gallery_list" :key="gallery.id" :label="`${gallery.entity.name}`"
@@ -67,7 +76,7 @@ import type { FormInstance, FormRules } from "element-plus";
 import { createGalleryTokenMetaList } from "@/api/gallery-token";
 import { createTokenMetaWithReference, getTokenMetaDocumentRef, updateTokenMeta } from "@/api/token-meta";
 import { uploadFile } from "@/api/storage";
-import { type TokenMeta, Blockchain, TokenPlatform, type FirestoreDocument, type Gallery, type GalleryTokenMeta } from "@/types/types";
+import { type TokenMeta, Blockchain, TokenPlatform, type FirestoreDocument, type Gallery, type GalleryTokenMeta, PriceUnit } from "@/types/types";
 import { useAccountStore } from "@/stores/account"
 import { useTokenMetaStore } from "@/stores/token-meta"
 import { showError } from "@/util/util";
@@ -98,7 +107,9 @@ const form = ref<TokenMeta>({
     blockchain: Blockchain.OffChain,
     asset_contract_address: "",
     token_id: "",
-    platform: TokenPlatform.Archive
+    platform: TokenPlatform.Archive,
+    price: undefined,
+    price_unit: PriceUnit.USD,
 });
 const file_list = ref<UploadUserFile[]>([]);
 const rules = reactive<FormRules>({
@@ -117,6 +128,9 @@ const gallery_list = ref<FirestoreDocument<Gallery>[]>([]);
 onMounted(() => {
     if (props.token_meta_id) {
         form.value = { ...token_meta_store.all_token_metas[props.token_meta_id].entity }
+        if (!form.value.price_unit) {
+            form.value.price_unit = PriceUnit.USD
+        }
     } else {
         // only show galleries for new tokens for now
         getAllGalleries().then((galleries) => {
@@ -266,6 +280,13 @@ const updateToken = (token_meta_id: string) => {
 }
 .el-form {
     max-width: 650px;
+}
+::v-deep(.el-upload-dragger){
+    padding: 5px 10px;
+}
+
+::v-deep(.el-input__inner){
+    text-align:left;
 }
 .el-upload {
     --el-upload-dragger-padding-horizontal: 4px;

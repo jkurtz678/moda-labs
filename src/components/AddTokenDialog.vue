@@ -125,7 +125,7 @@ const clearList = () => {
 .dialog-container {
   position: relative;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-  width: 50%;
+  width: 60%;
   height: 100%;
 }
 
