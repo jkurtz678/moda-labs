@@ -1,9 +1,10 @@
 <template>
-    <el-form ref="formRef" :model="form" :rules="rules" label-position="left" label-width="180px" style="margin: 0 auto;">
-        <el-form-item label="Artwork Title"  prop="name">
+    <el-form ref="formRef" :model="form" :rules="rules" label-position="left" label-width="180px"
+        style="margin: 0 auto;">
+        <el-form-item label="Artwork Title" prop="name">
             <el-input v-model="form.name" />
         </el-form-item>
-        <el-form-item label="Artist Name"  prop="artist">
+        <el-form-item label="Artist Name" prop="artist">
             <el-input v-model="form.artist" />
         </el-form-item>
         <el-form-item label="Plaque Description" prop="description">
@@ -12,31 +13,37 @@
         <el-form-item label="Plaque QR Code Link" prop="public_link">
             <el-input v-model="form.public_link" />
         </el-form-item>
-        <el-form-item label="Artist Social Media Link"  prop="artist_social_link">
+        <el-form-item label="Artist Social Media Link" prop="artist_social_link">
             <el-input v-model="form.artist_social_link" />
         </el-form-item>
         <el-form-item label="Link to Blockchain">
-            <el-switch v-model="using_blockchain" :active-text="using_blockchain ? 'Enabled' : 'Disabled'"/>
+            <el-switch v-model="using_blockchain" :active-text="using_blockchain ? 'Enabled' : 'Disabled'" />
         </el-form-item>
         <el-form-item v-if="using_blockchain" label="Blockchain" prop="blockchain">
-            <el-select v-model="form.blockchain" >
+            <el-select v-model="form.blockchain">
                 <el-option label="Ethereum" value="ethereum" />
             </el-select>
         </el-form-item>
-        <el-form-item v-if="using_blockchain" label="Contract Address" 
-            prop="asset_contract_address">
+        <el-form-item v-if="using_blockchain" label="Contract Address" prop="asset_contract_address">
             <el-input v-model="form.asset_contract_address" />
         </el-form-item>
-        <el-form-item v-if="using_blockchain" label="Token ID"  prop="token_id">
+        <el-form-item v-if="using_blockchain" label="Token ID" prop="token_id">
             <el-input v-model="form.token_id" />
         </el-form-item>
-        <el-form-item label="Price"  prop="price">
-            <div style="display: flex; align-items: center">
-                <el-input-number v-model="form.price" :controls="false" placeholder="no price" style="max-width:133px;"/>
-                <el-select v-model="form.price_unit" style="margin-left: 12px; max-width: 90px;">
-                    <el-option label="USD" :value="PriceUnit.USD" />
-                    <el-option label="ETH" :value="PriceUnit.ETH"/>
-                </el-select>
+        <el-form-item label="Are You Willing to Sell This Piece?" class="sell-piece">
+            <el-switch v-model="form.permission_to_sell" :active-text="form.permission_to_sell ? 'Yes' : 'No'" />
+        </el-form-item>
+        <el-form-item v-if="form.permission_to_sell" label="Price" prop="price">
+            <div>
+                <div style="display: flex; align-items: center">
+                    <el-input-number v-model="form.price" :controls="false" placeholder="No Price"
+                        style="max-width:133px;" />
+                    <el-select v-model="form.price_unit" style="margin-left: 12px; max-width: 90px;">
+                        <el-option label="USD" :value="PriceUnit.USD" />
+                        <el-option label="ETH" :value="PriceUnit.ETH" />
+                    </el-select>
+                </div>
+                <div style="font-size: 11px;">GALLERY COMISSION RATE IS 33%</div>
             </div>
         </el-form-item>
         <el-form-item v-if="!props.token_meta_id" label="Share to Gallery(s)">
@@ -108,6 +115,7 @@ const form = ref<TokenMeta>({
     asset_contract_address: "",
     token_id: "",
     platform: TokenPlatform.Archive,
+    permission_to_sell: false,
     price: undefined,
     price_unit: PriceUnit.USD,
 });
@@ -201,7 +209,7 @@ const startFileUpload = async (formEl: FormInstance) => {
         loading.value = false;
         showError(`Error getting moda archive token meta document - ${err}`);
     });
-    if(!ref) {
+    if (!ref) {
         return
     }
 
@@ -278,16 +286,19 @@ const updateToken = (token_meta_id: string) => {
 .el-form-item {
     max-width: 650px;
 }
+
 .el-form {
     max-width: 650px;
 }
-::v-deep(.el-upload-dragger){
+
+::v-deep(.el-upload-dragger) {
     padding: 5px 10px;
 }
 
-::v-deep(.el-input__inner){
-    text-align:left;
+::v-deep(.el-input__inner) {
+    text-align: left;
 }
+
 .el-upload {
     --el-upload-dragger-padding-horizontal: 4px;
     --el-upload-dragger-padding-vertical: 10px;
@@ -295,5 +306,11 @@ const updateToken = (token_meta_id: string) => {
 
 .el-upload-dragger .el-icon--upload {
     margin-bottom: 0px;
+}
+
+::v-deep(.sell-piece .el-form-item__label) {
+    line-height: inherit;
+    margin-bottom: 10px;
+    text-align: left;
 }
 </style>

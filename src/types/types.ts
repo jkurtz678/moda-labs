@@ -113,6 +113,7 @@ export interface TokenMeta extends BaseDocument {
     aspect_ratio?: number
     deleted?: boolean; // if true this token meta has been soft deleted and wont be displayed in the UI
     media_size?: number; // size of media in bytes
+    permission_to_sell?: boolean;
     price?: number;
     price_unit?: PriceUnit;
 }
