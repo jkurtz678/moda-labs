@@ -116,7 +116,7 @@ const form = ref<TokenMeta>({
     token_id: "",
     platform: TokenPlatform.Archive,
     permission_to_sell: false,
-    price: undefined,
+    price: 0,
     price_unit: PriceUnit.USD,
 });
 const file_list = ref<UploadUserFile[]>([]);
