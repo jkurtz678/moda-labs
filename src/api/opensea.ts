@@ -3,17 +3,35 @@ import type { OpenseaToken, FirestoreDocument, TokenMeta } from "@/types/types";
 const OPENSEA_API_KEY = import.meta.env.VITE_OPENSEA_API_KEY;
 
 // loadTokensByAccountID returns all associated opensea tokens for a given account id
-export async function loadTokensByAccountID(user_id: string): Promise<Array<OpenseaToken>> {
-    const res = await fetch(`https://api.opensea.io/api/v1/assets/?owner=${user_id}`, {
-        headers: {
-            'X-API-KEY': OPENSEA_API_KEY
+export async function loadTokensByAccountID(wallet_address: string): Promise<Array<OpenseaToken>> {
+    const token_list = [];
+    const chain = "ethereum"
+    let cursor = "";
+    while (true) {
+        // https://api.opensea.io/api/v2/chain/{chain}/account/{address}/nfts
+        const res = await fetch(`https://api.opensea.io/api/v2/chain/${chain}/account/${wallet_address}/nfts?limit=200${cursor ? '&next=' + cursor : ""}`,
+            {
+                headers: {
+                    'X-API-KEY': OPENSEA_API_KEY
+                }
+            }
+        );
+
+        const res_json = await res.json();
+        handleOpenseaFetchError(res, res_json)
+        if (res_json.nfts) {
+            token_list.push(...res_json.nfts);
         }
-    });
 
-    const res_json = await res.json();
-    handleOpenseaFetchError(res, res_json) 
 
-    return res_json.assets;
+        // continue to call api until all tokens have been retrieved
+        cursor = res_json.next;
+        if (!cursor) {
+            break;
+        }
+    }
+
+    return token_list;
 }
 
 // loadTokensByAccountID returns opensea tokens by a list asset contract addresses and token ids
@@ -36,11 +54,11 @@ export const loadTokensByTokenIDAndAssetContract = async (tokens: Array<Firestor
 }
 
 // loadTokensCreatedByAddress returns opensea tokens that are created by a wallet address
-export const loadTokensCreatedByAddress = async (user_id: string): Promise<Array<OpenseaToken>> => {
+export const loadTokensCreatedByAddress = async (wallet_address: string): Promise<Array<OpenseaToken>> => {
     const token_list = [];
     let cursor = "";
     while (true) {
-        const res = await fetch(`https://api.opensea.io/api/v1/events?account_address=${user_id}&event_type=created&limit=50${cursor ? '&cursor=' + cursor : ""}`,
+        const res = await fetch(`https://api.opensea.io/api/v2/events/accounts/${wallet_address}?chain=ethereum&event_type=listing&limit=50${cursor ? '&next=' + cursor : ""}`,
             {
                 headers: {
                     'X-API-KEY': OPENSEA_API_KEY
@@ -49,12 +67,12 @@ export const loadTokensCreatedByAddress = async (user_id: string): Promise<Array
         );
 
         const res_json = await res.json();
-        handleOpenseaFetchError(res, res_json) 
+        handleOpenseaFetchError(res, res_json)
         // add creator to fit with other opensea endpoint pattern
 
         if (res_json.asset_events) {
             token_list.push(...res_json.asset_events.map((e: any) => {
-                return { ...e.asset, creator: e.from_account };
+                return { ...e.asset  };
             }));
         }
 
@@ -70,10 +88,10 @@ export const loadTokensCreatedByAddress = async (user_id: string): Promise<Array
 
 const handleOpenseaFetchError = (res: Response, body: any) => {
     if (res.status >= 400) {
-        if(body.detail) {
+        if (body.detail) {
             throw body.detail
         }
-        if(res.status == 429) {
+        if (res.status == 429) {
             throw "Error - opensea rejected request due to rate limiting"
         }
         throw "Error loading opensea tokens"

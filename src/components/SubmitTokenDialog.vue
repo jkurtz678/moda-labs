@@ -1,6 +1,5 @@
 <template>
-    <el-dialog v-model="show_dialog" title="Submit To Moda Archives" top="2vh" :fullscreen="screen_type == 'xs'"
-        width="75%" @close="router.push({name: 'token-list'})">
+    <el-dialog v-model="show_dialog" title="Submit To Moda Archives" top="2vh" :fullscreen="screen_type == 'xs'" style="max-width: 900px" @close="router.back()" :width="screen_type != 'xs' ? '80%' : '100%'">
         <SubmitTokenForm :token_meta_id="(route.params.token_meta_id as string)"></SubmitTokenForm>
     </el-dialog>
 </template>

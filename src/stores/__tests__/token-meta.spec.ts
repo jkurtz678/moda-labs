@@ -3,6 +3,7 @@ import { useTokenMetaStore } from '@/stores/token-meta'
 import { describe, it, expect, beforeEach } from 'vitest'
 import { type FirestoreDocument, type TokenMeta, type OpenseaToken, Blockchain, TokenPlatform, getTokenMetaUniqueChainID } from "@/types/types"
 import { v4 as uuidv4 } from "uuid";
+import { convertOpenseaToTokenMeta } from "../util";
 
 describe('Token Meta Store', () => {
     beforeEach(() => {
@@ -65,9 +66,22 @@ describe('Token Meta Store', () => {
             token_meta_store.opensea_minted_token_meta_list = [opensea_minted_duplicate_with_archive, opensea_minted_duplicate_with_wallet];
             token_meta_store.opensea_wallet_token_meta_list = [opensea_wallet_duplicated_with_minted, opensea_wallet_unique];
 
+            // empty converted tokens until we explicitly call it
+            expect(token_meta_store.opensea_converted_tokens).toHaveLength(0)
+
+            // only 3 because we skip opensea
+            expect(Object.values(token_meta_store.all_token_metas)).toHaveLength(3)
+
+            // add opensea converted tokens
+            token_meta_store.opensea_converted_tokens = [...token_meta_store.opensea_minted_token_meta_list, ...token_meta_store.opensea_wallet_token_meta_list].map(t => convertOpenseaToTokenMeta(t))
+
             expect(Object.values(token_meta_store.all_token_metas)).toHaveLength(5)
+
+            // 2 archive, 1 opensea_archive, 2 opensea
             const archive_tokens = Object.values(token_meta_store.all_token_metas).filter(t => t.entity.platform == TokenPlatform.Archive)
-            expect(archive_tokens).toHaveLength(3)
+            expect(archive_tokens).toHaveLength(2)
+            const opensea_archive_tokens = Object.values(token_meta_store.all_token_metas).filter(t => t.entity.platform == TokenPlatform.OpenseaArchive)
+            expect(opensea_archive_tokens).toHaveLength(1)
             const opensea_tokens = Object.values(token_meta_store.all_token_metas).filter(t => t.entity.platform == TokenPlatform.Opensea)
             expect(opensea_tokens).toHaveLength(2)
         })

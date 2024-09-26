@@ -9,17 +9,17 @@
                         <div></div>
                         <div></div>
                     </div>
-                    <div style="margin-top: 10px; font-size: 30px;">Preparing art</div>
+                    <div class="status">Preparing art</div>
                 </div>
                 <!-- <div v-show="status == Status.STATUS_QR_SCAN">
                     <div id="scan-qrcode" style="display: flex; justify-content: center;"></div>
                     <div style="margin-top: 10px; font-size: 30px;">Scan to cast art</div>
                 </div> -->
-                <div v-show="status == Status.STATUS_NO_VALID_TOKENS">
+                <!-- <div v-show="status == Status.STATUS_NO_VALID_TOKENS">
                     <div style="font-size: 30px;">No art selected</div>
-                </div>
+                </div> -->
                 <div v-show="status == Status.STATUS_ERROR">
-                    <div style="font-size: 30px;">Error loading art. Please try a different piece.</div>
+                    <div class="status">Error loading art.</div>
                 </div>
                 <!-- <div v-show="status == Status.STATUS_NO_INTERNET">
                     <div style="font-size: 30px;">No internet connection. Please connect to wifi.</div>
@@ -29,21 +29,20 @@
                 </div> -->
 
                 <div v-show="status == Status.STATUS_DISPLAY">
-                    <div class="title">{{ active_token_meta?.entity?.name }}</div>
                     <div class="grid">
-                        <div class="col" style="max-width:650px; text-align: left;">
-                            <div style="margin-bottom: 22px; font-size: 22px;">{{ active_token_meta?.entity?.artist }}</div>
-                            <div>{{ active_token_meta?.entity?.description }}</div>
+                        <div style="flex-basis: 67%; text-align: left;">
+                            <div class="title">{{ token_meta?.entity?.name }}</div>
+                            <div class="artist" style="margin-bottom: 22px;">{{ token_meta?.entity?.artist }}</div>
+                            <div :class="description_class" style="white-space: pre-line; text-align: justify">{{ token_meta?.entity?.description }}</div>
                         </div>
-                        <div class="col" style="display: flex; justify-content: center; flex-direction: column; align-items: center; padding-top: 25px;">
-                            <QrcodeVue :value="active_token_meta?.entity?.public_link" :size="220" level="H" />
-                            <div style="padding-top: 25px; font-size: 22px;">2.88 ETH ($4,948.85)</div>
+                        <div style="display: flex; justify-content: center; align-items: center; flex-basis: 33%;">
+                            <QrcodeVue :value="qr_code_value" :size="220" level="H" />
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div style="position: fixed; bottom: 10px; right: 15px; font-style: italic; opacity: 0.7; font-size: 14px">
+        <div style="position: fixed; bottom: 10px; right: 15px; font-style: italic; opacity: 0.7; font-size: 0.8em">
             Powered by MoDA Labs
         </div>
     </div>
@@ -52,7 +51,7 @@
 import { ref, onMounted, computed } from "vue";
 import type { FirestoreDocument, Plaque, TokenMeta } from "@/types/types";
 import { getPlaqueByPlaqueIDWithListener } from "@/api/plaque";
-import { getTokenMetaListByIDList } from "@/api/token-meta";
+import { getTokenMetaByIDWithListener } from "@/api/token-meta";
 import { useRoute } from "vue-router";
 import QrcodeVue from 'qrcode.vue'
 
@@ -70,47 +69,67 @@ enum Status {
 //const status = ref<Status>(Status.STATUS_LOADING);
 const loading = ref(true);
 const show_content = ref(true);
-const plaque = ref<FirestoreDocument<Plaque>>();
-const token_list = ref<FirestoreDocument<TokenMeta>[]>([]);
-const active_token_index = ref(0);
+//const plaque = ref<FirestoreDocument<Plaque>>();
+//const token_list = ref<FirestoreDocument<TokenMeta>[]>([]);
+//const active_token_index = ref(0);
+const token_meta = ref<FirestoreDocument<TokenMeta>>();
 
-const active_token_meta = computed(() => {
+/* const active_token_meta = computed(() => {
     return token_list.value[active_token_index.value]
-})
+}) */
 
 const status = computed(() => {
     if (loading.value) return Status.STATUS_LOADING
 
-    if (!plaque.value || !token_list.value) return Status.STATUS_ERROR
-
-    if (token_list.value.length == 0) return Status.STATUS_NO_VALID_TOKENS
+    if (!token_meta.value || !token_meta.value) return Status.STATUS_ERROR
 
     return Status.STATUS_DISPLAY
 })
 
+const qr_code_value = computed(() => {
+    const public_link = token_meta?.value?.entity?.public_link 
+    if(public_link) {
+        return public_link 
+    }
+
+    return "https://modadisplay.art/MODA-Labs"
+})
+
+const description_class = computed(() => {
+    if(!token_meta?.value?.entity?.description) {
+        return "description-medium"
+    }
+    if (token_meta.value?.entity?.description?.length > 1200) {
+        return "description-xsmall"
+    } 
+    if (token_meta.value?.entity?.description?.length > 800) {
+        return "description-small"
+    }
+    return "description-medium"
+})
+
+
 onMounted(() => {
-    const plaque_id = route?.params?.plaque_id;
-    if (!plaque_id || typeof plaque_id != "string") return;
-    show_content.value = false
-    getPlaqueByPlaqueIDWithListener(plaque_id, (p) => {
-        loading.value = true
+    const token_meta_id = route?.params?.token_meta_id;
+    if (!token_meta_id || typeof token_meta_id != "string") return;
+    getTokenMetaByIDWithListener(token_meta_id, (t) => {
         show_content.value = false
-        plaque.value = p;
-        getTokenMetaListByIDList(p.entity.token_meta_id_list).then(t_list => {
-            //fade in, update data
-            setTimeout(() => {
-                token_list.value = t_list;
-                //this.updateQrCode()
-                show_content.value = true;
-                loading.value = false;
-            }, 500)
-        })
+        //fade in, update data
+        setTimeout(() => {
+            token_meta.value = t
+            console.log("desc", token_meta.value?.entity?.description?.length)
+            show_content.value = true;
+            loading.value = false;
+        }, 500)
     })
 })
 
 </script>
 
 <style>
+ html {
+        font-family: K2D, Avenir, Helvetica, Arial, sans-serif;
+ }
 .background {
     background-color: black;
     position: absolute;
@@ -123,9 +142,10 @@ onMounted(() => {
 body {
     margin: 0px;
     color: #FFFFFF;
-    font-size: 18px;
-
+    font-size: 25px;
 }
+
+
 
 .container {
     opacity: 0;
@@ -142,7 +162,7 @@ body {
     top: 50%;
     left: 50%;
     padding-left: 4rem;
-    padding-right: 4rem;
+    padding-right: 0rem;
     -ms-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
     text-align: left;
@@ -152,7 +172,24 @@ body {
 
 .title {
     text-align: left;
-    font-size: 40px;
+    font-size: 2.5em;
+    font-weight: bold;
+}
+.artist {
+    font-weight: bold;
+    font-size: 1.5em;
+}
+
+.description-medium {
+    font-size: 18px;
+}
+
+.description-small {
+    font-size: 16px;
+}
+
+.description-xsmall {
+    font-size: 14px;
 }
 
 .grid {
@@ -163,11 +200,6 @@ body {
     margin-top: -0.5rem;
 }
 
-.col {
-    flex-grow: 1;
-    flex-basis: 0;
-    padding: 0.3rem 0.5rem 0.5rem 0.5rem;
-}
 
 #scan-qrcode img {
     border: 1.5px solid rgba(255, 255, 255, 1);
@@ -229,5 +261,9 @@ body {
     100% {
         transform: rotate(360deg);
     }
+}
+
+.status {
+    font-size: 30px;
 }
 </style>

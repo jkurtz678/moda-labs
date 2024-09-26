@@ -1,4 +1,5 @@
 
+import type { FirestoreDocument, Plaque } from '@/types/types';
 import { ElMessage } from 'element-plus'
 
 export function showError(message: string) {
@@ -27,5 +28,49 @@ export function getAdminUserIDList(): string[] {
 export function getAdminEmailList(): string[] {
     return [
         "jkurtz678@gmail.com",
+        "natemohler@ucla.edu",
+        "natemohleriv@gmail.com",
+        "ruben@eastsideled.com",
+        "juliaschell@ucla.edu",
+        "carolinepgluck@gmail.com",
     ];
+}
+
+export function isPlaqueOnline(plaque: FirestoreDocument<Plaque>) {
+    if(!plaque.entity.last_check_in_time) {
+        return false;
+      }
+    
+    
+      const now = new Date();
+      const last_check_in = plaque.entity.last_check_in_time.seconds
+      const time_diff = (now.getTime()/1000) - last_check_in
+      const hours_diff = time_diff / (60 * 60);
+      return hours_diff < 2
+}
+
+export function isLocalStorageSupported(): boolean{
+    try {
+        localStorage.setItem('test', 'test');
+        localStorage.removeItem('test');
+        return true;
+    } catch(e) {
+        return false;
+    }
+}
+
+export function mediaSizeDisplay(media_size: number) {
+    const kb = 1000;
+    const mb = kb * 1000;
+    const gb = mb * 1000;
+  
+    if (media_size < kb) {
+      return `${media_size} B`;
+    } else if (media_size < mb) {
+      return `${(media_size / kb).toFixed(2)} KB`;
+    } else if (media_size < gb) {
+      return `${(media_size / mb).toFixed(2)} MB`;
+    } else {
+      return `${(media_size / gb).toFixed(2)} GB`;
+    }
 }

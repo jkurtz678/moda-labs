@@ -5,7 +5,6 @@
         <AddPlaqueItem v-for="plaque in filtered_plaque_list" :plaque="plaque"
             :in_list="Boolean(selected_plaque_set.has(plaque.id))" @update_plaque_list="updateSelectedPlaqueList">
         </AddPlaqueItem>
-        <hr class="hr" />
     </div>
 </template>
 

@@ -39,6 +39,7 @@ onMounted(async () => {
       loading.value.close();
     } else {
       account_store.setAccount(null)
+      loading.value.close();
       router.push({ name: "login", query: { redir: window.location.href } });
     }
   });

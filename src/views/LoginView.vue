@@ -28,6 +28,7 @@
             </el-button>
         </div>
     </el-container>
+    <WelcomeDialog />
 </template>
 <script lang="ts" setup>
 import { onMounted, ref } from "vue";
@@ -37,6 +38,8 @@ import { showError } from "@/util/util";
 import type { FormInstance, FormRules } from "element-plus";
 import { ElMessage } from 'element-plus'
 import { useRoute, useRouter } from "vue-router";
+import {isLocalStorageSupported } from "@/util/util";
+import WelcomeDialog from "@/components/WelcomeDialog.vue";
 
 const loading = ref(false);
 const form_ref = ref<FormInstance>();
@@ -66,10 +69,12 @@ const form = ref<LoginForm>({
 
 // load email from local storage on mounted
 onMounted(() => {
-    const email = localStorage.getItem("saved_email");
-    if (email) {
-        form.value.email = email;
-    }
+    if(isLocalStorageSupported()) {
+        const email = localStorage.getItem("saved_email");
+        if (email) {
+            form.value.email = email;
+        }
+    } 
 });
 
 const submit = async (form_el: FormInstance | undefined) => {
@@ -85,8 +90,9 @@ const submit = async (form_el: FormInstance | undefined) => {
     loading.value = true;
     signInWithEmailAndPassword(auth, form.value.email, form.value.password)
         .then((userCredential) => {
-
-            localStorage.setItem("saved_email", form.value.email);
+            if(isLocalStorageSupported() && userCredential?.user?.email) {
+                localStorage.setItem("saved_email", userCredential.user.email);
+            }
             if (route.query.redir && typeof route.query.redir === 'string') {
                 window.location.assign(route.query.redir);
                 return

@@ -49,12 +49,56 @@ export interface Plaque extends BaseDocument {
     name: string; // name of plaque, given by user in order to remember 
     user_id: string; // user id of user currently paired with display, empty if no user is paired
     token_meta_id_list: string[]; // list of TokenMeta document ids, plaque will attempt to download and play this art in order
+    orientation: OrientationType;
+    command: Command;
+    machine_data: MachineData;
+    last_check_in_time: Timestamp;
+    vpn_active: boolean;
+    uploaded_log_files?: UploadedLogFile[];
+    free_space: number; // number of bytes free on the plaque
+    local_media_list: PlaqueLocalMedia[];
 }
+
+// PlaqueLocalMedia is a media file stored on the plaque
+export interface PlaqueLocalMedia {
+    file_name: string;
+    total_bytes: number;
+    bytes_downloaded: number;
+}
+
+// UploadedLogFile is a log file uploaded from a plaque
+export interface UploadedLogFile {
+    file_name: string;
+    bytes: number
+    UploadTime: Timestamp;
+}
+
+export interface Command {
+    type: string;
+    time_sent: Timestamp;
+}
+
+export interface MachineData {
+    machine_name: string;
+    version: string;
+    local_ip: string;
+    public_ip: string;
+    updated_at: Timestamp;
+}
+
+export enum OrientationType {
+    Landscape = "landscape" ,
+    Portrait = "portrait",
+    LandscapeReversed = "landscape_reversed",
+    PortraitReversed = "portrait_reversed"
+}
+
 
 // TokenMeta contains metadata about a token stored in the archive
 export interface TokenMeta extends BaseDocument {
     name: string; // name of piece
     artist?: string; // name of artist
+    artist_social_link?: string; // social media url for artist
     description?: string; // description of artwork
     public_link?: string; // link to public site for art, such as opensea listing. Embedded in plaque qr code link
     media_id: string; // uid of media in firebase storage
@@ -67,6 +111,12 @@ export interface TokenMeta extends BaseDocument {
     external_thumbnail_url?: string; // url to thumbnail image from outside moda archives (e.g. from opensea servers)
     external_media_url?: string; // url to media source file from outside moda archives (e.g. opensea servers)
     starting_bid?: number; // optional starting bid for token in usd, if it is for sale
+    aspect_ratio?: number
+    deleted?: boolean; // if true this token meta has been soft deleted and wont be displayed in the UI
+    media_size?: number; // size of media in bytes
+    permission_to_sell?: boolean;
+    price?: number;
+    price_unit?: PriceUnit;
 }
 
 export enum Blockchain {
@@ -74,38 +124,86 @@ export enum Blockchain {
     OffChain = "off_chain" // off chain art, stored in moda archive but cannot be found on chain
 }
 
+export enum PriceUnit {
+    USD = "usd",
+    ETH = "eth"
+}
+
 export enum TokenPlatform {
     Archive = "archive", // tokens uploaded directly to the moda archive 
     Opensea = "opensea", // token from opensea api, not stored in moda archive
-    OpenseaArchive = "opensea_archive" // token from opensea api that has been added to moda archive
+    OpenseaArchive = "opensea_archive", // token from opensea api that has been added to moda archive
+    ArchiveDemo = "archive_demo" // tokens that are available to all users from the archive as demo art
 }
 
 // Gallery is a group of users and token metas
 export interface Gallery extends BaseDocument {
     name: string;
-    user_id_list: string[];
-    plaque_id_list: string[];
-    token_meta_id_list: string[];
+    //user_id_list: string[];
+    //plaque_id_list: string[];
+    //token_meta_id_list: string[];
+}
+
+// GalleryTokenUser is a mapping between a gallery and a user
+export interface GalleryUser extends BaseDocument {
+    gallery_id: string;
+    user_id: string;
+    role: GalleryUserRole;
+}
+
+// GalleryUserRole is the role a user has in a gallery
+export enum GalleryUserRole {
+    Owner = "owner",
+    Editor = "editor",
+    Reader = "reader"
+}
+
+// GalleryPlaque is a mapping between a gallery and a plaque
+export interface GalleryPlaque extends BaseDocument {
+    gallery_id: string;
+    plaque_id: string;
+}
+
+// GalleryTokenMeta is a mapping between a gallery and a token meta
+export interface GalleryTokenMeta extends BaseDocument {
+    gallery_id: string;
+    token_meta_id: string;
 }
 
 // OpenseaToken is the structure of tokens returned from the opensea API
+// export interface OpenseaTokenOld {
+//     image_url: string;
+//     image_thumbnail_url: string;
+//     animation_url: string;
+//     name: string;
+//     asset_contract: { address: string; };
+//     token_id: string;
+//     description: string;
+//     permalink: string;
+//     creator: { user: { username: string } };
+//     orders: Array<any>;
+//     external_link: string;
+// }
+
+// OpenseaToken is the structure of tokens returned from the opensea API
 export interface OpenseaToken {
-    image_url: string;
-    image_thumbnail_url: string;
-    animation_url: string;
+    identifier: string;
+    collection: string;
+    contract: string;
+    token_standard: string;
     name: string;
-    asset_contract: { address: string; };
-    token_id: string;
     description: string;
-    permalink: string;
-    creator: { user: { username: string } };
-    orders: Array<any>;
-    external_link: string;
+    image_url: string;
+    metadata_url: string | null;
+    opensea_url: string;
+    updated_at: string;
+    is_disabled: boolean;
+    is_nsfw: boolean;
 }
 
 // getUniqueOpenseaID returns a unique identifier for opensea tokens
 export function getUniqueOpenseaID(opensea_token: OpenseaToken): string {
-    return `${opensea_token.asset_contract.address}/${opensea_token.token_id}`
+    return `${opensea_token.contract}/${opensea_token.identifier}`
 }
 
 // getTokenMetaUniqueChainID returns a unique identifier for token metas that are on chain
@@ -131,10 +229,10 @@ export async function getTokenMetaThumbnailImageURL(token_meta: FirestoreDocumen
     const storage = getStorage();
     const path_ref = ref(storage, `thumb_${token_meta.entity.media_id}.jpg`);
     try {
-       const url = await getDownloadURL(path_ref) 
-       console.log(`getTokenMetaThumbnailImageURL - found url for image ${token_meta.entity.name}`, url)
-       return url
-    } catch (err){
+        const url = await getDownloadURL(path_ref)
+        //console.log(`getTokenMetaThumbnailImageURL - found url for image ${token_meta.entity.name}`, url)
+        return url
+    } catch (err) {
         console.log(`getTokenMetaThumbnailImageURL - failed to find archive thumbnail image ${token_meta.entity.name}`, err)
     }
 
@@ -155,4 +253,60 @@ export interface Bid extends BaseDocument{
     email: string; // email for contact
     bidding_name: string; // public bidding name for display on plaque and form
     amount: number; // bid amount in usd 
+}
+// getTokenMetaThumbnailImageURL returns the url to the thumbnail image for a token meta
+export async function getTokenMetaMediumImageURL(token_meta: FirestoreDocument<TokenMeta>): Promise<string> {
+    // first check if archive medium image exist in firebase storage
+    const storage = getStorage();
+    const medium_path_ref = ref(storage, `medium_${token_meta.entity.media_id}.jpg`);
+    try {
+        const url = await getDownloadURL(medium_path_ref)
+        //console.log(`getTokenMetaThumbnailImageURL - found url for image ${token_meta.entity.name}`, url)
+        return url
+    } catch (err) {
+        console.log(`getTokenMetaThumbnailImageURL - failed to find archive medium image ${token_meta.entity.name}`, err)
+    }
+
+    // then fallback to thumbnail if it exists
+    const thumbnail_path_ref = ref(storage, `thumb_${token_meta.entity.media_id}.jpg`);
+    try {
+        const url = await getDownloadURL(thumbnail_path_ref)
+        //console.log(`getTokenMetaThumbnailImageURL - found url for image ${token_meta.entity.name}`, url)
+        return url
+    } catch (err) {
+        console.log(`getTokenMetaThumbnailImageURL - failed to find archive thumbnail image ${token_meta.entity.name}`, err)
+    } 
+
+
+    // then we check external thumbnail url
+    if (token_meta.entity.external_thumbnail_url) {
+        return token_meta.entity.external_thumbnail_url
+    }
+
+    // if none found return moda logo as placeholder image
+    return new URL(`../assets/logo.png`, import.meta.url).href
+}
+
+export async function getSourceFile(token_meta: FirestoreDocument<TokenMeta>): Promise<string> {
+    const storage = getStorage();
+    let path;
+    if(token_meta.entity?.media_id) {
+        path = getTokenMetaFileName(token_meta)
+    } else if (token_meta.entity?.external_media_url) {
+        return token_meta.entity.external_media_url;
+    }
+
+    const path_ref = ref(storage, path);
+
+    try {
+        const url = await getDownloadURL(path_ref)
+        return url
+    } catch (err) {
+        console.log(`getTokenMetaThumbnailImageURL - failed to find archive thumbnail image ${token_meta.entity.name}`, err)
+    }
+    return ""
+}
+
+export function getTokenMetaFileName(token_meta: FirestoreDocument<TokenMeta>): string {
+    return `${token_meta.entity.media_id}${token_meta.entity.media_type}`
 }

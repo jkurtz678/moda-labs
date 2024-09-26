@@ -44,6 +44,27 @@ const router = createRouter({
           ]
         },
         {
+          path: "artwork-tile-grid",
+          name: "artwork-tile-grid",
+          component: () => import('@/components/ArtworkTileGrid.vue'),
+          children: [
+            {
+              path: "new",
+              name: "new-artwork",
+              components: {
+                default: () => import('@/components/SubmitTokenDialog.vue')
+              }
+            },
+            {
+              path: ":token_meta_id",
+              name: "edit-artwork",
+              components: {
+                default: () => import('@/components/SubmitTokenDialog.vue')
+              }
+            },
+          ]
+        },
+        {
           path: "gallery-list",
           name: "gallery-list",
           component: () => import('@/components/GalleryList.vue'),
@@ -62,6 +83,11 @@ const router = createRouter({
                 default: () => import('@/components/GalleryDetailDialog.vue')
               }
             }]
+        },
+        {
+          path: "account-settings",
+          name: "account-settings",
+          component: () => import('@/components/AccountSettings.vue'),
         },
         {
           path: "qr-scan",
@@ -96,7 +122,7 @@ const router = createRouter({
       component: () => import('@/views/SubmitView.vue')
     },
     {
-      path: '/preview-plaque/:plaque_id',
+      path: '/preview-plaque/:token_meta_id',
       name: 'preview-plaque',
       component: () => import('@/views/PlaquePreview.vue')
     },

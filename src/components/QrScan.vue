@@ -6,11 +6,12 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { QrcodeStream } from "vue3-qrcode-reader";
-import { updatePlaque } from "@/api/plaque";
+import { updatePlaque, getPlaqueByID } from "@/api/plaque";
 import { useRouter } from 'vue-router';
 import { useAccountStore } from "@/stores/account"
 import { ElLoading } from 'element-plus'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import {addPlaqueToAccount} from "@/util/add-plaque"
 
 
 const account_store = useAccountStore()
@@ -39,11 +40,13 @@ const onDecode = async (qr_code_link: string) => {
         text: 'Loading',
         background: 'rgba(0, 0, 0, 0.7)',
     })
-    await updatePlaque(plaque_id, {user_id: user_id}).then((plaque) => {
-        ElMessage({ message: `Connected to plaque ${plaque.entity.name}`, type: 'success', showClose: true, duration: 6000 });
-    }).catch(err => {
-        ElMessage({ message: `Error adding account to plaque - ${err}`, type: 'error', showClose: true, duration: 12000 });
-    })
+
+    const success = await addPlaqueToAccount(user_id, plaque_id)
+    if (!success) {
+        loading.close();
+        return
+    } 
+
     loading.close();
     router.push('plaque-list');
 };
