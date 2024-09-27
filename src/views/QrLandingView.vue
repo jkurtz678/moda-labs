@@ -102,10 +102,10 @@ onMounted(async () => {
         token_meta.value = meta;
         form.value.token_meta_id = meta.id;
     });
-    await getBidListByTokenMetaIDWithListener(route.params.token_meta_id, (bids) => {
-        bid_list.value = bids;
-        global_loading.value.close();
-    });
+    // await getBidListByTokenMetaIDWithListener(route.params.token_meta_id, (bids) => {
+    //     bid_list.value = bids;
+    //     global_loading.value.close();
+    // });
 });
 
 const heighest_bid = computed(() => {
