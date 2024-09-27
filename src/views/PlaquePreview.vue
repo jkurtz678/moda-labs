@@ -34,10 +34,10 @@
                             <div class="title">{{ token_meta?.entity?.name }}</div>
                             <div class="artist" style="margin-bottom: 22px;">{{ token_meta?.entity?.artist }}</div>
                             <div :class="description_class" style="white-space: pre-line; text-align: justify">{{ token_meta?.entity?.description }}</div>
-                            <div v-if="token_meta?.entity.permission_to_sell" style="font-size: 1em; padding: 8px 0px;">{{ price }}</div>
                         </div>
-                        <div style="display: flex; justify-content: center; align-items: center; flex-basis: 33%;">
+                        <div style="display: flex; justify-content: center; align-items: center; flex-basis: 33%; flex-direction: column;">
                             <QrcodeVue :value="qr_code_value" :size="220" level="H" />
+                            <div v-if="token_meta?.entity.permission_to_sell" style="font-size: 1.15em; padding-top: 16px;">{{ price }}</div>
                         </div>
                     </div>
                 </div>
