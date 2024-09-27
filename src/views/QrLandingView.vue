@@ -101,6 +101,7 @@ onMounted(async () => {
     await getTokenMetaByIDWithListener(route.params.token_meta_id, (meta) => {
         token_meta.value = meta;
         form.value.token_meta_id = meta.id;
+        global_loading.value.close();
     });
     // await getBidListByTokenMetaIDWithListener(route.params.token_meta_id, (bids) => {
     //     bid_list.value = bids;
