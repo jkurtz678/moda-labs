@@ -130,6 +130,11 @@ const router = createRouter({
       path: "/bid/:token_meta_id",
       name: "bid",
       component: () => import('@/views/BiddingView.vue')
+    },
+    {
+      path: "/qr-landing/:token_meta_id",
+      name: "qr-landing",
+      component: () => import('@/views/QrLandingView.vue')
     }
     /*  {
        path: '/login',

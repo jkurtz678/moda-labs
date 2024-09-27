@@ -1,10 +1,7 @@
 <template>
   <div class="container">
-    <h1 style="font-weight: bold;">{{ token_meta?.entity?.name }}</h1>
-    <h3 style="font-weight: bold;">{{ token_meta?.entity?.artist }}</h3>
-    <el-link type="primary" style="margin: 12px 0px;" target="_blank"
-      :href="token_meta?.entity?.public_link">View</el-link>
-    <TruncatedDescription :description="token_meta?.entity?.description"></TruncatedDescription>
+    <div v-if="!token_meta">Loading</div>
+    <ArtPreviewHeader v-else :token_meta="token_meta"></ArtPreviewHeader>
     <div class="top-bid">
       <h3>Highest Bid</h3>
       <div class="bid">
@@ -44,7 +41,7 @@
 import { ref, reactive, onMounted, computed } from 'vue';
 import { showError } from "@/util/util";
 import type { FormInstance, FormRules } from "element-plus";
-import TruncatedDescription from '@/components/TruncatedDescription.vue';
+import ArtPreviewHeader from '@/components/ArtPreviewHeader.vue';
 import type { Bid, TokenMeta, FirestoreDocument } from "@/types/types";
 import { getBidListByTokenMetaIDWithListener, createBid } from "@/api/bid";
 import { getTokenMetaByIDWithListener } from "@/api/token-meta";
