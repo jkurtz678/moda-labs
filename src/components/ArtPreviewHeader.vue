@@ -5,7 +5,11 @@
         :href="token_meta?.entity?.public_link">View</el-link> -->
     <img :src="thumbnail_url" style="max-width: 100%; max-height: 200px; padding: 10px 0px;"/>
     <template v-if="route.name?.toString() != 'bid'">
-        <h2 v-if="token_meta.entity.permission_to_sell" style="font-weight: bold;">{{price}}</h2>
+        <div style="display: flex; align-items: center;">
+            <h2 v-if="token_meta.entity.permission_to_sell" style="font-weight: bold;">{{price}}</h2>
+            <el-button v-if="token_meta?.entity.permission_to_sell" color="#000000" size="small"
+                    style="margin-left: 12px; font-size: 14px;" round @click="router.push({ name: 'bid', params: {token_meta_id: route.params.token_meta_id  }})">Place A Bid</el-button>
+        </div>
         <TruncatedDescription :description="token_meta?.entity?.description"></TruncatedDescription>
     </template>
 </template>
@@ -16,8 +20,9 @@ import { FirestoreDocument, PriceUnit, TokenMeta } from '@/types/types';
 import TruncatedDescription from '@/components/TruncatedDescription.vue';
 import { useMediumThumbnail } from '@/composables/thumbnail-image';
 import { computed, toRef } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 const route = useRoute();
+const router = useRouter();
 
 interface ArtPreviewHeaderProps {
     token_meta: FirestoreDocument<TokenMeta>;
