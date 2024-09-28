@@ -2,22 +2,9 @@
     <div class="container">
         <div v-if="!token_meta">Loading</div>
         <ArtPreviewHeader v-else :token_meta="token_meta"></ArtPreviewHeader>
-        <div>
-            <div style="padding: 20px 0px; display: flex; gap: 10px; width: 100%;">
-                <el-button color="#000000" size="large" @click="tipArtist" style="flex-grow: 1; font-size: 18px;"
-                    round>Tip Artist</el-button>
-                <el-button v-if="token_meta?.entity.permission_to_sell" color="#000000" size="large"
-                    style="flex-grow: 1; font-size: 18px;" round>Place A Bid</el-button>
-            </div>
-            <div style="padding: 12px 0px; ">
-                <div style="font-size: var(--el-font-size-extra-small);">Learn More</div>
-                <div style="display: flex; gap: 10px; width: 100%;">
-                    <el-button @click="goToModaPlaque" style="flex-grow: 1;">Moda Plaque</el-button>
-                    <el-button @click="goToProjectBlank" style="flex-grow: 1;">Projekt
-                        ______</el-button>
-                </div>
-            </div>
-        </div>
+        <RouterView v-slot="{ Component }">
+            <component :is="Component" :token_meta="token_meta" />
+        </RouterView>
     </div>
 </template>
 
@@ -145,18 +132,7 @@ const submit = async (formEl: FormInstance | undefined) => {
 
 };
 
-const goToModaPlaque = () => {
-    window.open('https://moda-labs.xyz/', "_blank");
-}
 
-const goToProjectBlank = () => {
-    window.open('https://www.instagram.com/projekt.______/', "_blank");
-}
-
-const tipArtist = () => {
-    //window.open('https://account.venmo.com/u/ModaArt', "_blank");
-    window.open('https://account.venmo.com/pay?recipients=ModaArt&note=Tip%20for%20%3Cartist-name%3E', "_blank");
-}
 
 </script>
 

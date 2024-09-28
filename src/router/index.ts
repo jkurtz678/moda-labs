@@ -134,7 +134,17 @@ const router = createRouter({
     {
       path: "/qr-landing/:token_meta_id",
       name: "qr-landing",
-      component: () => import('@/views/QrLandingView.vue')
+      component: () => import('@/views/QrLandingView.vue'),
+      children: [
+        {
+          path: "",
+          component: () => import('@/components/QrLandingActions.vue'),
+        },
+        {
+          path: "bid",
+          component: () => import('@/components/QrLandingBiddingForm.vue')
+        },
+      ]
     }
     /*  {
        path: '/login',

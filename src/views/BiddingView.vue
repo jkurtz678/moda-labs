@@ -1,7 +1,7 @@
 <template>
   <div class="container">
-    <div v-if="!token_meta">Loading</div>
-    <ArtPreviewHeader v-else :token_meta="token_meta"></ArtPreviewHeader>
+    <!-- <div v-if="!token_meta">Loading</div>
+    <ArtPreviewHeader v-else :token_meta="token_meta"></ArtPreviewHeader> -->
     <div class="top-bid">
       <h3>Highest Bid</h3>
       <div class="bid">
