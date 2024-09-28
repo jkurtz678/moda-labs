@@ -244,11 +244,11 @@ const submit = async (formEl: FormInstance | undefined) => {
 }
 
 .submit-button {
-    margin-top: 20px;
+    margin-top: 8px;
 }
 
 .el-form-item {
-    margin-bottom: 14px;
+    margin-bottom: 12px;
 }
 
 @media (max-width: 768px) {

@@ -68,8 +68,10 @@ onMounted(async () => {
 .container {
     max-width: 500px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 16px 20px;
     font-family: Arial, Helvetica, sans-serif;
+    overflow-y: auto;
+    height: 100%;
 }
 
 .fade-enter-active,
