@@ -154,7 +154,8 @@ const goToProjectBlank = () => {
 }
 
 const tipArtist = () => {
-    window.open('https://account.venmo.com/u/ModaArt', "_blank");
+    //window.open('https://account.venmo.com/u/ModaArt', "_blank");
+    window.open('https://account.venmo.com/pay?recipients=ModaArt&note=Tip%20for%20%3Cartist-name%3E', "_blank");
 }
 
 </script>
