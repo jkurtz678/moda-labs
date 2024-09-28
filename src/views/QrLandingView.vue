@@ -25,14 +25,9 @@ import { ElMessage } from 'element-plus'
 import { useRoute } from 'vue-router';
 const route = useRoute();
 
-const formRef = ref<FormInstance>();
-
-
 const token_meta = ref<FirestoreDocument<TokenMeta>>();
 
-
 const global_loading = ref(); // should not have an initial value or type because of the way ElLoading.service works
-const submit_loading = ref(false);
 
 // call bid list on mount
 onMounted(async () => {
@@ -60,6 +55,7 @@ watch(
 );
 
 const fetchTokenMeta = async (token_meta_id: string) => {
+    token_meta.value = undefined;
     global_loading.value = ElLoading.service({
         lock: true,
         text: 'Loading',
@@ -76,7 +72,7 @@ const fetchTokenMeta = async (token_meta_id: string) => {
 
 </script>
 
-<style>
+<style >
 .container {
     max-width: 500px;
     margin: 0 auto;

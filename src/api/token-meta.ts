@@ -60,6 +60,18 @@ export const getAllTokenMetasWithListener = async (onChange: (arr: FirestoreDocu
     })
 }
 
+// getAllTokenMetasOnSaleWithListener loads all token metas with permission_to_sell = true
+export const getAllTokenMetasOnSaleWithListener = async (onChange: (arr: FirestoreDocument<TokenMeta>[]) => void) => {
+    const unsubscribe = await onSnapshot(query(token_meta_ref, where("permission_to_sell", "==", true)), (query_snapshot) => {
+        const token_metas: FirestoreDocument<TokenMeta>[] = [];
+        query_snapshot.forEach((doc) => {
+            token_metas.push({ id: doc.id, entity: doc.data() as TokenMeta })
+        })
+        const filtered_tokens = token_metas.filter((token_meta) => !token_meta.entity.deleted);
+        onChange(filtered_tokens)
+    })
+}
+
 // getTokenMetasWithListener returns a list of archive token metas that match the given wallet address, uses firebase listener callback
 export const getTokenMetaListByUserIDWithListener = async (user_id: string, onChange: (arr: Array<FirestoreDocument<TokenMeta>>) => void) => {
     const q = query(token_meta_ref, where("user_id", "==", user_id));

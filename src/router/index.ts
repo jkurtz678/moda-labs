@@ -147,7 +147,12 @@ const router = createRouter({
           component: () => import('@/components/QrLandingBiddingForm.vue')
         },
       ]
-    }
+    },
+    {
+      path: '/catalog',
+      name: 'catalog',
+      component: () => import('@/views/CatalogView.vue'),
+    },
     /*  {
        path: '/login',
        name: 'login',
