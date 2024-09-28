@@ -138,10 +138,12 @@ const router = createRouter({
       children: [
         {
           path: "",
+          name: "actions",
           component: () => import('@/components/QrLandingActions.vue'),
         },
         {
           path: "bid",
+          name: "bid",
           component: () => import('@/components/QrLandingBiddingForm.vue')
         },
       ]

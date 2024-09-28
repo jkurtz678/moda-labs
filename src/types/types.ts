@@ -253,6 +253,7 @@ export interface Bid extends BaseDocument{
     email: string; // email for contact
     bidding_name: string; // public bidding name for display on plaque and form
     amount: number; // bid amount in usd 
+    amount_unit: PriceUnit; // currency of bid amount
 }
 // getTokenMetaThumbnailImageURL returns the url to the thumbnail image for a token meta
 export async function getTokenMetaMediumImageURL(token_meta: FirestoreDocument<TokenMeta>): Promise<string> {

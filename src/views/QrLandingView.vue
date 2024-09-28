@@ -1,10 +1,13 @@
 <template>
     <div class="container">
-        <div v-if="!token_meta">Loading</div>
-        <ArtPreviewHeader v-else :token_meta="token_meta"></ArtPreviewHeader>
-        <RouterView v-slot="{ Component }">
-            <component :is="Component" :token_meta="token_meta" />
-        </RouterView>
+        <template v-if="token_meta">
+            <ArtPreviewHeader :token_meta="token_meta"></ArtPreviewHeader>
+            <transition name="fade" mode="out-in">
+                <RouterView v-slot="{ Component }">
+                    <component :is="Component" :token_meta="token_meta" />
+                </RouterView>
+            </transition>
+        </template>
     </div>
 </template>
 
@@ -24,48 +27,9 @@ const route = useRoute();
 
 const formRef = ref<FormInstance>();
 
-const form = ref<Bid>({
-    token_meta_id: '',
-    bidding_name: '',
-    email: '',
-    phone_number: '',
-    amount: 0,
-    created_at: Timestamp.now(),
-    updated_at: Timestamp.now(),
-});
 
 const bid_list = ref<FirestoreDocument<Bid>[]>([]);
 const token_meta = ref<FirestoreDocument<TokenMeta>>();
-
-const minAmount = (rule: any, value: any, callback: any) => {
-    let minimum_amount = 0;
-    if (heighest_bid.value) {
-        minimum_amount = heighest_bid.value.entity.amount + 1;
-    }
-    if (value <= minimum_amount) {
-        callback(new Error(`Please enter a bid amount greater than $${minimum_amount}`));
-    } else {
-        callback();
-    }
-};
-
-const rules = reactive({
-    bidding_name: [{ required: true, message: 'Please enter your bidding name', trigger: 'blur' }],
-    email: [
-        { required: true, message: 'Please enter your email', trigger: 'blur' },
-        { type: 'email', message: 'Please enter a valid email address', trigger: ['blur', 'change'] },
-    ],
-    phone_number: [
-        { required: true, message: 'Please enter your phone number', trigger: 'blur' },
-        { pattern: /^\d{10}$/, message: 'Please enter a valid 10-digit phone number', trigger: 'blur' },
-    ],
-    amount: [
-        { required: true, message: 'Please enter a bid amount', trigger: 'blur' },
-        { validator: minAmount, trigger: 'blur' },
-        { pattern: /^\d+(\.\d+)?$/, message: 'Please enter a valid number', trigger: 'blur' },
-    ]
-});
-
 
 
 const global_loading = ref(); // should not have an initial value or type because of the way ElLoading.service works
@@ -87,7 +51,6 @@ onMounted(async () => {
     console.log("route.params.token_meta_id", route.params.token_meta_id)
     await getTokenMetaByIDWithListener(route.params.token_meta_id, (meta) => {
         token_meta.value = meta;
-        form.value.token_meta_id = meta.id;
         global_loading.value.close();
     });
     // await getBidListByTokenMetaIDWithListener(route.params.token_meta_id, (bids) => {
@@ -95,42 +58,6 @@ onMounted(async () => {
     //     global_loading.value.close();
     // });
 });
-
-const heighest_bid = computed(() => {
-    if (bid_list.value.length === 0) {
-        return null;
-    }
-    // return highest bid in bid_list
-    return bid_list.value.reduce((prev, current) => {
-        return (prev.entity.amount > current.entity.amount) ? prev : current
-    });
-});
-
-const submit = async (formEl: FormInstance | undefined) => {
-    if (!formEl) {
-        showError(`Error finding form element`);
-        return;
-    }
-    const valid = await formEl.validate((v) => v);
-    if (!valid) {
-        return;
-    }
-    submit_loading.value = true;
-
-    // submit bid 
-    await createBid(form.value).then(() => {
-        submit_loading.value = false;
-        formEl.resetFields();
-        ElMessage({
-            type: 'success',
-            message: 'Successfully submitted bid!',
-        })
-    }).catch((err) => {
-        submit_loading.value = false;
-        showError(err);
-    })
-
-};
 
 
 
@@ -144,32 +71,18 @@ const submit = async (formEl: FormInstance | undefined) => {
     font-family: Arial, Helvetica, sans-serif;
 }
 
-.top-bid {
-    margin-top: 20px;
-    padding-top: 20px;
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.8s;
 }
 
-
-.bid-name {
-    font-weight: bold;
-    margin-right: 10px;
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
 }
 
-.bid-form {
-    margin-top: 40px;
-}
-
-.submit-button {
-    margin-top: 20px;
-}
-
-@media (max-width: 768px) {
-    .bid-form {
-        flex-wrap: wrap;
-    }
-
-    .el-form-item {
-        width: 100% !important;
-    }
+.fade-enter-to,
+.fade-leave-from {
+    opacity: 1;
 }
 </style>
