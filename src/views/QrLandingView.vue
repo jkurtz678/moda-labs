@@ -13,14 +13,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed } from 'vue';
+import { ref, reactive, onMounted, computed, watch } from 'vue';
 import { showError } from "@/util/util";
 import type { FormInstance, FormRules } from "element-plus";
 import ArtPreviewHeader from '@/components/ArtPreviewHeader.vue';
 import type { Bid, TokenMeta, FirestoreDocument } from "@/types/types";
 import { getBidListByTokenMetaIDWithListener, createBid } from "@/api/bid";
 import { getTokenMetaByIDWithListener } from "@/api/token-meta";
-import { Timestamp } from "firebase/firestore"
 import { ElLoading } from 'element-plus'
 import { ElMessage } from 'element-plus'
 import { useRoute } from 'vue-router';
@@ -29,7 +28,6 @@ const route = useRoute();
 const formRef = ref<FormInstance>();
 
 
-const bid_list = ref<FirestoreDocument<Bid>[]>([]);
 const token_meta = ref<FirestoreDocument<TokenMeta>>();
 
 
@@ -44,23 +42,37 @@ onMounted(async () => {
         return;
     }
 
+    fetchTokenMeta(route.params.token_meta_id);
+});
+
+watch(
+    () => route.params.token_meta_id, // Watch this value
+    (newVal, oldVal) => {
+        if (!newVal || newVal instanceof Array) {
+            showError(`Error invalid token meta id`);
+            return;
+        }
+
+        if (newVal !== oldVal) {
+            fetchTokenMeta(newVal); // Call API when token_meta_id changes
+        }
+    }
+);
+
+const fetchTokenMeta = async (token_meta_id: string) => {
     global_loading.value = ElLoading.service({
         lock: true,
         text: 'Loading',
         background: 'rgba(0, 0, 0, 0.7)',
     })
-    console.log("route.params.token_meta_id", route.params.token_meta_id)
-    await getTokenMetaByIDWithListener(route.params.token_meta_id, (meta) => {
+    await getTokenMetaByIDWithListener(token_meta_id, (meta) => {
         token_meta.value = meta;
+    }).catch((err) => {
+        showError(`Error fetching token meta: ${err}`);
+    }).finally(() => {
         global_loading.value.close();
     });
-    // await getBidListByTokenMetaIDWithListener(route.params.token_meta_id, (bids) => {
-    //     bid_list.value = bids;
-    //     global_loading.value.close();
-    // });
-});
-
-
+}
 
 </script>
 
