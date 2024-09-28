@@ -6,8 +6,8 @@
             <div style="padding: 20px 0px; display: flex; gap: 10px; width: 100%;">
                 <el-button color="#000000" size="large" @click="tipArtist" style="flex-grow: 1; font-size: 18px;"
                     round>Tip Artist</el-button>
-                <!-- <el-button v-if="token_meta?.entity.permission_to_sell" color="#000000" size="large"
-                    style="flex-grow: 1; font-size: 18px;" round>Place A Bid</el-button> -->
+                <el-button v-if="token_meta?.entity.permission_to_sell" color="#000000" size="large"
+                    style="flex-grow: 1; font-size: 18px;" round>Place A Bid</el-button>
             </div>
             <div style="padding: 12px 0px; ">
                 <div style="font-size: var(--el-font-size-extra-small);">Learn More</div>
