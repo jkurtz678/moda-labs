@@ -28,3 +28,14 @@ export const createBid = async (bid: Bid): Promise<FirestoreDocument<Bid>> => {
     const snapshot = await getDoc(document)
     return { id: document.id, entity: snapshot.data() as Bid }
 }
+
+// getAllBidsWithListener returns a list of all bids with a firebase listener callback
+export const getAllBidsWithListener = async (onChange: (arr: FirestoreDocument<Bid>[]) => void) => {
+    const unsubscribe = await onSnapshot(query(bid_ref), (query_snapshot) => {
+        const bids: FirestoreDocument<Bid>[] = [];
+        query_snapshot.forEach((doc) => {
+            bids.push({ id: doc.id, entity: doc.data() as Bid})
+        })
+        onChange(bids)
+    })
+}
