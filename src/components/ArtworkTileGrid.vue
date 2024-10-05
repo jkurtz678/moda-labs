@@ -91,9 +91,10 @@ const all_tokens = computed(() => {
     //      return Array(1000).fill(token_meta)
     // })
     // return all_token_metas
-    return token_meta_store.sorted_all_token_metas.filter((token_meta) => {
-        return Boolean(token_meta.entity.aspect_ratio)
-    });
+    return token_meta_store.sorted_all_token_metas
+    // return token_meta_store.sorted_all_token_metas.filter((token_meta) => {
+    //     return Boolean(token_meta.entity.aspect_ratio)
+    // });
 })
 
 

@@ -53,7 +53,11 @@
             </el-select>
         </el-form-item>
         <el-form-item v-if="!props.token_meta_id">
-            <el-upload class="upload-demo" :auto-upload="false" action="" :on-remove="handleRemove"
+            <el-radio-group v-if="account_store.get_account.entity?.email == 'jkurtz678@gmail.com'" v-model="submission_type">
+                <el-radio value="file_upload">Upload File</el-radio>
+                <el-radio value="browser_link">Web Browser Link</el-radio>
+            </el-radio-group>
+            <el-upload v-if="submission_type === 'file_upload'" class="upload-demo" :auto-upload="false" action="" :on-remove="handleRemove"
                 :before-remove="beforeRemove" :limit="1" drag v-model:file-list="file_list">
                 <el-icon class="el-icon--upload">
                     <upload-filled />
@@ -62,6 +66,7 @@
                     Drop file here or <em>click to upload</em>
                 </div>
             </el-upload>
+            <el-input v-else v-model="form.browser_media_url"></el-input>
         </el-form-item>
         <el-form-item>
             <el-button @click="submit(formRef)" :loading="loading" color="#000000">
@@ -110,6 +115,7 @@ const form = ref<TokenMeta>({
     updated_at: Timestamp.now(),
     media_id: "",
     media_type: "",
+    browser_media_url: "",
     user_id: "",
     blockchain: Blockchain.OffChain,
     asset_contract_address: "",
@@ -132,6 +138,7 @@ const selected_galleries = ref<string[]>([]);
 const account_store = useAccountStore();
 const token_meta_store = useTokenMetaStore();
 const gallery_list = ref<FirestoreDocument<Gallery>[]>([]);
+const submission_type = ref("file_upload");
 
 onMounted(() => {
     if (props.token_meta_id) {
@@ -188,21 +195,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         updateToken(props.token_meta_id);
         return
     }
-
-    // continue to file upload
-    if (file_list?.value?.length !== 1) {
-        showError(`Please add a file to upload`);
-        return;
-    }
-
-    await startFileUpload(formEl);
-};
-
-const startFileUpload = async (formEl: FormInstance) => {
-    const file = file_list.value[0]
-
     loading.value = true;
-
     // first get a token meta document ref, we will use the document id to save the file
     const ref = await getTokenMetaDocumentRef().catch(err => {
         console.error(err)
@@ -210,14 +203,38 @@ const startFileUpload = async (formEl: FormInstance) => {
         showError(`Error getting moda archive token meta document - ${err}`);
     });
     if (!ref) {
+        loading.value = false;
         return
     }
+
+    if (submission_type.value === 'browser_link') {
+        finishSubmission(formEl, ref)
+        return
+    }
+
+    // continue to file upload
+    if (file_list?.value?.length !== 1) {
+        showError(`Please add a file to upload`);
+        loading.value = false;
+        return;
+    }
+
+
+    await startFileUpload(formEl, ref);
+};
+
+const startFileUpload = async (formEl: FormInstance, ref: DocumentReference) => {
+    const file = file_list.value[0]
+
+    loading.value = true;
 
     const progressCallback = (progress: number) => {
         loading_progress.value = `${Math.round(progress * 100)}%`
     }
     const successCallback = () => {
-        uploadSuccess(formEl, file, ref)
+        form.value.media_id = `${ref.id}`
+        form.value.media_type = `.${file.name.split(".").pop()}`
+        finishSubmission(formEl, ref)
     }
 
     const file_uri = `${ref.id}.${file.name.split(".").pop()}`;
@@ -229,10 +246,7 @@ const startFileUpload = async (formEl: FormInstance) => {
         });
 }
 
-const uploadSuccess = async (formEl: FormInstance, file: UploadUserFile, ref: DocumentReference) => {
-    form.value.media_id = `${ref.id}`
-    form.value.media_type = `.${file.name.split(".").pop()}`
-
+const finishSubmission = async (formEl: FormInstance, ref: DocumentReference) => {
     let new_token_meta: FirestoreDocument<TokenMeta>;
     try {
         new_token_meta = await createTokenMetaWithReference(ref, form.value)

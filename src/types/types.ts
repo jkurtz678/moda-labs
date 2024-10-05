@@ -103,6 +103,7 @@ export interface TokenMeta extends BaseDocument {
     public_link?: string; // link to public site for art, such as opensea listing. Embedded in plaque qr code link
     media_id: string; // uid of media in firebase storage
     media_type: string; // file extension of media e.g. .mp4
+    browser_media_url: string; // browser based art url
     user_id?: string; // wallet address from the associated account 
     blockchain?: Blockchain; // ethereum, off-chain
     asset_contract_address?: string; // contract address for ethereum token
