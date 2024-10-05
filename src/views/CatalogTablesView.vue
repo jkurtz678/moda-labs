@@ -1,23 +1,31 @@
 <template>
-    <div style="overflow-y: auto; height: 100%">
-        <div class="container">
-            <div v-for="artist of artist_list_sorted" :key="artist" style="margin: 24px 0px;">
-                <h1>{{ artist }}</h1>
-                <div style="display: flex; margin: -12px; flex-wrap: wrap;">
-                    <CatalogArtTile v-for="t of artist_to_token_list_map[artist]" :token_meta="t">
-                    </CatalogArtTile>
-                </div>
-            </div>
-        </div>
+    <div class="container">
+        <h2>{{ `Artwork On Sale (${table_items.length} total)` }}</h2>
+        <el-table height="350" :data="table_items" style="width: 100%; overflow-y: auto;">
+            <el-table-column prop="artist" label="Artist" />
+            <el-table-column prop="name" label="Name" />
+            <el-table-column prop="price" label="Price" width="100" />
+            <el-table-column prop="price_unit" label="Price Unit" width="100" />
+        </el-table>
+
+        <h2 style="padding-top: 20px;">{{ `All Bids (${bid_table_items.length} total)` }}</h2>
+        <el-table height="350" :data="bid_table_items" style="width: 100%; overflow-y: auto;">
+            <el-table-column prop="bidding_name" label="Name" />
+            <el-table-column prop="email" label="Email" />
+            <el-table-column prop="phone_number" label="Phone Number" />
+            <el-table-column prop="amount" label="Amount" />
+            <el-table-column prop="amount_unit" label="Unit" />
+            <el-table-column prop="artist_name" label="Artist Name" />
+            <el-table-column prop="artwork_name" label="Artwork Name" />
+        </el-table>
     </div>
 </template>
 <script lang="ts" setup>
 import { getAllBidsWithListener } from '@/api/bid';
 import { getAllTokenMetasOnSaleWithListener } from '@/api/token-meta';
-import { priceDisplay, type Bid, type FirestoreDocument, type TokenMeta } from '@/types/types';
+import type { Bid, FirestoreDocument, TokenMeta } from '@/types/types';
 import { showError } from '@/util/util';
 import { computed, onMounted, ref } from 'vue';
-import CatalogArtTile from '@/components/CatalogArtTile.vue';
 
 const token_metas = ref<FirestoreDocument<TokenMeta>[]>([]);
 const bids = ref<FirestoreDocument<Bid>[]>([]);
@@ -38,27 +46,6 @@ const table_items = computed(() => {
             }
             return a.artist.localeCompare(b.artist)
         });
-})
-
-const artist_list_sorted = computed(() => {
-
-
-    return Array.from(new Set(token_metas.value.map((token_meta) => token_meta.entity.artist || "")))
-        .sort((a, b) => a.localeCompare(b));
-})
-
-const artist_to_token_list_map = computed(() => {
-    return token_metas.value.reduce((acc, token_meta) => {
-        if (!token_meta.entity.artist) {
-            return acc
-        }
-
-        if (!acc[token_meta.entity.artist]) {
-            acc[token_meta.entity.artist] = [];
-        }
-        acc[token_meta.entity.artist].push(token_meta);
-        return acc;
-    }, {} as Record<string, FirestoreDocument<TokenMeta>[]>);
 })
 
 const token_meta_map = computed(() => {
@@ -84,7 +71,7 @@ const bid_table_items = computed(() => {
             }
         })
         .sort((a, b) => {
-            if (!a?.artwork_name || !b?.artwork_name) {
+            if (!a?.artwork_name|| !b?.artwork_name) {
                 return 0
             }
             return a.artwork_name.localeCompare(b.artwork_name)
@@ -112,7 +99,7 @@ onMounted(async () => {
 
 <style>
 .container {
-    max-width: 1250px;
+    max-width: 900px;
     padding: 20px;
     margin: 0 auto;
 }

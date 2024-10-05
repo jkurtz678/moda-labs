@@ -223,6 +223,17 @@ export function getPlatformDisplay(plat: TokenPlatform): string {
     }
 }
 
+export function priceDisplay(t: FirestoreDocument<TokenMeta>): string {
+    switch (t?.entity?.price_unit) {
+        case PriceUnit.USD:
+            return `$${t?.entity?.price}`
+        case PriceUnit.ETH:
+            return `${t?.entity?.price} ETH`
+        default:
+            return ""
+    }
+}
+
 // getTokenMetaThumbnailImageURL returns the url to the thumbnail image for a token meta
 export async function getTokenMetaThumbnailImageURL(token_meta: FirestoreDocument<TokenMeta>): Promise<string> {
     // first check if archive thumbnail image exist in firebase storage
