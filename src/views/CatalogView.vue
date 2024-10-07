@@ -2,7 +2,7 @@
     <div style="overflow-y: auto; height: 100%">
         <div class="container">
             <div v-for="artist of artist_list_sorted" :key="artist" style="margin: 24px 0px;">
-                <h1>{{ artist }}</h1>
+                <h1 style="font-weight: bold;">{{ artist }}</h1>
                 <div style="display: flex; margin: -12px; flex-wrap: wrap;">
                     <CatalogArtTile v-for="t of artist_to_token_list_map[artist]" :token_meta="t">
                     </CatalogArtTile>
