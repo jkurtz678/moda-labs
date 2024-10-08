@@ -72,7 +72,7 @@ const fetchTokenMeta = async (token_meta_id: string) => {
 
 </script>
 
-<style >
+<style scoped>
 .container {
     max-width: 500px;
     margin: 0 auto;

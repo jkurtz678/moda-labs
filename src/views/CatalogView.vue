@@ -1,8 +1,9 @@
 <template>
     <div style="overflow-y: auto; height: 100%">
+        <CatalogHeader></CatalogHeader>
         <div class="container">
             <div v-for="artist of artist_list_sorted" :key="artist" style="margin: 24px 0px;">
-                <h1 style="font-weight: bold;">{{ artist }}</h1>
+                <h1 style="font-weight: bold; overflow-wrap: break-word;">{{ artist }}</h1>
                 <div style="display: flex; margin: -12px; flex-wrap: wrap;">
                     <CatalogArtTile v-for="t of artist_to_token_list_map[artist]" :token_meta="t">
                     </CatalogArtTile>
@@ -17,7 +18,8 @@ import { getAllTokenMetasOnSaleWithListener } from '@/api/token-meta';
 import { priceDisplay, type Bid, type FirestoreDocument, type TokenMeta } from '@/types/types';
 import { showError } from '@/util/util';
 import { computed, onMounted, ref } from 'vue';
-import CatalogArtTile from '@/components/CatalogArtTile.vue';
+import CatalogArtTile from '@/components/catalog/CatalogArtTile.vue';
+import CatalogHeader from '@/components/catalog/CatalogHeader.vue';
 
 const token_metas = ref<FirestoreDocument<TokenMeta>[]>([]);
 const bids = ref<FirestoreDocument<Bid>[]>([]);
@@ -110,10 +112,10 @@ onMounted(async () => {
 });
 </script>
 
-<style>
+<style scoped>
 .container {
     max-width: 1250px;
-    padding: 20px;
+    padding: 80px 20px 20px 20px;
     margin: 0 auto;
 }
 </style>

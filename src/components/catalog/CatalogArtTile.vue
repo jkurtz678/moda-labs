@@ -1,14 +1,14 @@
 <template>
-    <el-card style="margin: 12px; width: 340px;"
+    <div class="tile-container" style="margin: 12px; width: 340px;"
         @click="router.push({ name: 'qr-landing', params: { token_meta_id: props.token_meta.id } })">
-        <div style="display: flex; flex-direction: column">
-            <div style="display: flex; justify-content: center; background-color: #eeeeee; flex-grow: 1;">
-                <img :src="thumbnail_url" style="max-width: 100%; min-width: 140px; max-height: 240px; object-fit: contain;" />
+        <div style="display: flex; flex-direction: column; height: 100%;">
+            <div style="display: flex; border-radius: 18px; flex-grow: 1;">
+                <img :src="thumbnail_url" />
             </div>
             <h2 style="font-weight: bold">{{ props.token_meta.entity.name }}</h2>
             <div>{{ priceDisplay(props.token_meta) }}</div>
         </div>
-    </el-card>
+    </div>
 </template>
 <script lang="ts" setup>
 import { useMediumThumbnail } from '@/composables/thumbnail-image';
@@ -26,3 +26,28 @@ const props = defineProps<ArtPreviewHeaderProps>();
 const thumbnail_url = useMediumThumbnail(toRef(props, "token_meta"));
 
 </script>
+
+<style scoped>
+:deep(.el-card__body) {
+    height: 100%;
+}
+
+img {
+    border-radius: 18px;
+    max-width: 100%;
+    min-width: 140px;
+    max-height: 400px; 
+    object-fit: contain;
+    transition-property: box-shadow, height;
+    transition-duration: 0.5s, 0.3s;
+    transition-timing-function: ease-out ease-out;
+}
+
+img:hover {
+  box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.7);
+}
+
+.tile-container {
+    cursor: pointer;
+}
+</style>
