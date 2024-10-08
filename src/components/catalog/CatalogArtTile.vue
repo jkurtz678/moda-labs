@@ -1,6 +1,6 @@
 <template>
     <div class="tile-container" style="margin: 12px; width: 340px;"
-        @click="router.push({ name: 'qr-landing', params: { token_meta_id: props.token_meta.id } })">
+        @click="router.push({ name: 'actions', params: { token_meta_id: props.token_meta.id } })">
         <div style="display: flex; flex-direction: column; height: 100%;">
             <div style="display: flex; border-radius: 18px; flex-grow: 1;">
                 <img :src="thumbnail_url" />
