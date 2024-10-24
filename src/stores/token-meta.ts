@@ -91,7 +91,15 @@ export const useTokenMetaStore = defineStore({
             if(account_store.is_user_admin) {
                 await getAllTokenMetasWithListener((token_metas) => {
                     // filter out invalid tokens
-                    this.archive_token_meta_list = token_metas.filter(t => t.entity.external_media_url || t.entity.media_id || t.entity.browser_media_url);
+                    this.archive_token_meta_list = token_metas.filter(t => {
+
+                        // filter out the nsfw stuff
+                        if( t.entity.user_id === "AJZLGgjxYCgCyxVIOStbS4TDuRF3" ) {
+                            return false
+                        }
+
+                        return t.entity.external_media_url || t.entity.media_id || t.entity.browser_media_url
+                    });
                 })
                 return
             }

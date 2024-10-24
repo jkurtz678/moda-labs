@@ -2,8 +2,8 @@
     <div style="overflow-y: auto; height: 100%">
         <CatalogHeader></CatalogHeader>
         <div class="container">
-            <div v-for="artist of artist_list_sorted" :key="artist" style="margin: 24px 0px;">
-                <h1 style="font-weight: bold; overflow-wrap: break-word;">{{ artist }}</h1>
+            <div v-for="artist of artist_list_sorted" :key="artist" style="margin: 20px 0px;">
+                <h1 style="font-weight: bold; font-size: 2.8em; padding: 48px 0px 24px 0px;">{{ artist }}</h1>
                 <div style="display: flex; margin: -12px; flex-wrap: wrap;">
                     <CatalogArtTile v-for="t of artist_to_token_list_map[artist]" :token_meta="t">
                     </CatalogArtTile>

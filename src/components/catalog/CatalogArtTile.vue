@@ -5,7 +5,7 @@
             <div style="display: flex; border-radius: 18px; flex-grow: 1;">
                 <img :src="thumbnail_url" />
             </div>
-            <h2 style="font-weight: bold">{{ props.token_meta.entity.name }}</h2>
+            <h2 style="font-weight: bold; overflow-wrap: break-word;">{{ props.token_meta.entity.name }}</h2>
             <div>{{ priceDisplay(props.token_meta) }}</div>
         </div>
     </div>
