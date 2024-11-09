@@ -152,6 +152,19 @@ const router = createRouter({
       path: '/catalog',
       name: 'catalog',
       component: () => import('@/views/CatalogView.vue'),
+      children: [
+        {
+          path: '', 
+          name: 'catalog-gallery-list',
+          component: () => import('@/components/catalog/CatalogGalleryList.vue')
+        },
+        {
+          path: ':gallery_id', 
+          name: 'catalog-gallery-detail',
+          component: () => import('@/components/catalog/CatalogGalleryDetail.vue'),
+          props: true
+        }
+      ]
     },
     /*  {
        path: '/login',

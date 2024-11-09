@@ -53,7 +53,7 @@
             </el-select>
         </el-form-item>
         <el-form-item v-if="!props.token_meta_id">
-            <el-radio-group v-if="account_store.get_account.entity?.email == 'jkurtz678@gmail.com'" v-model="submission_type">
+            <el-radio-group v-if="account_store.is_user_admin" v-model="submission_type">
                 <el-radio value="file_upload">Upload File</el-radio>
                 <el-radio value="browser_link">Web Browser Link</el-radio>
             </el-radio-group>
