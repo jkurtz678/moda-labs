@@ -82,6 +82,10 @@ const gallery_store = useGalleryStore();
 const { screen_type } = useBreakpoints();
 
 const platform = computed(() => {
+  if(props.token_meta.entity.browser_media_url) {
+    return "External Generative"
+  }
+
   return getPlatformDisplay(props.token_meta.entity.platform)
 })
 
