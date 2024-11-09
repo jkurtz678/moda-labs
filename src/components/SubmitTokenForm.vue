@@ -52,12 +52,12 @@
                     :value="gallery.id" />
             </el-select>
         </el-form-item>
-        <el-form-item v-if="!props.token_meta_id">
-            <el-radio-group v-if="account_store.get_account.entity?.email == 'jkurtz678@gmail.com'" v-model="submission_type">
+        <el-form-item>
+            <el-radio-group v-if="account_store.get_account.entity?.email == 'jkurtz678@gmail.com'" v-model="submission_type" :disabled="props.token_meta_id">
                 <el-radio value="file_upload">Upload File</el-radio>
                 <el-radio value="browser_link">Web Browser Link</el-radio>
             </el-radio-group>
-            <el-upload v-if="submission_type === 'file_upload'" class="upload-demo" :auto-upload="false" action="" :on-remove="handleRemove"
+            <el-upload v-if="submission_type === 'file_upload' && !props.token_meta_id" class="upload-demo" :auto-upload="false" action="" :on-remove="handleRemove"
                 :before-remove="beforeRemove" :limit="1" drag v-model:file-list="file_list">
                 <el-icon class="el-icon--upload">
                     <upload-filled />
@@ -66,7 +66,7 @@
                     Drop file here or <em>click to upload</em>
                 </div>
             </el-upload>
-            <el-input v-else v-model="form.browser_media_url"></el-input>
+            <el-input v-else-if="submission_type=='browser_link'" v-model="form.browser_media_url"></el-input>
         </el-form-item>
         <el-form-item>
             <el-button @click="submit(formRef)" :loading="loading" color="#000000">
@@ -146,6 +146,7 @@ onMounted(() => {
         if (!form.value.price_unit) {
             form.value.price_unit = PriceUnit.USD
         }
+        submission_type.value = form.value.browser_media_url ? 'browser_link' : 'file_upload'
     } else {
         // only show galleries for new tokens for now
         getAllGalleries().then((galleries) => {
