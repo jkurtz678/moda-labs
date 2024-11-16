@@ -23,7 +23,7 @@
     "firebase-functions": "^4.6.0",
     "fluent-ffmpeg": "^2.1.2",
     "mkdirp": "^1.0.4",
-    "sharp": "^0.32.4"
+    "sharp": "^0.32.6"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.44.0",
