@@ -323,3 +323,42 @@ export async function getSourceFile(token_meta: FirestoreDocument<TokenMeta>): P
 export function getTokenMetaFileName(token_meta: FirestoreDocument<TokenMeta>): string {
     return `${token_meta.entity.media_id}${token_meta.entity.media_type}`
 }
+
+export async function getTokenMetaAnimationURL(token_meta: FirestoreDocument<TokenMeta>): Promise<string> {
+    const storage = getStorage();
+
+    // First check if tile image exists in Firebase Storage
+    const tile_path_ref = ref(storage, `tile/tile_${token_meta.entity.media_id}.webp`);
+    try {
+        const url = await getDownloadURL(tile_path_ref);
+        return url;
+    } catch (err) {
+        console.log(`getTokenMetaMediumImageURL - failed to find tile image ${token_meta.entity.name}`, err);
+    }
+
+    // Fallback to medium image
+    const medium_path_ref = ref(storage, `medium_${token_meta.entity.media_id}.jpg`);
+    try {
+        const url = await getDownloadURL(medium_path_ref);
+        return url;
+    } catch (err) {
+        console.log(`getTokenMetaMediumImageURL - failed to find medium image ${token_meta.entity.name}`, err);
+    }
+
+    // Then fallback to thumbnail if it exists
+    const thumbnail_path_ref = ref(storage, `thumb_${token_meta.entity.media_id}.jpg`);
+    try {
+        const url = await getDownloadURL(thumbnail_path_ref);
+        return url;
+    } catch (err) {
+        console.log(`getTokenMetaMediumImageURL - failed to find thumbnail image ${token_meta.entity.name}`, err);
+    }
+
+    // Check external thumbnail URL
+    if (token_meta.entity.external_thumbnail_url) {
+        return token_meta.entity.external_thumbnail_url;
+    }
+
+    // Return placeholder image as a last resort
+    return new URL(`../assets/logo.png`, import.meta.url).href;
+}

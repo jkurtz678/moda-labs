@@ -11,7 +11,7 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { useMediumThumbnail } from '@/composables/thumbnail-image';
+import { useTileAnimation } from '@/composables/thumbnail-image';
 import { FirestoreDocument, priceDisplay, TokenMeta } from '@/types/types';
 import { toRef } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -23,7 +23,7 @@ interface ArtPreviewHeaderProps {
 
 }
 const props = defineProps<ArtPreviewHeaderProps>();
-const thumbnail_url = useMediumThumbnail(toRef(props, "token_meta"));
+const thumbnail_url = useTileAnimation(toRef(props, "token_meta"));
 
 </script>
 
