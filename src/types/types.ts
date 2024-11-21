@@ -225,6 +225,9 @@ export function getPlatformDisplay(plat: TokenPlatform): string {
 }
 
 export function priceDisplay(t: FirestoreDocument<TokenMeta>): string {
+    if(!t?.entity?.price) {
+        return ""
+    }
     switch (t?.entity?.price_unit) {
         case PriceUnit.USD:
             return `$${t?.entity?.price}`

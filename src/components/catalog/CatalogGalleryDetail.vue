@@ -1,8 +1,13 @@
 <template>
     <div>
         <h1 style="font-weight: bold; font-size: 2.8em; padding-top: 1.5em;">{{ gallery?.entity.name }}</h1>
-        <div style="white-space: pre-wrap;">{{ description }}</div>
-        <div v-for="artist of artist_list_sorted" :key="artist" style="margin: 20px 0px;">
+        <template v-if="description">
+            <div style="white-space: pre-wrap;">{{ description }}</div>
+        </template>
+        <div v-if="artist_list_sorted.length == 0">
+            <h1 style="font-weight: bold; font-size: 2.8em; padding: 48px 0px 24px 0px;">No Artworks</h1>
+        </div>
+        <div v-else v-for="artist of artist_list_sorted" :key="artist" style="margin: 20px 0px;">
             <h1 style="font-weight: bold; font-size: 2.8em; padding: 48px 0px 24px 0px;">{{ artist }}</h1>
             <div style="display: flex; margin: -12px; flex-wrap: wrap;">
                 <CatalogArtTile v-for="t of artist_to_token_list_map[artist]" :token_meta="t">
@@ -31,9 +36,9 @@ const token_metas = ref<FirestoreDocument<TokenMeta>[]>([]);
 const bids = ref<FirestoreDocument<Bid>[]>([]);
 const gallery = ref<FirestoreDocument<Gallery>>();
 const gallery_desc: Record<string, string> = {
-    'XoE4gdUpdZJ5dcdGRHH3': `Presenting “Sequencer :: 002 — MICRO MYTHOLOGIES” a design and media art group exhibition featuring a curation of new media artists exploring generative systems, mythical biology, micro organisms, and unseen or endangered parts of our world. This second edition will feature artists working in: Film, Animation, Light, Generative Art, Projection, Performance, and Time. Hosted at 821 Mateo St, SEQUENCER :: 002 will feature a gallery exhibition and an afterparty featuring Live performances by Spencer Sterling, Ninocence and DJ FUCK.
+//     'XoE4gdUpdZJ5dcdGRHH3': `Presenting “Sequencer :: 002 — MICRO MYTHOLOGIES” a design and media art group exhibition featuring a curation of new media artists exploring generative systems, mythical biology, micro organisms, and unseen or endangered parts of our world. This second edition will feature artists working in: Film, Animation, Light, Generative Art, Projection, Performance, and Time. Hosted at 821 Mateo St, SEQUENCER :: 002 will feature a gallery exhibition and an afterparty featuring Live performances by Spencer Sterling, Ninocence and DJ FUCK.
 
-​Presented by the combined forces at Projekt______, and Optic Nerve.`
+// ​Presented by the combined forces at Projekt______, and Optic Nerve.`
 }
 
 const description = computed(() => {
