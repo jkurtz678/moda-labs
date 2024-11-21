@@ -1,30 +1,39 @@
 <template>
     <div class="tile-container" style="margin: 12px; width: 340px;"
         @click="router.push({ name: 'actions', params: { token_meta_id: props.token_meta.id } })">
-        <div style="display: flex; flex-direction: column; height: 100%;">
+        <div style="display: flex; flex-direction: column; height: 100%;" ref="tile">
             <div style="display: flex; border-radius: 18px; flex-grow: 1;">
-                <img :src="thumbnail_url" />
+                <img v-if="isIntersecting" :src="thumbnail_url" />
             </div>
             <h2 style="font-weight: bold; overflow-wrap: break-word;">{{ props.token_meta.entity.name }}</h2>
             <div>{{ priceDisplay(props.token_meta) }}</div>
         </div>
     </div>
 </template>
+
 <script lang="ts" setup>
-import { useMediumThumbnail } from '@/composables/thumbnail-image';
+import { useTileAnimation } from '@/composables/thumbnail-image';
 import { FirestoreDocument, priceDisplay, TokenMeta } from '@/types/types';
-import { toRef } from 'vue';
+import { toRef, ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useLazyLoad } from '@/composables/lazy-load';
 
 const route = useRoute();
 const router = useRouter();
 interface ArtPreviewHeaderProps {
     token_meta: FirestoreDocument<TokenMeta>;
-
 }
 const props = defineProps<ArtPreviewHeaderProps>();
-const thumbnail_url = useMediumThumbnail(toRef(props, "token_meta"));
+const thumbnail_url = useTileAnimation(toRef(props, "token_meta"));
 
+const { isIntersecting, observe } = useLazyLoad("600px");
+const tile = ref<HTMLElement | null>(null);
+
+onMounted(() => {
+    if (tile.value) {
+        observe(tile.value);
+    }
+});
 </script>
 
 <style scoped>
@@ -37,7 +46,7 @@ img {
     max-width: 100%;
     min-width: 140px;
     max-height: 400px; 
-    object-fit: contain;
+    margin: auto auto 0 0;
     transition-property: box-shadow, height;
     transition-duration: 0.5s, 0.3s;
     transition-timing-function: ease-out ease-out;

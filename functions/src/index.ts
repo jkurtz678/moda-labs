@@ -28,6 +28,9 @@ const MEDIUM_MAX_HEIGHT = 960;
 const MEDIUM_MAX_WIDTH = 960;
 const MEDIUM_PREFIX = 'medium_';
 
+const TILE_PREFIX = 'tile_';
+const DOWNSCALE_PREFIX = 'ds_';
+
 const generateThumbnail = async (object: any) => {
     functions.logger.log('Generating thumbnail for', object);
     // File and directory paths.
@@ -44,6 +47,16 @@ const generateThumbnail = async (object: any) => {
 
     if (file_name.startsWith(MEDIUM_PREFIX)) {
         functions.logger.log('Already a Medium.');
+        return null;
+    }
+
+    if (file_name.startsWith(TILE_PREFIX)) {
+        functions.logger.log('Already a Tile.');
+        return null;
+    }
+
+    if (file_name.startsWith(DOWNSCALE_PREFIX)) {
+        functions.logger.log('Already a Downscale.');
         return null;
     }
 

@@ -20,23 +20,23 @@
       <template v-if="show_detail">
         <div style="display: flex; align-items: center;">
           <el-tooltip class="box-item" effect="dark" content="Edit art data" placement="top">
-            <el-button icon="Edit" text circle
+            <el-button icon="Edit" text circle size="large"
               @click.stop="router.push({ name: 'edit-artwork', params: { 'token_meta_id': props.token_meta.id } })">
             </el-button>
           </el-tooltip>
-          <el-tooltip class="box-item" effect="dark" content="Download art" placement="top">
-            <el-button icon="Download" text circle @click.stop="openArt"></el-button>
+          <el-tooltip class="box-item" effect="dark" content="View art" placement="top">
+            <el-button icon="PictureFilled" text circle @click.stop="openArt" size="large"></el-button>
           </el-tooltip>
           <el-tooltip class="box-item" effect="dark" content="Preview plaque" placement="top">
-            <el-button icon="Tickets" text circle @click.stop="previewPlaque"></el-button>
+            <el-button icon="Tickets" text circle @click.stop="previewPlaque" size="large"></el-button>
           </el-tooltip>
           <el-tooltip v-if="token_meta.entity.public_link" class="box-item" effect="dark" content="QR Code Link"
             placement="top">
-            <el-button icon="Link" text circle @click.stop="qrCodeLink"></el-button>
+            <el-button icon="Link" text circle @click.stop="qrCodeLink" size="large"></el-button>
           </el-tooltip>
           <el-tooltip v-if="account_store.is_user_admin" class="box-item" effect="dark" content="Delete Artwork"
             placement="top">
-            <el-button icon="Delete" text circle @click.stop="deleteConfirm"></el-button>
+            <el-button icon="Delete" text circle @click.stop="deleteConfirm" size="large"></el-button>
           </el-tooltip>
           <span v-if="media_size_display" style="font-size: 0.8em; padding-left: 1em; color: #606266">{{ media_size_display }}</span>
         </div>
@@ -82,11 +82,20 @@ const gallery_store = useGalleryStore();
 const { screen_type } = useBreakpoints();
 
 const platform = computed(() => {
+  if(props.token_meta.entity.browser_media_url) {
+    return "External Generative"
+  }
+
   return getPlatformDisplay(props.token_meta.entity.platform)
 })
 
 const openArt = async () => {
-  const url = await getSourceFile(props.token_meta);
+  let url;
+  if(props.token_meta.entity.browser_media_url) {
+    url = props.token_meta.entity.browser_media_url
+  } else {
+    url = await getSourceFile(props.token_meta);
+  }
 
   if (!url) {
     showError("Error getting source file")
@@ -302,4 +311,9 @@ img {
 .el-button+.el-button {
     margin-left: 8px;
 }
+
+::v-deep .el-button .el-icon {
+  font-size: 1.3em;
+}
+
 </style>
