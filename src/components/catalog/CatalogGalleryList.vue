@@ -2,11 +2,11 @@
   <div >
     <el-card @click="router.push({ name: 'catalog-gallery-detail', params: { gallery_id: 'CtmSolhMWKKqrSrch1L3' } });"
       class="card" style="
-       background-position: center -60px; 
+       background-position: center top; 
       background-repeat: no-repeat;
       background-image: url('https://firebasestorage.googleapis.com/v0/b/moda-archive.appspot.com/o/medium_WLPhhzVKsMMqwUv8IW4J.jpg?alt=media&token=a66d1586-3618-41bd-a0dd-9626eec08cd8');">
       <div class="overlay"></div>
-      <div style="padding: 40px;">
+      <div class="text-wrapper">
         <h1>Flux Festival</h1>
         <h2>November 23, 2024</h2>
       </div>
@@ -15,7 +15,7 @@
       class="card"
       style="background-image: url('https://firebasestorage.googleapis.com/v0/b/moda-archive.appspot.com/o/medium_EN2FVwhaMhA37E7skY0F.jpg?alt=media&token=7fada025-41ea-43d1-a4cb-f117b6d029a9');">
       <div class="overlay"></div>
-      <div style="padding: 40px;">
+      <div class="text-wrapper">
         <h1>Sequencer :: 002 — MICRO MYTHOLOGIES</h1>
         <h2>September 28, 2024</h2>
       </div>
@@ -32,14 +32,18 @@ const router = useRouter();
 <style scoped>
 .el-card {
   position: relative;
-  margin: 40px 0px;
+  margin: 40px auto;
   border-radius: 18px;
   cursor: pointer;
+  max-width:1000px;
   transition: box-shadow 0.3s, transform 0.3s;
   background-size: cover;
   background-position: center;
   color: white;
   overflow: hidden;
+}
+.text-wrapper {
+  padding: 0px 40px 20px 40px
 }
 
 .el-card .overlay {

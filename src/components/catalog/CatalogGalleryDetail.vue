@@ -1,10 +1,10 @@
 <template>
-    <div>
+    <div v-if="!artwork_loading?.visible">
         <h1 style="font-weight: bold; font-size: 2.8em; padding-top: 1.5em;">{{ gallery?.entity.name }}</h1>
         <template v-if="description">
             <div style="white-space: pre-wrap;">{{ description }}</div>
         </template>
-        <div v-if="artist_list_sorted.length == 0">
+        <div v-if="artist_list_sorted.length == 0 ">
             <h1 style="font-weight: bold; font-size: 2.8em; padding: 48px 0px 24px 0px;">No Artworks</h1>
         </div>
         <div v-else v-for="artist of artist_list_sorted" :key="artist" style="margin: 20px 0px;">
@@ -28,6 +28,7 @@ import CatalogArtTile from '@/components/catalog/CatalogArtTile.vue';
 import { useRoute } from 'vue-router';
 import { getGalleryTokenMetaByGalleryID } from '@/api/gallery-token';
 import { getGalleryByID } from '@/api/gallery';
+import { ElLoading } from 'element-plus';
 
 const route = useRoute();
 const gallery_id = route.params.gallery_id
@@ -35,10 +36,11 @@ const gallery_id = route.params.gallery_id
 const token_metas = ref<FirestoreDocument<TokenMeta>[]>([]);
 const bids = ref<FirestoreDocument<Bid>[]>([]);
 const gallery = ref<FirestoreDocument<Gallery>>();
+const artwork_loading = ref();
 const gallery_desc: Record<string, string> = {
-//     'XoE4gdUpdZJ5dcdGRHH3': `Presenting “Sequencer :: 002 — MICRO MYTHOLOGIES” a design and media art group exhibition featuring a curation of new media artists exploring generative systems, mythical biology, micro organisms, and unseen or endangered parts of our world. This second edition will feature artists working in: Film, Animation, Light, Generative Art, Projection, Performance, and Time. Hosted at 821 Mateo St, SEQUENCER :: 002 will feature a gallery exhibition and an afterparty featuring Live performances by Spencer Sterling, Ninocence and DJ FUCK.
+    //     'XoE4gdUpdZJ5dcdGRHH3': `Presenting “Sequencer :: 002 — MICRO MYTHOLOGIES” a design and media art group exhibition featuring a curation of new media artists exploring generative systems, mythical biology, micro organisms, and unseen or endangered parts of our world. This second edition will feature artists working in: Film, Animation, Light, Generative Art, Projection, Performance, and Time. Hosted at 821 Mateo St, SEQUENCER :: 002 will feature a gallery exhibition and an afterparty featuring Live performances by Spencer Sterling, Ninocence and DJ FUCK.
 
-// ​Presented by the combined forces at Projekt______, and Optic Nerve.`
+    // ​Presented by the combined forces at Projekt______, and Optic Nerve.`
 }
 
 /*
@@ -50,12 +52,12 @@ We cordially Invite you to the Flux Festival Saturday Exhibition Nov. 23rd at th
       the esteemed @nosajthing.
       */
 
-      /*
-       Presenting “Sequencer :: 002 — MICRO MYTHOLOGIES" a design and media art group exhibition featuring a curation of
-      new media artists exploring generative systems, mythical biology, micro organisms, and unseen or endangered parts
-      of our world. This second edition will feature artists working in: Film, Animation, Light, Generative Art,
-      Projection, Performance, and Time.
-      */
+/*
+ Presenting “Sequencer :: 002 — MICRO MYTHOLOGIES" a design and media art group exhibition featuring a curation of
+new media artists exploring generative systems, mythical biology, micro organisms, and unseen or endangered parts
+of our world. This second edition will feature artists working in: Film, Animation, Light, Generative Art,
+Projection, Performance, and Time.
+*/
 
 const description = computed(() => {
     if (!route.params.gallery_id || typeof route.params.gallery_id !== "string") {
@@ -140,6 +142,11 @@ onMounted(async () => {
         console.log("failed to get gallery id from params")
         return
     }
+    artwork_loading.value = ElLoading.service({
+        lock: true,
+        text: 'Loading',
+        background: 'rgba(0, 0, 0, 0.7)',
+    })
 
     getGalleryTokenMetaByGalleryID(route.params.gallery_id).then((gallery_token_metas) => {
         const token_meta_ids = gallery_token_metas.map((gtm) => gtm.entity.token_meta_id);
@@ -149,6 +156,8 @@ onMounted(async () => {
             token_metas.value = metas;
         }).catch((err) => {
             showError(`Error fetching token metas: ${err}`);
+        }).finally(() => {
+            artwork_loading.value.close();
         });
 
     }).catch((err) => {
