@@ -1,29 +1,28 @@
 <template>
-  <div>
-    <el-card @click="router.push({ name: 'catalog-gallery-detail', params: { gallery_id: 'CtmSolhMWKKqrSrch1L3' } });">
-      <h1>Flux Festival</h1>
-      November 23, 2024<br />
-
-      We cordially Invite you to the Flux Festival Saturday Exhibition Nov. 23rd at the beautiful Audry Irmas Pavillion
-      featuring Live Performances, New Media Art Gallery, VR films, and 3 floors of installations. Projekt Blank and
-      Flux Festival are co-curating the physical exhibition to highlight artists and filmmakers pioneering creative uses
-      of Ai and innovations in media art and film.
-      <br/>
-      Flux Festival culminates with live audio-visual performances by New York based @kevinpeterhe and @jakeoleson and
-      the esteemed @nosajthing.
+  <div >
+    <el-card @click="router.push({ name: 'catalog-gallery-detail', params: { gallery_id: 'CtmSolhMWKKqrSrch1L3' } });"
+      class="card" style="
+       background-position: center -60px; 
+      background-repeat: no-repeat;
+      background-image: url('https://firebasestorage.googleapis.com/v0/b/moda-archive.appspot.com/o/medium_WLPhhzVKsMMqwUv8IW4J.jpg?alt=media&token=a66d1586-3618-41bd-a0dd-9626eec08cd8');">
+      <div class="overlay"></div>
+      <div style="padding: 40px;">
+        <h1>Flux Festival</h1>
+        <h2>November 23, 2024</h2>
+      </div>
     </el-card>
-    <el-card @click="router.push({ name: 'catalog-gallery-detail', params: { gallery_id: 'vN1VWlc07Qo48dRTMKZw' } });">
-      <h1>Sequencer :: 002 — MICRO MYTHOLOGIES</h1>
-      September 28, 2024<br />
-
-      Presenting “Sequencer :: 002 — MICRO MYTHOLOGIES" a design and media art group exhibition featuring a curation of
-      new media artists exploring generative systems, mythical biology, micro organisms, and unseen or endangered parts
-      of our world. This second edition will feature artists working in: Film, Animation, Light, Generative Art,
-      Projection, Performance, and Time.
+    <el-card @click="router.push({ name: 'catalog-gallery-detail', params: { gallery_id: 'vN1VWlc07Qo48dRTMKZw' } });"
+      class="card"
+      style="background-image: url('https://firebasestorage.googleapis.com/v0/b/moda-archive.appspot.com/o/medium_EN2FVwhaMhA37E7skY0F.jpg?alt=media&token=7fada025-41ea-43d1-a4cb-f117b6d029a9');">
+      <div class="overlay"></div>
+      <div style="padding: 40px;">
+        <h1>Sequencer :: 002 — MICRO MYTHOLOGIES</h1>
+        <h2>September 28, 2024</h2>
+      </div>
     </el-card>
-
   </div>
 </template>
+
 <script lang="ts" setup>
 import { useRouter } from 'vue-router';
 
@@ -32,15 +31,41 @@ const router = useRouter();
 
 <style scoped>
 .el-card {
+  position: relative;
   margin: 40px 0px;
-  padding: 20px;
   border-radius: 18px;
   cursor: pointer;
   transition: box-shadow 0.3s, transform 0.3s;
+  background-size: cover;
+  background-position: center;
+  color: white;
+  overflow: hidden;
+}
+
+.el-card .overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1;
 }
 
 .el-card:hover {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   transform: translateY(-5px);
+}
+
+h1,
+h2 {
+  position: relative;
+  z-index: 2;
+}
+
+h1 {
+  font-weight: bold;
+  font-size: 2.8em;
+  padding: 24px 0px 24px 0px;
 }
 </style>

@@ -41,6 +41,22 @@ const gallery_desc: Record<string, string> = {
 // ​Presented by the combined forces at Projekt______, and Optic Nerve.`
 }
 
+/*
+We cordially Invite you to the Flux Festival Saturday Exhibition Nov. 23rd at the beautiful Audry Irmas Pavillion
+      featuring Live Performances, New Media Art Gallery, VR films, and 3 floors of installations. Projekt Blank and
+      Flux Festival are co-curating the physical exhibition to highlight artists and filmmakers pioneering creative uses
+      of Ai and innovations in media art and film.
+       Flux Festival culminates with live audio-visual performances by New York based @kevinpeterhe and @jakeoleson and
+      the esteemed @nosajthing.
+      */
+
+      /*
+       Presenting “Sequencer :: 002 — MICRO MYTHOLOGIES" a design and media art group exhibition featuring a curation of
+      new media artists exploring generative systems, mythical biology, micro organisms, and unseen or endangered parts
+      of our world. This second edition will feature artists working in: Film, Animation, Light, Generative Art,
+      Projection, Performance, and Time.
+      */
+
 const description = computed(() => {
     if (!route.params.gallery_id || typeof route.params.gallery_id !== "string") {
         console.log("failed to get gallery id from params")
