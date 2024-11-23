@@ -4,10 +4,10 @@
         </el-image>
         <h1 v-if="md_and_up" style="font-weight: bold">MODA CATALOG</h1>
         <div style="flex-grow: 1"></div>
-        <el-button link @click="goToGalleries" class="header-button">Exhibitions</el-button>
-        <el-button v-if="md_and_up" link @click="goToProjectBlank" class="header-button">Projekt _______</el-button>
-        <el-button v-if="md_and_up" link @click="goToModaPlaque" class="header-button">MODA Plaque</el-button>
-        <el-button color="#000000" size="large" @click="goToLogin">LOGIN</el-button>
+        <el-button link @click="goToGalleries" class="header-button toolbar-item">All Exhibitions</el-button>
+        <el-button v-if="md_and_up" link @click="goToProjectBlank" class="header-button toolbar-item">Projekt _______</el-button>
+        <el-button v-if="md_and_up" link @click="goToModaPlaque" class="header-button toolbar-item">MODA Plaque</el-button>
+        <!-- <el-button color="#000000" size="large" @click="goToLogin">LOGIN</el-button> -->
         <el-divider style="position: absolute; bottom: 0px; left: 0px; right: 0px; margin: 0px;"/>
     </el-header>
 </template>
@@ -53,10 +53,25 @@ const goToLogin = () => {
     z-index: 100;
 }
 
-.header-button{
+.header-button {
     font-size: 1.4em;
-    padding-left: .6em;
-    padding-right: .6em;
+    padding-left: .8em;
+    padding-right: .8em;
     font-weight: bold;
+}
+
+.toolbar-item {
+    background-color: transparent;
+    border: none;
+    color: #000;
+    padding: 0.5em 1em;
+    margin: 0 0.5em;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.toolbar-item:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
 }
 </style>

@@ -19,7 +19,6 @@
 </template>
 
 <script lang="ts" setup>
-import { getAllBidsWithListener } from '@/api/bid';
 import { getAllTokenMetasOnSaleWithListener, getTokenMetaListByIDList } from '@/api/token-meta';
 import { Gallery, priceDisplay, type Bid, type FirestoreDocument, type TokenMeta } from '@/types/types';
 import { showError } from '@/util/util';
@@ -38,18 +37,12 @@ const bids = ref<FirestoreDocument<Bid>[]>([]);
 const gallery = ref<FirestoreDocument<Gallery>>();
 const artwork_loading = ref();
 const gallery_desc: Record<string, string> = {
-    //     'XoE4gdUpdZJ5dcdGRHH3': `Presenting “Sequencer :: 002 — MICRO MYTHOLOGIES” a design and media art group exhibition featuring a curation of new media artists exploring generative systems, mythical biology, micro organisms, and unseen or endangered parts of our world. This second edition will feature artists working in: Film, Animation, Light, Generative Art, Projection, Performance, and Time. Hosted at 821 Mateo St, SEQUENCER :: 002 will feature a gallery exhibition and an afterparty featuring Live performances by Spencer Sterling, Ninocence and DJ FUCK.
-
-    // ​Presented by the combined forces at Projekt______, and Optic Nerve.`
+    'CtmSolhMWKKqrSrch1L3' : `The Flux Festival Saturday Exhibition takes place on Nov. 23rd at the beautiful Audry Irmas Pavillion featuring Live Performances, New Media Art Gallery, VR films, and 3 floors of installations. Projekt Blank and Flux Festival are co-curating the physical exhibition to highlight artists and filmmakers pioneering creative uses of Ai and innovations in media art and film.\n\n Flux Festival culminates with live audio-visual performances by New York based @kevinpeterhe and @jakeoleson and the esteemed @nosajthing.`,
+    'vN1VWlc07Qo48dRTMKZw': `Presenting “Sequencer :: 002 — MICRO MYTHOLOGIES” a design and media art group exhibition featuring a curation of new media artists exploring generative systems, mythical biology, micro organisms, and unseen or endangered parts of our world. This second edition will feature artists working in: Film, Animation, Light, Generative Art, Projection, Performance, and Time. Hosted at 821 Mateo St, SEQUENCER :: 002 will feature a gallery exhibition and an afterparty featuring Live performances by Spencer Sterling, Ninocence and DJ FUCK. \n\nPresented by the combined forces at Projekt______, and Optic Nerve.`
 }
 
 /*
-We cordially Invite you to the Flux Festival Saturday Exhibition Nov. 23rd at the beautiful Audry Irmas Pavillion
-      featuring Live Performances, New Media Art Gallery, VR films, and 3 floors of installations. Projekt Blank and
-      Flux Festival are co-curating the physical exhibition to highlight artists and filmmakers pioneering creative uses
-      of Ai and innovations in media art and film.
-       Flux Festival culminates with live audio-visual performances by New York based @kevinpeterhe and @jakeoleson and
-      the esteemed @nosajthing.
+
       */
 
 /*

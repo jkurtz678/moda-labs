@@ -43,7 +43,7 @@ const router = useRouter();
   overflow: hidden;
 }
 .text-wrapper {
-  padding: 0px 40px 20px 40px
+  padding: 0px 25px 20px 25px
 }
 
 .el-card .overlay {

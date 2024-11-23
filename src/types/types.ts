@@ -365,3 +365,12 @@ export async function getTokenMetaAnimationURL(token_meta: FirestoreDocument<Tok
     // Return placeholder image as a last resort
     return new URL(`../assets/logo.png`, import.meta.url).href;
 }
+
+// SalesInquiry represents an inquiry about the sale of a token meta
+export interface SalesInquiry extends BaseDocument {
+    token_meta_id: string; // ID of the token meta the inquiry is associated with
+    phone_number: string; // contact phone number of the inquirer
+    email: string; // contact email of the inquirer
+    name: string; // name of the inquirer
+    message: string; // message from the inquirer
+}

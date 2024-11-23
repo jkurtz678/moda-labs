@@ -1,9 +1,11 @@
 <template>
     <div>
-        <div style="padding: 20px 0px; display: flex; gap: 10px; width: 100%;">
-            <el-button color="#000000" size="large" @click="tipArtist" style="flex-grow: 1; font-size: 18px;" round>Tip
+        <div class="button-container">
+            <el-button class="action-button" color="#000000" size="large" @click="tipArtist" round>Tip
                 Artist</el-button>
-                <el-button v-if="token_meta.entity.public_link" color="#000000" size="large" @click="openArtistLink" style="flex-grow: 1; font-size: 18px;" round>Learn More</el-button>
+                <el-button class="action-button" color="#000000" size="large" round @click="router.push({name: 'sales-inquiry'})">Purchase Inquiry</el-button>
+                <el-button class="action-button" color="#000000" size="large" round @click="router.push({name: 'catalog-gallery-list'})">View Catalog</el-button>
+                <el-button class="action-button" v-if="token_meta.entity.public_link" color="#000000" size="large" @click="openArtistLink"  round>Learn More</el-button>
             
         </div>
         <div style="padding: 12px 0px; ">
@@ -62,3 +64,17 @@ const tipArtist = () => {
 //     window.open('https://account.venmo.com/pay?recipients=ModaArt&note=Tip%20for%20%3Cartist-name%3E', "_blank");
 // }
 </script>
+<style>
+.action-button {
+  flex-grow: 1; 
+  font-size: 18px;
+  margin-left: 0px !important;
+}
+.button-container {
+    padding: 20px 0px; 
+    display: flex; 
+    gap: 10px; 
+    width: 100%;
+    flex-wrap: wrap;
+}
+</style>

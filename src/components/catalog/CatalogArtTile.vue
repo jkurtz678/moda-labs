@@ -6,7 +6,7 @@
                 <img v-if="isIntersecting" :src="thumbnail_url" />
             </div>
             <h2 style="font-weight: bold; overflow-wrap: break-word;">{{ props.token_meta.entity.name }}</h2>
-            <div>{{ priceDisplay(props.token_meta) }}</div>
+            <div style="min-height: 24px;">{{ priceDisplay(props.token_meta) }}</div>
         </div>
     </div>
 </template>
@@ -14,7 +14,7 @@
 <script lang="ts" setup>
 import { useTileAnimation } from '@/composables/thumbnail-image';
 import { FirestoreDocument, priceDisplay, TokenMeta } from '@/types/types';
-import { toRef, ref, onMounted } from 'vue';
+import { toRef, ref, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useLazyLoad } from '@/composables/lazy-load';
 
@@ -26,12 +26,19 @@ interface ArtPreviewHeaderProps {
 const props = defineProps<ArtPreviewHeaderProps>();
 const thumbnail_url = useTileAnimation(toRef(props, "token_meta"));
 
-const { isIntersecting, observe } = useLazyLoad("600px");
+const { isIntersecting, observe } = useLazyLoad('200% 0px');
 const tile = ref<HTMLElement | null>(null);
 
 onMounted(() => {
     if (tile.value) {
         observe(tile.value);
+    } else {
+        // If ref isn't ready on mount, watch for changes
+        watch(tile, (newRef) => {
+            if (newRef) {
+                observe(newRef);
+            }
+        }, { immediate: true });
     }
 });
 </script>
@@ -45,7 +52,7 @@ img {
     border-radius: 18px;
     max-width: 100%;
     min-width: 140px;
-    max-height: 400px; 
+    max-height: 400px;
     margin: auto auto 0 0;
     transition-property: box-shadow, height;
     transition-duration: 0.5s, 0.3s;
@@ -53,7 +60,7 @@ img {
 }
 
 img:hover {
-  box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.7);
+    box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.7);
 }
 
 .tile-container {

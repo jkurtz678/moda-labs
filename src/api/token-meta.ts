@@ -113,12 +113,22 @@ export const getTokenMetaListByIDList = async (token_meta_id_list: string[]): Pr
     if (token_meta_id_list.length == 0) {
         return [];
     }
-    const q = query(token_meta_ref, where(documentId(), "in", token_meta_id_list));
-    const query_snapshot = await getDocs(q);
+
+    const chunkSize = 30;
+    const chunks = [];
+    for (let i = 0; i < token_meta_id_list.length; i += chunkSize) {
+        chunks.push(token_meta_id_list.slice(i, i + chunkSize));
+    }
+
     const metas: FirestoreDocument<TokenMeta>[] = [];
-    query_snapshot.forEach((doc) => {
-        metas.push({ id: doc.id, entity: doc.data() as TokenMeta })
-    })
+    for (const chunk of chunks) {
+        const q = query(token_meta_ref, where(documentId(), "in", chunk));
+        const query_snapshot = await getDocs(q);
+        query_snapshot.forEach((doc) => {
+            metas.push({ id: doc.id, entity: doc.data() as TokenMeta });
+        });
+    }
+
     const filtered_metas = metas.filter((token_meta) => !token_meta.entity.deleted);
     return filtered_metas;
 }

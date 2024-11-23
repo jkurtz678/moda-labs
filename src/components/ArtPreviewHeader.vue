@@ -3,7 +3,7 @@
     <h3 style="font-weight: bold;">{{ token_meta?.entity?.artist }}</h3>
     <!-- <el-link type="primary" style="margin: 12px 0px;" target="_blank"
         :href="token_meta?.entity?.public_link">View</el-link> -->
-    <img :src="thumbnail_url" style="max-width: 100%; max-height: 200px; padding: 8px 0px;"/>
+    <img :src="thumbnail_url" style="max-width: 100%; max-height: 250px; padding: 8px 0px;"/>
     <template v-if="route.name?.toString() != 'bid'">
         <div style="display: flex; align-items: center;">
             <h2 v-if="token_meta.entity.permission_to_sell" style="font-weight: bold;">{{price}}</h2>
@@ -18,7 +18,7 @@
 <script setup lang="ts">
 import { FirestoreDocument, PriceUnit, TokenMeta } from '@/types/types';
 import TruncatedDescription from '@/components/TruncatedDescription.vue';
-import { useMediumThumbnail } from '@/composables/thumbnail-image';
+import { useTileAnimation } from '@/composables/thumbnail-image';
 import { computed, toRef } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 const route = useRoute();
@@ -29,7 +29,7 @@ interface ArtPreviewHeaderProps {
     
 }
 const props = defineProps<ArtPreviewHeaderProps>();
-const thumbnail_url = useMediumThumbnail(toRef(props, "token_meta"));
+const thumbnail_url = useTileAnimation(toRef(props, "token_meta"));
 
 const price = computed(() => {
     switch (props.token_meta?.entity?.price_unit) {
