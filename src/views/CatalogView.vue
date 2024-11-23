@@ -1,5 +1,5 @@
 <template>
-    <div style="overflow-y: auto; height: 100%">
+    <div class="wrapper" style="overflow-y: auto; height: 100%">
         <CatalogHeader></CatalogHeader>
         <div class="container">
             <router-view></router-view>
@@ -23,5 +23,16 @@ import CatalogHeader from '@/components/catalog/CatalogHeader.vue';
     max-width: 1250px;
     padding: 80px 20px 20px 20px;
     margin: 0 auto;
+}
+.wrapper {
+  font-family: "K2D", sans-serif;
+  font-size: 15px;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::v-deep .el-button {
+    font-family: "K2D", sans-serif;
 }
 </style>

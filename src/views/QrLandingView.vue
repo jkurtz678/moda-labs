@@ -77,9 +77,13 @@ const fetchTokenMeta = async (token_meta_id: string) => {
     max-width: 500px;
     margin: 0 auto;
     padding: 16px 20px;
-    font-family: Arial, Helvetica, sans-serif;
     overflow-y: auto;
     height: 100%;
+    font-family: "K2D", sans-serif;
+    font-size: 15px;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 .fade-enter-active,
@@ -96,4 +100,9 @@ const fetchTokenMeta = async (token_meta_id: string) => {
 .fade-leave-from {
     opacity: 1;
 }
+
+::v-deep .el-button {
+    font-family: "K2D", sans-serif;
+}
+
 </style>
