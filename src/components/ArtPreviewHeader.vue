@@ -31,7 +31,6 @@ const router = useRouter();
 
 interface ArtPreviewHeaderProps {
     token_meta: FirestoreDocument<TokenMeta>;
-
 }
 const props = defineProps<ArtPreviewHeaderProps>();
 const thumbnail_url = useTileAnimation(toRef(props, "token_meta"));
