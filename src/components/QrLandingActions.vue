@@ -1,14 +1,21 @@
 <template>
-    <div>
+    <div style="padding-bottom: 80px;">
         <div class="button-container">
-            <el-button class="action-button" color="#000000" size="large" @click="tipArtist" round>Tip
-                Artist</el-button>
-                <el-button class="action-button" color="#000000" size="large" round @click="router.push({name: 'sales-inquiry'})">Purchase Inquiry</el-button>
-                <el-button class="action-button" color="#000000" size="large" round @click="router.push({name: 'catalog-gallery-list'})">View Catalog</el-button>
-                <el-button class="action-button" v-if="token_meta.entity.public_link" color="#000000" size="large" @click="openArtistLink"  round>Learn More</el-button>
-            
+            <div class="row">
+                <el-button class="action-button" color="#000000" size="large" @click="tipArtist" round>Tip
+                    Artist</el-button>
+                <el-button class="action-button" color="#000000" size="large" round
+                    @click="router.push({ name: 'sales-inquiry' })">Purchase Art</el-button>
+            </div>
+            <div class="row">
+                <el-button class="action-button" color="#000000" size="large" round
+                    @click="router.push({ name: 'catalog-gallery-list' })">View Catalog</el-button>
+                <el-button class="action-button" v-if="token_meta.entity.public_link" color="#000000" size="large"
+                    @click="openArtistLink" round>Artwork Details</el-button>
+            </div>
+
         </div>
-        <div style="padding: 12px 0px; ">
+        <div style="padding: 12px 0px;">
             <div style="font-size: var(--el-font-size-extra-small);">Powered By</div>
             <div style="display: flex; gap: 10px; width: 100%;">
                 <el-button @click="goToModaPlaque" style="flex-grow: 1;">Moda Plaque</el-button>
@@ -21,7 +28,7 @@
 
 <script setup lang="ts">
 import { FirestoreDocument, TokenMeta } from '@/types/types';
-import { useRouter, useRoute} from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 
 const router = useRouter();
 const route = useRoute();
@@ -66,15 +73,19 @@ const tipArtist = () => {
 </script>
 <style>
 .action-button {
-  flex-grow: 1; 
-  font-size: 18px;
-  margin-left: 0px !important;
+    flex-grow: 1;
+    font-size: 18px;
+    margin-left: 0px !important;
+    flex: 1;
+    margin: 0 10px
 }
+
+.row {
+    display: flex;
+    padding: 10px 0px;
+}
+
 .button-container {
-    padding: 20px 0px; 
-    display: flex; 
-    gap: 10px; 
-    width: 100%;
-    flex-wrap: wrap;
+    padding: 20px 0px;
 }
 </style>

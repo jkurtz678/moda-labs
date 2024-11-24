@@ -13,11 +13,11 @@
                 <el-form-item label="Phone" prop="phone_number">
                     <el-input v-model.trim="form.phone_number"></el-input>
                 </el-form-item>
-                <el-form-item label="Message" prop="message" style="max-width: 350px">
+                <el-form-item label="Message" prop="message">
                     <el-input v-model="form.message" type="textarea">
                     </el-input>
                 </el-form-item>
-                <div style="display: flex;">
+                <div style="display: flex; padding-bottom: 80px;">
                     <el-button :loading="submit_loading" @click="submit(formRef)" class="submit-button" color="#000000"
                         round style="flex-grow: 1">
                         SUBMIT

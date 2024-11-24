@@ -43,7 +43,7 @@ const router = useRouter();
   overflow: hidden;
 }
 .text-wrapper {
-  padding: 0px 25px 20px 25px
+  padding: 0px 40px 20px 40px
 }
 
 .el-card .overlay {
@@ -72,4 +72,17 @@ h1 {
   font-size: 2.8em;
   padding: 24px 0px 24px 0px;
 }
+@media (max-width: 600px) {
+  h1 {
+    font-size: 1.8em;
+  }
+  h2 {
+    font-size: 1.2em;
+  }
+  .text-wrapper {
+    padding: 0px 15px 20px 15px; 
+ 
+  }
+}
+
 </style>
