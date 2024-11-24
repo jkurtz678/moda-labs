@@ -3,7 +3,7 @@
         @click="router.push({ name: 'actions', params: { token_meta_id: props.token_meta.id } })">
         <div style="display: flex; flex-direction: column; height: 100%;" ref="tile">
             <div style="display: flex; border-radius: 18px; flex-grow: 1;" :style="`height: ${tile_height}px !important; width: ${tile_width}px !important `">
-                <img v-if="isIntersecting" :src="thumbnail_url" />
+                <img v-if="isIntersecting" :src="thumbnail_url" :style="`max-height: ${tile_height}px !important;`"/>
             </div>
             <h2 style="font-weight: bold; overflow-wrap: break-word;">{{ props.token_meta.entity.name }}</h2>
             <div style="min-height: 24px;">{{ priceDisplay(props.token_meta) }}</div>
