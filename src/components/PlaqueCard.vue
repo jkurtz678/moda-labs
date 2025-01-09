@@ -89,8 +89,13 @@
           <div>Public IP: {{ plaque.entity.machine_data?.public_ip ?? "N/A" }}</div>
           <div>Updated At: {{ machine_data_updated_at }}</div>
           <div>Free Space: {{ plaque.entity.free_space ? mediaSizeDisplay(plaque.entity.free_space) : "N/A" }}</div>
+          <div style="margin-top: .5em">
+            <el-button type="danger" plain @click="restartAppCommand" :loading="restart_app_loading">Restart
+              App</el-button>
+            <el-button type="danger" plain @click="restartMachineCommand" :loading="restart_machine_loading">Restart
+              Machine</el-button>
+          </div>
         </div>
-
         <div v-if="account_store.is_user_admin" style="margin-bottom: 1em">
           <div class="caption">Admin only commands</div>
           <div style="margin-bottom: 1em">
@@ -101,12 +106,6 @@
           <div style="margin-bottom: 1em">
             <el-button plain @click="extendDisplayCommand" :loading="extend_display_loading">Extend Display</el-button>
             <el-button plain @click="mirrorDisplayCommand" :loading="mirror_display_loading">Mirror Display</el-button>
-          </div>
-          <div style="margin-bottom: 1em">
-            <el-button type="danger" plain @click="restartAppCommand" :loading="restart_app_loading">Restart
-              App</el-button>
-            <el-button type="danger" plain @click="restartMachineCommand" :loading="restart_machine_loading">Restart
-              Machine</el-button>
           </div>
           <div style="margin-bottom: 1em">
             <el-button type="danger" plain @click="clearMediaFilesCommand" :loading="clear_media_files_loading">
