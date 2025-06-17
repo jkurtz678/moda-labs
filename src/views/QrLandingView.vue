@@ -1,8 +1,8 @@
 <template>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <div class="container">
+    <div :class="{ container: !isIframePage, 'iframe-page': isIframePage }">
         <template v-if="token_meta">
-            <ArtPreviewHeader :token_meta="token_meta"></ArtPreviewHeader>
+            <ArtPreviewHeader v-if="!isIframePage" :token_meta="token_meta"></ArtPreviewHeader>
             <transition name="fade" mode="out-in">
                 <RouterView v-slot="{ Component }">
                     <component :is="Component" :token_meta="token_meta" />
@@ -22,12 +22,18 @@ import { getBidListByTokenMetaIDWithListener, createBid } from "@/api/bid";
 import { getTokenMetaByIDWithListener } from "@/api/token-meta";
 import { ElLoading } from 'element-plus'
 import { ElMessage } from 'element-plus'
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 const route = useRoute();
+const router = useRouter();
 
 const token_meta = ref<FirestoreDocument<TokenMeta>>();
 
 const global_loading = ref(); // should not have an initial value or type because of the way ElLoading.service works
+
+// Check if current route is the iframe page
+const isIframePage = computed(() => {
+    return route.name === 'iframe';
+});
 
 // call bid list on mount
 onMounted(async () => {
@@ -84,6 +90,13 @@ const fetchTokenMeta = async (token_meta_id: string) => {
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+
+.iframe-page {
+    height: 100vh;
+    width: 100vw;
+    margin: 0;
+    padding: 0;
 }
 
 .fade-enter-active,

@@ -151,6 +151,11 @@ const router = createRouter({
           name: "sales-inquiry",
           component: () => import('@/components/QrLandingSalesInquiry.vue')
         },
+        {
+          path: "iframe",
+          name: "iframe",
+          component: () => import('@/components/IframeView.vue')
+        },
       ]
     },
     {

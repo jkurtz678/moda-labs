@@ -5,7 +5,7 @@
                 <el-button class="action-button" color="#000000" size="large" @click="tipArtist" round>Tip
                     Artist</el-button>
                 <el-button class="action-button" color="#000000" size="large" round
-                    @click="router.push({ name: 'sales-inquiry' })">Purchase Art</el-button>
+                    @click="handlePurchaseArt">Purchase Art</el-button>
             </div>
             <div class="row">
                 <el-button class="action-button" color="#000000" size="large" round
@@ -47,6 +47,15 @@ const goToProjectBlank = () => {
 }
 const openArtistLink = () => {
     window.open(props.token_meta?.entity?.public_link, "_blank");
+}
+
+const handlePurchaseArt = () => {
+    // Check if token has iframe_purchase_url, if so route to iframe, otherwise route to sales-inquiry
+    if (props.token_meta?.entity?.iframe_purchase_url) {
+        router.push({ name: 'iframe' });
+    } else {
+        router.push({ name: 'sales-inquiry' });
+    }
 }
 
 const tipArtist = () => {

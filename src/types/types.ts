@@ -118,6 +118,7 @@ export interface TokenMeta extends BaseDocument {
     permission_to_sell?: boolean;
     price?: number;
     price_unit?: PriceUnit;
+    iframe_purchase_url?: string; // url to iframe for purchasing the token, if it is for sale
 }
 
 export enum Blockchain {
