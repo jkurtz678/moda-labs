@@ -22,7 +22,7 @@ const max_description_length = 150;
 
 const optionally_truncated_description = computed(() => {
     if (!props.description) {
-        return "No artwork description";
+        return "";
     }
 
     if (show_full_description.value || props.description.length < max_description_length) {
