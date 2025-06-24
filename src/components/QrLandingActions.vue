@@ -1,5 +1,5 @@
 <template>
-    <div style="padding-bottom: 80px;">
+    <div style="padding-bottom: 80px; padding-top: 8px;">
         <div class="button-container">
             <div class="row">
                 <el-button class="action-button" color="#000000" size="large" @click="tipArtist" round>Tip

@@ -18,7 +18,7 @@ interface TruncatedDescriptionProps {
 const props = defineProps<TruncatedDescriptionProps>();
 
 const show_full_description = ref(false);
-const max_description_length = 150;
+const max_description_length = 180;
 
 const optionally_truncated_description = computed(() => {
     if (!props.description) {

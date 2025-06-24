@@ -1,4 +1,7 @@
 <template>
+    <div style="display:flex; justify-content: center; margin-bottom: 8px;">
+        <img :src="thumbnail_url" style="max-width: 100%; max-height: 250px; padding: 8px 0px;" />
+    </div>
     <h1 style="font-weight: bold;">{{ token_meta?.entity?.name }}</h1>
     <el-button v-if="token_meta.entity.artist_social_link" link size="large" style="font-weight: bold; display:block; font-size: 1.1em"
         type="primary" @click="openArtistSocial">
@@ -8,7 +11,6 @@
     <h3 v-else style="font-weight: bold;">{{ token_meta?.entity?.artist }}</h3>
     <!-- <el-link type="primary" style="margin: 12px 0px;" target="_blank"
         :href="token_meta?.entity?.public_link">View</el-link> -->
-    <img :src="thumbnail_url" style="max-width: 100%; max-height: 250px; padding: 8px 0px;" />
     <template v-if="route.name?.toString() != 'bid'">
         <div style="display: flex; align-items: center;">
             <h2 v-if="token_meta.entity.permission_to_sell" style="font-weight: bold;">{{ price }}</h2>

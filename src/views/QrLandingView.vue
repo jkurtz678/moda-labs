@@ -1,14 +1,18 @@
 <template>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <div :class="{ container: !isIframePage, 'iframe-page': isIframePage }">
-        <template v-if="token_meta">
-            <ArtPreviewHeader v-if="!isIframePage" :token_meta="token_meta"></ArtPreviewHeader>
-            <transition name="fade" mode="out-in">
-                <RouterView v-slot="{ Component }">
-                    <component :is="Component" :token_meta="token_meta" />
-                </RouterView>
-            </transition>
-        </template>
+        <transition name="slide-in" appear>
+            <template v-if="token_meta">
+                <div class="content-wrapper">
+                    <ArtPreviewHeader v-if="!isIframePage" :token_meta="token_meta"></ArtPreviewHeader>
+                    <transition name="fade" mode="out-in">
+                        <RouterView v-slot="{ Component }">
+                            <component :is="Component" :token_meta="token_meta" />
+                        </RouterView>
+                    </transition>
+                </div>
+            </template>
+        </transition>
     </div>
 </template>
 
@@ -112,6 +116,24 @@ const fetchTokenMeta = async (token_meta_id: string) => {
 .fade-enter-to,
 .fade-leave-from {
     opacity: 1;
+}
+
+.slide-in-enter-active {
+    transition: all 0.6s ease-out;
+}
+
+.slide-in-enter-from {
+    transform: translateY(30px);
+    opacity: 0;
+}
+
+.slide-in-enter-to {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.content-wrapper {
+    width: 100%;
 }
 
 ::v-deep .el-button {
