@@ -331,7 +331,16 @@ export function getTokenMetaFileName(token_meta: FirestoreDocument<TokenMeta>): 
 export async function getTokenMetaAnimationURL(token_meta: FirestoreDocument<TokenMeta>): Promise<string> {
     const storage = getStorage();
 
-    // First check if tile image exists in Firebase Storage
+    // First check if user uploaded webp exists in Firebase Storage
+     const user_upload_path_ref = ref(storage, `user-upload/user-upload_${token_meta.entity.media_id}.webp`);
+    try {
+        const url = await getDownloadURL(user_upload_path_ref);
+        return url;
+    } catch (err) {
+        console.log(`getTokenMetaMediumImageURL - failed to find tile image ${token_meta.entity.name}`, err);
+    }
+
+    // next best is tile image
     const tile_path_ref = ref(storage, `tile/tile_${token_meta.entity.media_id}.webp`);
     try {
         const url = await getDownloadURL(tile_path_ref);
